@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-node@v3
       - working-directory: backend
         run: |
-          npm ci
-          npm run lint-fix
+          pnpm install --frozen-lockfile
+          pnpm run lint-fix
   frontend:
     name: Frontend check
     runs-on: ubuntu-latest
@@ -25,5 +25,5 @@ jobs:
       - uses: actions/setup-node@v3
       - working-directory: frontend
         run: |
-          npm ci
-          npm run lint-fix
+          pnpm install --frozen-lockfile
+          pnpm run lint-fix
