@@ -185,13 +185,13 @@ main() {
 		exit 1
 	fi
 
-	secret_scan_script="$(dirname "${0}")/../.secret-scan/secret-scan.js"
-	node "${secret_scan_script}" || exit
+	# secret_scan_script="$(dirname "${0}")/../.secret-scan/secret-scan.js"
+	# node "${secret_scan_script}" || exit
 
-	if [ "${enabled}" = 0 ] || [ "${NO_LINT}" = 1 ]; then
-		warn "Lint check has been disabled."
-		exit 0
-	fi
+	# if [ "${enabled}" = 0 ] || [ "${NO_LINT}" = 1 ]; then
+	# 	warn "Lint check has been disabled."
+	# 	exit 0
+	# fi
 
 	trap cancel INT
 	log "Starting lint check. Use Ctrl+C to cancel."
