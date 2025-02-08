@@ -8,7 +8,9 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "lint-check": "eslint . && prettier --check .",
-    "lint-fix": "eslint . --fix && prettier --write ."
+    "lint-fix": "eslint . --fix && prettier --write .",
+    "prepare": "cd .. && husky",
+    "check-git-hooks": "cd .. && node .secret-scan/secret-scan.js -- --check-git-hooks"
   },
   "keywords": [],
   "author": "",
