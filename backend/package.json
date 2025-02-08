@@ -7,10 +7,8 @@
     "build": "pnpm run check-git-hooks && npx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "lint-check": "pnpm run check-git-hooks && eslint . && prettier --check .",
-    "lint-fix": "pnpm run check-git-hooks && eslint . --fix && prettier --write .",
-    "prepare": "cd .. && husky",
-    "check-git-hooks": "cd .. && node .secret-scan/secret-scan.js -- --check-git-hooks"
+    "lint-check": "eslint . && prettier --check .",
+    "lint-fix": "eslint . --fix && prettier --write ."
   },
   "keywords": [],
   "author": "",
