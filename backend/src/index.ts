@@ -1,15 +1,28 @@
-import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import cron from "node-cron";
+
+import scrape from "./scrape";
+import logger from "./logger";
 
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+const schedulJobs = () => {
+  logger.debug("Scheduling scraping jobs");
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Server");
-});
+  // Schedule the job to run every hour (adjust as needed)
+  cron.schedule(
+    "* * * * *",
+    async () => {
+      logger.debug("Running scraping task...");
+      await scrape();
+    },
+    {
+      scheduled: true,
+      timezone: "America/Los_Angeles",
+    },
+  );
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+  logger.debug("Scraping jobs scheduled");
+};
+
+schedulJobs();
