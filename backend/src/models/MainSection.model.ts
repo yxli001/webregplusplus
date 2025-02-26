@@ -1,4 +1,4 @@
-import { MainSectionTypes } from "@/types";
+import { MainSectionType } from "@/types";
 import { Optional } from "sequelize";
 import {
   Table,
@@ -59,7 +59,7 @@ class MainSection extends Model<
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  type: MainSectionTypes;
+  type: MainSectionType;
 
   @AllowNull(false)
   @Column(DataType.STRING)

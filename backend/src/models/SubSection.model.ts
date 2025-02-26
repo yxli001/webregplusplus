@@ -1,4 +1,4 @@
-import { SubSectionTypes } from "@/types";
+import { SubSectionType } from "@/types";
 import { Optional } from "sequelize";
 import {
   Table,
@@ -47,7 +47,7 @@ class SubSection extends Model<
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  type: SubSectionTypes;
+  type: SubSectionType;
 
   @AllowNull(false)
   @Column(DataType.INTEGER)

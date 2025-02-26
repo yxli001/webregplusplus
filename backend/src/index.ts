@@ -26,8 +26,7 @@ const schedulJobs = () => {
   logger.info("Scraping jobs scheduled");
 };
 
-// scrapeSchedule();
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const startServer = async () => {
   try {
     // Connect to Postgres
@@ -62,4 +61,5 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// startServer();
+scrapeSchedule();
