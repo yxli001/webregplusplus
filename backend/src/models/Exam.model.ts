@@ -1,4 +1,3 @@
-import { SubSectionType } from "@/types";
 import { Optional } from "sequelize";
 import {
   Table,
@@ -14,14 +13,13 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import MainSection from "./MainSection.model";
+import { ExamType } from "@/types";
 
 // All attributes
-type SubSectionAttributes = {
+type ExamAttributes = {
   id: string;
-  type: SubSectionType;
-  section: number;
-  instructor: string;
-  days: string;
+  type: ExamType;
+  date: Date;
   startTime: string;
   endTime: string;
   location: string;
@@ -31,23 +29,20 @@ type SubSectionAttributes = {
 };
 
 // Define the creation attributes of the School model
-type SubSectionCreationAttributes = Optional<SubSectionAttributes, "id">;
+type ExamCreationAttributes = Optional<ExamAttributes, "id">;
 
 /**
- * The SubSection model represents a sub section in the database.
+ * The Exam model represents an exam in the database.
  *
- * @class SubSection
+ * @class Exam
  * @extends Model
  *
  * @see {@link MainSection}
  */
 @Table({
-  tableName: "sub_section",
+  tableName: "exam",
 })
-class SubSection extends Model<
-  SubSectionAttributes,
-  SubSectionCreationAttributes
-> {
+class Exam extends Model<ExamAttributes, ExamCreationAttributes> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -55,19 +50,11 @@ class SubSection extends Model<
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  type: SubSectionType;
+  type: ExamType;
 
   @AllowNull(false)
-  @Column(DataType.INTEGER)
-  section: number;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
-  instructor: string;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
-  days: string;
+  @Column(DataType.DATE)
+  date: Date;
 
   @AllowNull(false)
   @Column({ type: DataType.TIME, field: "start_time" })
@@ -99,4 +86,4 @@ class SubSection extends Model<
   mainSection: MainSection;
 }
 
-export default SubSection;
+export default Exam;

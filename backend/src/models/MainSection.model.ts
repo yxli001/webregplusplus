@@ -21,8 +21,16 @@ import SubSection from "./SubSection.model";
 // All attributes
 type MainSectionAttributes = {
   id: string;
-  subject: string;
-  code: string;
+  type: MainSectionType;
+  letter: string;
+  instructor: string;
+  days: string;
+  startTime: Date;
+  endTime: Date;
+  location: string;
+  courseId: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 // Define the creation attributes of the School model
@@ -75,11 +83,11 @@ class MainSection extends Model<
 
   @AllowNull(false)
   @Column({ type: DataType.TIME, field: "start_time" })
-  startTime: Date;
+  startTime: string;
 
   @AllowNull(false)
   @Column({ type: DataType.TIME, field: "end_time" })
-  endTime: Date;
+  endTime: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
