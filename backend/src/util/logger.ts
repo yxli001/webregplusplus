@@ -19,7 +19,7 @@ const logger = createLogger({
       maxSize: "10m",
       maxFiles: "14d",
       zippedArchive: true,
-      level: "info", // Only store info-level logs and above in files
+      level: "debug", // Only store info-level logs and above in files
     }),
   ],
 });

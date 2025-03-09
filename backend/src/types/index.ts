@@ -1,6 +1,8 @@
 export enum MainSectionType {
   LE = "LE",
   SE = "SE",
+  LA = "LA",
+  ST = "ST",
 }
 
 export enum SubSectionType {
@@ -28,13 +30,24 @@ export type MainSection = {
   endTime: string;
   instructor: string;
   sections: SubSection[];
+  location: string;
+  exams: Exam[];
 };
 
 export type SubSection = {
   type: SubSectionType;
-  section: number;
+  section: string;
   days: string;
   startTime: string;
   endTime: string;
   isRequired: boolean;
+  location: string;
+};
+
+export type Exam = {
+  type: ExamType;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
 };

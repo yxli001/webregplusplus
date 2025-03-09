@@ -19,7 +19,7 @@ import MainSection from "./MainSection.model";
 type SubSectionAttributes = {
   id: string;
   type: SubSectionType;
-  section: number;
+  section: string;
   instructor: string;
   days: string;
   startTime: string;
@@ -58,8 +58,8 @@ class SubSection extends Model<
   type: SubSectionType;
 
   @AllowNull(false)
-  @Column(DataType.INTEGER)
-  section: number;
+  @Column(DataType.STRING)
+  section: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
