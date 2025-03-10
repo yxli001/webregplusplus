@@ -12,11 +12,11 @@ import SubSection from "./models/SubSection.model";
 import Exam from "./models/Exam.model";
 
 const updateSchedules = async () => {
-  logger.info("Dropping old schedules...");
-  await Course.drop({ cascade: true });
-  await MainSection.drop({ cascade: true });
-  await SubSection.drop({ cascade: true });
-  await Exam.drop({ cascade: true });
+  // logger.info("Dropping old schedules...");
+  // await Course.drop({ cascade: true });
+  // await MainSection.drop({ cascade: true });
+  // await SubSection.drop({ cascade: true });
+  // await Exam.drop({ cascade: true });
 
   logger.info("Updating schedules...");
 
@@ -70,7 +70,7 @@ const updateSchedules = async () => {
 
 // Schedules scraping job to run every minute
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const schedulJobs = () => {
+const scheduleJobs = () => {
   logger.info("Scheduling scraping jobs");
 
   cron.schedule(
