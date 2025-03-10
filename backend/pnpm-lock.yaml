@@ -19,6 +19,12 @@ importers:
       express:
         specifier: ^4.21.2
         version: 4.21.2
+      express-async-handler:
+        specifier: ^1.2.0
+        version: 1.2.0
+      express-validator:
+        specifier: ^7.2.1
+        version: 7.2.1
       http-errors:
         specifier: ^2.0.0
         version: 2.0.0
@@ -1452,6 +1458,19 @@ packages:
         integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==,
       }
     engines: { node: ">= 0.6" }
+
+  express-async-handler@1.2.0:
+    resolution:
+      {
+        integrity: sha512-rCSVtPXRmQSW8rmik/AIb2P0op6l7r1fMW538yyvTMltCO4xQEWMmobfrIxN2V1/mVrgxB8Az3reYF6yUZw37w==,
+      }
+
+  express-validator@7.2.1:
+    resolution:
+      {
+        integrity: sha512-CjNE6aakfpuwGaHQZ3m8ltCG2Qvivd7RHtVMS/6nVxOM7xVGqr4bhflsm4+N5FP5zI7Zxp+Hae+9RE+o8e3ZOQ==,
+      }
+    engines: { node: ">= 8.0.0" }
 
   express@4.21.2:
     resolution:
@@ -4615,6 +4634,13 @@ snapshots:
   esutils@2.0.3: {}
 
   etag@1.8.1: {}
+
+  express-async-handler@1.2.0: {}
+
+  express-validator@7.2.1:
+    dependencies:
+      lodash: 4.17.21
+      validator: 13.12.0
 
   express@4.21.2:
     dependencies:

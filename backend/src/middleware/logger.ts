@@ -5,6 +5,8 @@ import path from "path";
 const fsPromises = fs.promises;
 
 export const logEvents = async (message: string, logFileName: string) => {
+  console.log(message);
+
   const dateTime = new Date();
   const logItem = `${dateTime}\t${message}\n`;
 
@@ -25,6 +27,5 @@ export const logEvents = async (message: string, logFileName: string) => {
 
 export const logger: RequestHandler = (req, res, next) => {
   logEvents(`${req.method}\t${req.url}\t${req.headers.origin}`, "reqLog.log");
-  console.log(`${req.method} ${req.path}`);
   next();
 };
