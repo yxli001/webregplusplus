@@ -10,6 +10,41 @@ import Course from "./models/Course.model";
 import MainSection from "./models/MainSection.model";
 import SubSection from "./models/SubSection.model";
 import Exam from "./models/Exam.model";
+import app from "./app";
+
+const connectDB = async () => {
+  try {
+    // Connect to Postgres
+    const sequelize = new Sequelize({
+      models: [__dirname + "/models/*.model.ts"],
+      dialect: "postgres",
+      host: env.POSTGRES_HOST,
+      port: parseInt(env.POSTGRES_PORT),
+      database: env.POSTGRES_DB,
+      username: env.POSTGRES_USER,
+      password: env.POSTGRES_PASSWORD,
+      ssl: true,
+      // dialectOptions: {
+      //   ssl: {
+      //     require: true,
+      //     rejectUnauthorized: false,
+      //     ca: fs.readFileSync(join(__dirname, "..", "ca.pem")).toString(),
+      //   },
+      // },
+    });
+
+    // Test DB Connection
+    await sequelize.authenticate();
+
+    // Sync models with database
+    await sequelize.sync({ alter: true });
+
+    console.log("Database connection established.");
+  } catch (error) {
+    console.error("Database connection error:", error);
+    process.exit(1); // Exit the process with an error code if initialization fails
+  }
+};
 
 const updateSchedules = async () => {
   // logger.info("Dropping old schedules...");
@@ -71,13 +106,13 @@ const updateSchedules = async () => {
 // Schedules scraping job to run every minute
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scheduleJobs = () => {
-  logger.info("Scheduling scraping jobs");
+  logger.info("Scheduling schedule update job");
 
   cron.schedule(
     "* * * * *",
     async () => {
-      logger.info("Running scraping task...");
-      await scrapeSchedule();
+      logger.info("Starting schedule update job...");
+      await updateSchedules();
     },
     {
       scheduled: true,
@@ -85,44 +120,17 @@ const scheduleJobs = () => {
     },
   );
 
-  logger.info("Scraping jobs scheduled");
+  logger.info("Schedule update job scheduled");
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const connectDB = async () => {
-  try {
-    // Connect to Postgres
-    const sequelize = new Sequelize({
-      models: [__dirname + "/models/*.model.ts"],
-      dialect: "postgres",
-      host: env.POSTGRES_HOST,
-      port: parseInt(env.POSTGRES_PORT),
-      database: env.POSTGRES_DB,
-      username: env.POSTGRES_USER,
-      password: env.POSTGRES_PASSWORD,
-      ssl: true,
-      // dialectOptions: {
-      //   ssl: {
-      //     require: true,
-      //     rejectUnauthorized: false,
-      //     ca: fs.readFileSync(join(__dirname, "..", "ca.pem")).toString(),
-      //   },
-      // },
-    });
+const startServer = async () => {
+  await connectDB();
 
-    // Test DB Connection
-    await sequelize.authenticate();
+  // scheduleJobs();
 
-    // Sync models with database
-    await sequelize.sync({ alter: true });
-
-    console.log("Database connection established.");
-  } catch (error) {
-    console.error("Database connection error:", error);
-    process.exit(1); // Exit the process with an error code if initialization fails
-  }
+  app.listen(env.PORT, () => {
+    logger.info(`Server listening on port ${env.PORT}`);
+  });
 };
 
-connectDB();
-updateSchedules();
-// startServer();
+startServer();
