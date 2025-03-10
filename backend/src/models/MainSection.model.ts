@@ -17,6 +17,7 @@ import {
 } from "sequelize-typescript";
 import Course from "./Course.model";
 import SubSection from "./SubSection.model";
+import Exam from "./Exam.model";
 
 // All attributes
 type MainSectionAttributes = {
@@ -110,6 +111,9 @@ class MainSection extends Model<
 
   @HasMany(() => SubSection)
   subSections: SubSection[];
+
+  @HasMany(() => Exam)
+  exams: Exam[];
 }
 
 export default MainSection;

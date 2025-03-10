@@ -1,6 +1,10 @@
 import z from "zod";
 
 const envSchema = z.object({
+  PORT: z.string().optional().default("3000"),
+  FRONTEND_ORIGIN: z.string({
+    message: "Missing FRONTEND_ORIGIN in environment variables",
+  }),
   POSTGRES_HOST: z.string({
     message: "Missing POSTGRES_HOST in environment variables",
   }),
@@ -18,4 +22,6 @@ const envSchema = z.object({
   }),
 });
 
-export default envSchema.parse(process.env);
+const env = envSchema.parse(process.env);
+
+export default env;
