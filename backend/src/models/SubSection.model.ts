@@ -20,14 +20,11 @@ type SubSectionAttributes = {
   id: string;
   type: SubSectionType;
   section: string;
-  instructor: string;
   days: string;
   startTime: string;
   endTime: string;
   location: string;
   mainSectionId: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 // Define the creation attributes of the School model
@@ -63,18 +60,14 @@ class SubSection extends Model<
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  instructor: string;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
   days: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "start_time" })
+  @Column({ type: DataType.STRING, field: "start_time" })
   startTime: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "end_time" })
+  @Column({ type: DataType.STRING, field: "end_time" })
   endTime: string;
 
   @AllowNull(false)

@@ -8,9 +8,8 @@ import {
   SubSectionType,
   ExamType,
 } from "@/types";
-import { coursesToString } from "@/util/courses";
 
-export async function scrapeSchedule(): Promise<void> {
+export async function scrapeSchedule(): Promise<Course[]> {
   const SCHEDULE_OF_CLASSES_URL =
     "https://act.ucsd.edu/scheduleOfClasses/scheduleOfClassesStudent.htm";
 
@@ -257,7 +256,7 @@ export async function scrapeSchedule(): Promise<void> {
                   const [startTime, endTime] = examTime.split("-");
                   const exam = {
                     type: examType as ExamType,
-                    date: examDate,
+                    date: new Date(examDate),
                     startTime,
                     endTime,
                     location: examLocation,
@@ -312,13 +311,16 @@ export async function scrapeSchedule(): Promise<void> {
 
     if (!courses) {
       logger.error("No courses found.");
-      return;
+      return [];
     }
 
     logger.debug(`Found ${courses.length} courses.\n`);
-    logger.debug("\nCourses: \n" + coursesToString(courses));
+
+    return courses;
   } catch (error) {
     logger.error(`Scraping failed: ${(error as Error).stack}`);
+
+    return [];
   } finally {
     if (browser) {
       await browser.close();

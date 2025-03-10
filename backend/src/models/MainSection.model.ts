@@ -25,12 +25,10 @@ type MainSectionAttributes = {
   letter: string;
   instructor: string;
   days: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   location: string;
   courseId: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 // Define the creation attributes of the School model
@@ -82,11 +80,11 @@ class MainSection extends Model<
   days: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "start_time" })
+  @Column({ type: DataType.STRING, field: "start_time" })
   startTime: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "end_time" })
+  @Column({ type: DataType.STRING, field: "end_time" })
   endTime: string;
 
   @AllowNull(false)

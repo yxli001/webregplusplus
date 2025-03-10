@@ -24,8 +24,6 @@ type ExamAttributes = {
   endTime: string;
   location: string;
   mainSectionId: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 // Define the creation attributes of the School model
@@ -53,15 +51,15 @@ class Exam extends Model<ExamAttributes, ExamCreationAttributes> {
   type: ExamType;
 
   @AllowNull(false)
-  @Column(DataType.DATE)
+  @Column(DataType.DATEONLY)
   date: Date;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "start_time" })
+  @Column({ type: DataType.STRING, field: "start_time" })
   startTime: string;
 
   @AllowNull(false)
-  @Column({ type: DataType.TIME, field: "end_time" })
+  @Column({ type: DataType.STRING, field: "end_time" })
   endTime: string;
 
   @AllowNull(false)
