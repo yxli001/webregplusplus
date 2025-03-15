@@ -14,7 +14,7 @@ const logger = createLogger({
   transports: [
     new transports.Console({ level: "debug" }), // Console logs everything from debug and above
     new transports.DailyRotateFile({
-      filename: "logs/scraper-%DATE%.log",
+      filename: "logs/server-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",

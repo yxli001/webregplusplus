@@ -13,6 +13,8 @@ import {
   UpdatedAt,
 } from "sequelize-typescript";
 import MainSection from "./MainSection.model";
+import SubSection from "./SubSection.model";
+import Exam from "./Exam.model";
 
 // All attributes
 type CourseAttributes = {
@@ -32,10 +34,18 @@ type CourseCreationAttributes = Optional<CourseAttributes, "id">;
  *
  */
 @Scopes(() => ({
-  default: {
+  details: {
     include: [
       {
         model: MainSection,
+        include: [
+          {
+            model: SubSection,
+          },
+          {
+            model: Exam,
+          },
+        ],
       },
     ],
   },
