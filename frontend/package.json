@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "next": "15.1.6",
+    "primereact": "^10.9.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { PrimeReactProvider } from "primereact/api";
+
 import "./globals.css";
+import "primereact/resources/themes/lara-light-blue/theme.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +16,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PrimeReactProvider
+          value={{
+            inputStyle: "filled",
+          }}
+        >
+          {children}
+        </PrimeReactProvider>
+      </body>
     </html>
   );
 }
