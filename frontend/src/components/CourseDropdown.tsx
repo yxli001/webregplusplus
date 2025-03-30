@@ -61,7 +61,7 @@ const Option = ({
 }: OptionProps<{ label: string; value: Course }, true>) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { onMouseMove, onMouseOver, ...rest } = props.innerProps;
-  const newProps = Object.assign(props, { innerProps: rest });
+  const newProps = { ...props, innerProps: rest };
 
   const {
     isFocused,
