@@ -94,25 +94,30 @@ const ClearIndicator = ({
 };
 
 interface CourseDropdownProps {
-  maxCourses?: number;
   courses: Course[];
+  selectedCourses: Course[];
+  setSelectedCourses: (courses: Course[]) => void;
+  maxCourses?: number;
   className?: string;
 }
 
 /**
  * Dropdown to select courses
  *
+ * @param props.selectedCourses - State of currently selected courses
+ * @param props.setSelectedCourses - Function to set the selected courses
  * @param props.courses - List of courses to display in the dropdown
  * @param props.maxCourses - Maximum number of courses to select
- * @returns
+ *
+ * @returns CourseDropdown component
  */
 const CourseDropdown = ({
+  selectedCourses,
+  setSelectedCourses,
   courses,
   className,
   maxCourses = 5,
 }: CourseDropdownProps) => {
-  const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
-
   return (
     <EmotionCacheProvider>
       <Select

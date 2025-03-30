@@ -4,8 +4,8 @@
 
 @layer utilities {
   :root {
-    --background: #ffffff;
-    --foreground: #f6f6f6;
+    --background: #f6f6f6;
+    --foreground: #ffffff;
 
     --primary-light: #1992d4;
     --primary-dark: #0b69a3;
@@ -20,7 +20,9 @@
     box-sizing: border-box;
   }
 
-  body {
+  html, body {
+    width: 100vw;
+    height: 100vh;
     color: var(--text-light);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;

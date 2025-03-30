@@ -1,10 +1,3 @@
-import { getCourses } from "@/api/courses";
-import CourseDropdown from "@/components/CourseDropdown";
-
-export default async function Home() {
-  const courses = await getCourses();
-
-  if (!courses.success) return null;
-
-  return <CourseDropdown courses={courses.data} className="w-[50%]" />;
+export default function Home() {
+  return <div>Webreg++</div>;
 }
