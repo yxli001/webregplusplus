@@ -52,6 +52,9 @@ async function fetchRequest(
     method,
     headers: newHeaders,
     body: requestBody,
+    next: {
+      revalidate: 3600, // 1 hour
+    },
   });
 
   return response;

@@ -2,11 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer utilities {
+  :root {
+    --background: #ffffff;
+    --foreground: #f6f6f6;
+
+    --primary-light: #1992d4;
+    --primary-dark: #0b69a3;
+
+    --text-light: #627d98;
+    --text-dark: #334e68;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    color: var(--text-light);
+    background: var(--background);
+    font-family: Inter, Helvetica, sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 1rem;
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: var(--background);
+    width: 1rem;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--text-light);
+    border-radius: 100vh;
+    border: 0.2rem solid var(--background);
+  }
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

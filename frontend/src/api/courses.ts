@@ -1,14 +1,24 @@
 import { Course, CourseJSON } from "@/types/course";
 import { APIResult, get, handleAPIError } from "./requests";
 
-function parseCourse(course: CourseJSON): Course {
+/**
+ * Parses a CourseJSON object into a Course object.
+ * @param course - The CourseJSON object to parse.
+ * @returns The parsed Course object.
+ */
+const parseCourse = (course: CourseJSON): Course => {
   return {
     ...course,
     createdAt: new Date(course.createdAt),
     updatedAt: new Date(course.updatedAt),
   };
-}
+};
 
+/**
+ * Fetches all courses from the API.
+ *
+ * @returns A promise that resolves to an APIResult containing an array of Course objects.
+ */
 const getCourses: () => Promise<APIResult<Course[]>> = async () => {
   try {
     const response = await get("/api/course");

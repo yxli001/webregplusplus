@@ -13,13 +13,17 @@
     "prepare": "cd .. && husky"
   },
   "dependencies": {
-    "next": "15.1.6",
-    "primereact": "^10.9.3",
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "next": "15.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-select": "^5.10.1",
+    "react-window": "^1.8.11"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@svgr/webpack": "^8.1.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

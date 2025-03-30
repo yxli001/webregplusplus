@@ -6,5 +6,5 @@ export default async function Home() {
 
   if (!courses.success) return null;
 
-  return <CourseDropdown courses={courses.data} />;
+  return <CourseDropdown courses={courses.data} className="w-[50%]" />;
 }
