@@ -14,11 +14,11 @@ const Check = ({ color, size = 16, ...props }: CheckProps) => (
     {...props}
   >
     <path
+      d="M1 7L5 11L15 1"
       stroke={color ? color : "#627D98"}
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={2}
-      d="m1 7 4 4L15 1"
     />
   </svg>
 );

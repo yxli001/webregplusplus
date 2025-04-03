@@ -14,11 +14,11 @@ const Cross = ({ color, size = 16, ...props }: CrossProps) => (
     {...props}
   >
     <path
+      d="M1 13L13 1M1 1L13 13"
       stroke={color ? color : "#627D98"}
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={2}
-      d="M1 1l14 14M15 1 1 15"
     />
   </svg>
 );
