@@ -1,10 +1,15 @@
 import { SVGProps } from "react";
 
-const Check = ({ color, ...props }: SVGProps<SVGSVGElement>) => (
+interface CheckProps extends SVGProps<SVGSVGElement> {
+  size?: number; // Add a size prop
+}
+
+const Check = ({ color, size = 16, ...props }: CheckProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
+    viewBox="0 0 16 12" // Define the coordinate system for scaling
+    width={size} // Use the size prop for width
+    height={size} // Use the size prop for height (square aspect ratio)
     fill="none"
     {...props}
   >
@@ -17,4 +22,5 @@ const Check = ({ color, ...props }: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
+
 export default Check;

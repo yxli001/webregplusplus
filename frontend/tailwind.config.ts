@@ -13,7 +13,7 @@ export default {
         foreground: "var(--foreground)",
         border: "var(--border)",
         primary: {
-          light: "var(--primary)",
+          light: "var(--primary-light)",
           dark: "var(--primary-dark)",
         },
         text: {
