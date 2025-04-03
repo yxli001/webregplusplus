@@ -9,7 +9,7 @@ const UpDownArrows = ({ color, size = 16, ...props }: UpDownArrowsProps) => (
     xmlns="http://www.w3.org/2000/svg"
     width={size} // Use the size prop for width
     height={size} // Keep the height equal to the width for a square aspect ratio
-    viewBox="0 0 16 16"
+    viewBox="0 0 10 16"
     fill="none"
     {...props}
   >
@@ -18,7 +18,7 @@ const UpDownArrows = ({ color, size = 16, ...props }: UpDownArrowsProps) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
-      d="M8 1l4 4H4l4-4ZM8 15l-4-4h8l-4 4Z"
+      d="m1 5 4-4 4 4m0 6-4 4-4-4"
     />
   </svg>
 );
