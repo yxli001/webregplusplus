@@ -17,6 +17,7 @@ export default {
           dark: "var(--primary-dark)",
         },
         text: {
+          lighter: "var(--text-lighter)",
           light: "var(--text-light)",
           dark: "var(--text-dark)",
         },

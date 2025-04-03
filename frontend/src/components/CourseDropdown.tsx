@@ -47,7 +47,7 @@ const Control = ({
 }: ControlProps<{ label: string; value: Course }, true>) => {
   return (
     <components.Control {...props}>
-      <div className="w-full flex flex-row items-center justify-between gap-4 p-3 border border-text-light rounded-lg">
+      <div className="w-full bg-foreground flex flex-row items-center justify-between gap-4 p-3 border border-text-light rounded-lg hover:cursor-pointer">
         <Search />
         {children}
       </div>
@@ -123,8 +123,8 @@ const CourseDropdown = ({
       <Select
         className={className}
         classNames={{
-          container: () => "w-full",
-          menuList: () => "shadow-lg rounded-lg",
+          container: () => "w-full flex flex-col gap-2",
+          menuList: () => "bg-foreground shadow-lg rounded-lg",
           input: () => "py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>

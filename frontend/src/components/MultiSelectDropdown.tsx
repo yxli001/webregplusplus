@@ -82,11 +82,11 @@ const MultiSelectDropdown = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full max-h-40 overflow-y-auto border border-text-light rounded-md bg-foreground shadow-lg">
+        <div className="absolute z-10 mt-2 w-full max-h-40 overflow-y-auto rounded-md bg-foreground shadow-lg">
           {options.map((option) => (
             <div
               key={option.value}
-              className={`p-2 cursor-pointer flex items-center gap-2`}
+              className={`p-2 cursor-pointer flex items-center gap-2 hover:bg-gray-100`}
               onClick={() => handleOptionClick(option.value)}
             >
               <Checkbox
