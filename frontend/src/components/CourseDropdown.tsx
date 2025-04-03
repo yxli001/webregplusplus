@@ -123,8 +123,8 @@ const CourseDropdown = ({
       <Select
         className={className}
         classNames={{
-          container: () => "w-full flex flex-col gap-2",
-          menuList: () => "bg-foreground shadow-lg rounded-lg",
+          container: () => "w-full flex flex-col",
+          menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg",
           input: () => "py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
