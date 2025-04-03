@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 
-import { PrimeReactProvider } from "primereact/api";
-
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,15 +20,7 @@ export default function RootLayout({
           content="emotion-insertion-point"
         />
       </head>
-      <body>
-        <PrimeReactProvider
-          value={{
-            unstyled: true,
-          }}
-        >
-          {children}
-        </PrimeReactProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
