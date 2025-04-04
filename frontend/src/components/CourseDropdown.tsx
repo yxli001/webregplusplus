@@ -47,7 +47,7 @@ const Control = ({
 }: ControlProps<{ label: string; value: Course }, true>) => {
   return (
     <components.Control {...props}>
-      <div className="w-full bg-foreground flex flex-row items-center justify-between gap-4 px-3 py-1 border border-text-light rounded-lg hover:cursor-pointer">
+      <div className="w-full bg-foreground flex flex-row items-center justify-between gap-4 px-3 py-2 border border-text-light rounded-lg hover:cursor-pointer">
         <Search size={18} />
         {children}
       </div>
@@ -115,15 +115,14 @@ const CourseDropdown = ({
   selectedCourses,
   setSelectedCourses,
   courses,
-  className,
   maxCourses = 5,
+  className = "",
 }: CourseDropdownProps) => {
   return (
     <EmotionCacheProvider>
       <Select
-        className={className}
         classNames={{
-          container: () => "w-full flex flex-col",
+          container: () => `w-full flex flex-col ${className}`,
           menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg",
           input: () => "py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
