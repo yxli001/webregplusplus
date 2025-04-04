@@ -13,6 +13,21 @@ importers:
       "@emotion/react":
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.0.12)(react@19.1.0)
+      "@fullcalendar/core":
+        specifier: ^6.1.15
+        version: 6.1.17
+      "@fullcalendar/daygrid":
+        specifier: ^6.1.15
+        version: 6.1.17(@fullcalendar/core@6.1.17)
+      "@fullcalendar/react":
+        specifier: ^6.1.15
+        version: 6.1.17(@fullcalendar/core@6.1.17)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      "@fullcalendar/timegrid":
+        specifier: ^6.1.15
+        version: 6.1.17(@fullcalendar/core@6.1.17)
+      luxon:
+        specifier: ^3.5.0
+        version: 3.6.1
       next:
         specifier: 15.2.4
         version: 15.2.4(@babel/core@7.26.10)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -35,6 +50,9 @@ importers:
       "@svgr/webpack":
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.8.2)
+      "@types/luxon":
+        specifier: ^3.4.2
+        version: 3.6.2
       "@types/node":
         specifier: ^20
         version: 20.17.28
@@ -1107,6 +1125,38 @@ packages:
         integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==,
       }
 
+  "@fullcalendar/core@6.1.17":
+    resolution:
+      {
+        integrity: sha512-0W7lnIrv18ruJ5zeWBeNZXO8qCWlzxDdp9COFEsZnyNjiEhUVnrW/dPbjRKYpL0edGG0/Lhs0ghp1z/5ekt8ZA==,
+      }
+
+  "@fullcalendar/daygrid@6.1.17":
+    resolution:
+      {
+        integrity: sha512-K7m+pd7oVJ9fW4h7CLDdDGJbc9szJ1xDU1DZ2ag+7oOo1aCNLv44CehzkkknM6r8EYlOOhgaelxQpKAI4glj7A==,
+      }
+    peerDependencies:
+      "@fullcalendar/core": ~6.1.17
+
+  "@fullcalendar/react@6.1.17":
+    resolution:
+      {
+        integrity: sha512-AA8soHhlfRH5dUeqHnfAtzDiXa2vrgWocJSK/F5qzw/pOxc9MqpuoS/nQBROWtHHg6yQUg3DoGqOOhi7dmylXQ==,
+      }
+    peerDependencies:
+      "@fullcalendar/core": ~6.1.17
+      react: ^16.7.0 || ^17 || ^18 || ^19
+      react-dom: ^16.7.0 || ^17 || ^18 || ^19
+
+  "@fullcalendar/timegrid@6.1.17":
+    resolution:
+      {
+        integrity: sha512-K4PlA3L3lclLOs3IX8cvddeiJI9ZVMD7RA9IqaWwbvac771971foc9tFze9YY+Pqesf6S+vhS2dWtEVlERaGlQ==,
+      }
+    peerDependencies:
+      "@fullcalendar/core": ~6.1.17
+
   "@humanfs/core@0.19.1":
     resolution:
       {
@@ -1642,6 +1692,12 @@ packages:
     resolution:
       {
         integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==,
+      }
+
+  "@types/luxon@3.6.2":
+    resolution:
+      {
+        integrity: sha512-R/BdP7OxEMc44l2Ex5lSXHoIXTB2JLNa3y2QISIbr58U/YcsffyQrYW//hZSdrfxrjRZj3GcUoxMPGdO8gSYuw==,
       }
 
   "@types/node@20.17.28":
@@ -3460,6 +3516,13 @@ packages:
         integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==,
       }
 
+  luxon@3.6.1:
+    resolution:
+      {
+        integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==,
+      }
+    engines: { node: ">=12" }
+
   math-intrinsics@1.1.0:
     resolution:
       {
@@ -3860,6 +3923,12 @@ packages:
         integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==,
       }
     engines: { node: ^10 || ^12 || >=14 }
+
+  preact@10.12.1:
+    resolution:
+      {
+        integrity: sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==,
+      }
 
   prelude-ls@1.2.1:
     resolution:
@@ -5486,6 +5555,25 @@ snapshots:
 
   "@floating-ui/utils@0.2.9": {}
 
+  "@fullcalendar/core@6.1.17":
+    dependencies:
+      preact: 10.12.1
+
+  "@fullcalendar/daygrid@6.1.17(@fullcalendar/core@6.1.17)":
+    dependencies:
+      "@fullcalendar/core": 6.1.17
+
+  "@fullcalendar/react@6.1.17(@fullcalendar/core@6.1.17)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)":
+    dependencies:
+      "@fullcalendar/core": 6.1.17
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  "@fullcalendar/timegrid@6.1.17(@fullcalendar/core@6.1.17)":
+    dependencies:
+      "@fullcalendar/core": 6.1.17
+      "@fullcalendar/daygrid": 6.1.17(@fullcalendar/core@6.1.17)
+
   "@humanfs/core@0.19.1": {}
 
   "@humanfs/node@0.16.6":
@@ -5769,6 +5857,8 @@ snapshots:
   "@types/json-schema@7.0.15": {}
 
   "@types/json5@0.0.29": {}
+
+  "@types/luxon@3.6.2": {}
 
   "@types/node@20.17.28":
     dependencies:
@@ -7011,6 +7101,8 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
+  luxon@3.6.1: {}
+
   math-intrinsics@1.1.0: {}
 
   mdn-data@2.0.28: {}
@@ -7237,6 +7329,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  preact@10.12.1: {}
 
   prelude-ls@1.2.1: {}
 

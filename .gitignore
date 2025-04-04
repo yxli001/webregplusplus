@@ -160,3 +160,4 @@ dist
 # IDE
 !.vscode/extensions.json
 .idea
+frontend/src/app/lib/dummy_courses.ts
