@@ -129,6 +129,7 @@ const CourseDropdown = ({
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
+          noOptionsMessage: () => "p-4 text-text-light",
         }}
         name="course"
         value={selectedCourses.map((course) => ({
