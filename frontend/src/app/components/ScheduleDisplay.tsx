@@ -34,7 +34,7 @@ export default function ScheduleDisplay() {
       const userPreferences: Preferences = {
         preferredStart: "12:00", // e.g. "09:00"
         preferredEnd: "18:00", // e.g. "15:00"
-        preferredDays: [0, 6, 9, 6, 9, 6, 0],
+        preferredDays: [0, 6, 0, 6, 0, 6, 0],
         spread: 9,
         avoidBackToBack: false,
       };

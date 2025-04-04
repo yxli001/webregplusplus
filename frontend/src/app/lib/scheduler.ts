@@ -1,4 +1,3 @@
-import { dummyCourses } from "@/app/lib/dummy_courses";
 import { brandon_wi24 } from "./brandon_wi24";
 import { Lecture, Preferences, Section, Schedule } from "../types/interfaces";
 import {
@@ -13,10 +12,7 @@ const TIME_INTERVAL = 10;
 const TOTAL_MINUTES = (22 - 8) * 60;
 const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sample1 = brandon_wi24;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const sample2 = dummyCourses;
 const lectureMap = createLectureLookup(sample1.lectures);
 const sectionMap = createSectionLookup(sample1.sections);
 
@@ -218,151 +214,6 @@ export function calculateFitness(
 
   return score;
 }
-// I originally had calc fitness for a single entry and total schedule so i refactored it above but idk if its correct yet lol
-// export function calculateEntryFitness(
-//   entry: Lecture | Section,
-//   schedule: (Lecture | Section)[],
-//   preferences: Preferences,
-// ): number {
-//   let score = 0;
-//   const earliest = Array(7).fill(10000);
-//   const latest = Array(7).fill(0);
-//   const startIdx = timeToIndex(entry.start_time, START_TIME, TIME_INTERVAL);
-//   const endIdx = timeToIndex(entry.end_time, START_TIME, TIME_INTERVAL);
-
-//   if (
-//     entry.start_time >= preferences.preferredStart &&
-//     entry.end_time <= preferences.preferredEnd
-//   ) {
-//     score += 8;
-//   }
-
-//   const entryDays = convertDaysToNumbers(entry.days); // Convert ["M", "W", "F"] → [1, 3, 5]
-
-//   // Preferred days
-
-//   for (const day of entryDays) {
-//     if (preferences.preferredDays[day]) {
-//       score += preferences.preferredDays[day];
-//     }
-//     if (startIdx < earliest[day]) {
-//       earliest[day] = startIdx;
-//     }
-//     if (endIdx > latest[day]) {
-//       latest[day] = endIdx;
-//     }
-//   }
-
-//   for (let j = 1; j < schedule.length; j++) {
-//     const other = schedule[j];
-//     const otherStartIdx = timeToIndex(
-//       other.start_time,
-//       START_TIME,
-//       TIME_INTERVAL,
-//     );
-//     const otherEndIdx = timeToIndex(other.end_time, START_TIME, TIME_INTERVAL);
-//     const sharedDays = entry.days.filter((day) => other.days.includes(day));
-//     if (sharedDays.length > 0) {
-//       // Back-To-Back Preference
-//       if (preferences.avoidBackToBack) {
-//         if (
-//           Math.abs(startIdx - otherEndIdx) <= 1 ||
-//           Math.abs(endIdx - otherStartIdx) <= 1
-//         ) {
-//           score -= 5 * sharedDays.length;
-//         }
-//       }
-//     }
-//   }
-//   // Overall Fitness
-//   for (let i = 1; i < 5; i++) {
-//     // Spread Preference
-//     if (earliest[i] != 10000 && latest[i] != 0) {
-//       const duration = latest[i] - earliest[i];
-//       const spreadDiff = Math.abs(
-//         duration - preferences.spread / TIME_INTERVAL,
-//       );
-//       score += Math.floor(5 / spreadDiff);
-//     }
-//   }
-//   return score;
-// }
-// export function calculateTotalFitness(
-//   schedule: (Lecture | Section)[],
-//   preferences: Preferences,
-// ): number {
-//   let score = 0;
-//   const earliest = Array(7).fill(10000);
-//   const latest = Array(7).fill(0);
-//   // Entries Fitness
-//   for (let i = 0; i < schedule.length; i++) {
-//     const entry = schedule[i];
-//     const startIdx = timeToIndex(entry.start_time, START_TIME, TIME_INTERVAL);
-//     const endIdx = timeToIndex(entry.end_time, START_TIME, TIME_INTERVAL);
-
-//     if (
-//       entry.start_time >= preferences.preferredStart &&
-//       entry.end_time <= preferences.preferredEnd
-//     ) {
-//       score += 8;
-//     }
-
-//     const entryDays = convertDaysToNumbers(entry.days); // Convert ["M", "W", "F"] → [1, 3, 5]
-
-//     // Preferred days
-
-//     for (const day of entryDays) {
-//       if (preferences.preferredDays[day]) {
-//         score += preferences.preferredDays[day];
-//       }
-//       if (startIdx < earliest[day]) {
-//         earliest[day] = startIdx;
-//       }
-//       if (endIdx > latest[day]) {
-//         latest[day] = endIdx;
-//       }
-//     }
-
-//     for (let j = i + 1; j < schedule.length; j++) {
-//       const other = schedule[j];
-//       const otherStartIdx = timeToIndex(
-//         other.start_time,
-//         START_TIME,
-//         TIME_INTERVAL,
-//       );
-//       const otherEndIdx = timeToIndex(
-//         other.end_time,
-//         START_TIME,
-//         TIME_INTERVAL,
-//       );
-//       const sharedDays = entry.days.filter((day) => other.days.includes(day));
-//       if (sharedDays.length > 0) {
-//         // Back-To-Back Preference
-//         if (preferences.avoidBackToBack) {
-//           if (
-//             Math.abs(startIdx - otherEndIdx) <= 1 ||
-//             Math.abs(endIdx - otherStartIdx) <= 1
-//           ) {
-//             score -= 5 * sharedDays.length;
-//           }
-//         }
-//       }
-//     }
-//   }
-//   // Overall Fitness
-//   for (let i = 1; i < 5; i++) {
-//     // Spread Preference
-//     if (earliest[i] != 10000 && latest[i] != 0) {
-//       const duration = latest[i] - earliest[i];
-//       const spreadDiff = Math.abs(
-//         duration - preferences.spread / TIME_INTERVAL,
-//       );
-//       score += Math.floor(5 / spreadDiff);
-//     }
-//   }
-
-//   return score;
-// }
 
 export async function generateRandomSchedule(
   courseIds: number[],
@@ -435,138 +286,6 @@ export function selectParents(schedules: Schedule[]): Schedule[] {
   );
   return selectedSchedules;
 }
-
-export function mutate(
-  schedule: Schedule,
-  preferences: Preferences,
-  cache: Map<string, number>,
-): Schedule {
-  let originalFitness = 0;
-
-  let newSchedule = [...schedule.classes];
-  let newFitness = originalFitness;
-  let iterations = 0;
-
-  while (newFitness <= originalFitness && iterations < 100) {
-    iterations++;
-    const mutatedSchedule = [...newSchedule];
-    const randomIndex = Math.floor(Math.random() * mutatedSchedule.length);
-    const selectedEntry = mutatedSchedule[randomIndex];
-
-    // Replace section with another section from the same lecture
-    if ("lecture_id" in selectedEntry) {
-      const availableSections = (
-        sectionMap.get(selectedEntry.lecture_id) || []
-      ).filter(
-        (section) => !section.is_required, // Exclude required sections
-      );
-      if (availableSections.length > 1) {
-        const newSection =
-          availableSections[
-            Math.floor(Math.random() * availableSections.length)
-          ];
-
-        originalFitness = calculateFitness(newSchedule, preferences, [
-          selectedEntry,
-        ]);
-        // console.log("old Fitness: " + originalFitness);
-        mutatedSchedule[randomIndex] = newSection; // Swap section
-        console.log(
-          `🔄 Mutating: Replacing ${JSON.stringify(newSection)} with a new section.`,
-        );
-
-        if (!isValidEntry(mutatedSchedule, newSection)) {
-          continue;
-        }
-        const hash = hashSchedule({ classes: mutatedSchedule, fitness: 0 });
-        if (cache.has(hash)) {
-          newFitness = cache.get(hash)!;
-          // console.log("new Fitness cache: " + newFitness);
-        } else {
-          newFitness = calculateFitness(mutatedSchedule, preferences, [
-            newSection,
-          ]);
-          // console.log("new Fitness calc: " + newFitness);
-          cache.set(hash, newFitness);
-        }
-        if (newFitness >= originalFitness) {
-          newSchedule = mutatedSchedule;
-          break;
-        }
-      }
-    } else {
-      // Replace lecture with another lecture from the same course and update the section
-      const availableLectures = lectureMap.get(selectedEntry.course_id) || [];
-      if (availableLectures.length > 1) {
-        const newLecture =
-          availableLectures[
-            Math.floor(Math.random() * availableLectures.length)
-          ];
-        mutatedSchedule[randomIndex] = newLecture; // Swap lecture
-        console.log(
-          `🔄 Mutating: Replacing ${JSON.stringify(newLecture)} with a new section.`,
-        );
-
-        if (!isValidEntry(mutatedSchedule, newLecture)) {
-          continue;
-        }
-
-        // Find and update section
-        const sectionIndex = mutatedSchedule.findIndex(
-          (sec) => "lecture_id" in sec && sec.lecture_id === selectedEntry.id,
-        );
-
-        if (sectionIndex !== -1) {
-          const availableSections = (
-            sectionMap.get(newLecture.id) || []
-          ).filter(
-            (section) => !section.is_required, // Exclude required sections
-          );
-
-          if (availableSections.length > 1) {
-            const newSection =
-              availableSections[
-                Math.floor(Math.random() * availableSections.length)
-              ];
-            originalFitness = calculateFitness(mutatedSchedule, preferences, [
-              selectedEntry,
-              mutatedSchedule[sectionIndex],
-            ]);
-            mutatedSchedule[sectionIndex] = newSection;
-            console.log(
-              `🔄 Mutating: Replacing ${JSON.stringify(newSection)} with a new section.`,
-            );
-
-            if (!isValidEntry(mutatedSchedule, newSection)) {
-              continue;
-            }
-
-            const hash = hashSchedule({ classes: mutatedSchedule, fitness: 0 });
-            if (cache.has(hash)) {
-              newFitness = cache.get(hash)!;
-            } else {
-              newFitness = calculateFitness(mutatedSchedule, preferences, [
-                newLecture,
-                newSection,
-              ]);
-              cache.set(hash, newFitness);
-            }
-            if (newFitness >= originalFitness) {
-              newSchedule = mutatedSchedule;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return {
-    classes: newSchedule,
-    fitness: calculateFitness(newSchedule, preferences),
-  };
-}
-
 function mutateSection(
   schedule: (Lecture | Section)[],
   selectedEntry: Section,
@@ -699,7 +418,7 @@ function mutateLecture(
   return false;
 }
 
-export function mutateNew(
+export function mutate(
   schedule: Schedule,
   preferences: Preferences,
   cache: Map<string, number>,
@@ -771,7 +490,7 @@ export default async function generateOptimalSchedule(
     // }
     const parents = selectParents(scheduleList);
     const children = parents.map((parent) =>
-      mutateNew(parent, preferences, cache, 10),
+      mutate(parent, preferences, cache, 10),
     );
     scheduleList = [...parents, ...children];
 
