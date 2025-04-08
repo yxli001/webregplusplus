@@ -16,6 +16,7 @@ import { Course } from "@/types/course";
 import Check from "@/icons/Check";
 import Search from "@/icons/Search";
 import Cross from "@/icons/Cross";
+import { usePreferenceStore } from "@/store/preferenceStore";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
 const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
@@ -47,8 +48,8 @@ const Control = ({
 }: ControlProps<{ label: string; value: Course }, true>) => {
   return (
     <components.Control {...props}>
-      <div className="w-full flex flex-row items-center justify-between gap-4 p-3 border border-text-light rounded-lg">
-        <Search />
+      <div className="w-full bg-foreground flex flex-row items-center justify-between gap-4 px-3 py-2 border border-text-light rounded-lg hover:cursor-pointer">
+        <Search size={18} />
         {children}
       </div>
     </components.Control>
@@ -95,8 +96,6 @@ const ClearIndicator = ({
 
 interface CourseDropdownProps {
   courses: Course[];
-  selectedCourses: Course[];
-  setSelectedCourses: (courses: Course[]) => void;
   maxCourses?: number;
   className?: string;
 }
@@ -104,31 +103,32 @@ interface CourseDropdownProps {
 /**
  * Dropdown to select courses
  *
- * @param props.selectedCourses - State of currently selected courses
- * @param props.setSelectedCourses - Function to set the selected courses
  * @param props.courses - List of courses to display in the dropdown
  * @param props.maxCourses - Maximum number of courses to select
  *
  * @returns CourseDropdown component
  */
 const CourseDropdown = ({
-  selectedCourses,
-  setSelectedCourses,
   courses,
-  className,
   maxCourses = 5,
+  className = "",
 }: CourseDropdownProps) => {
+  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const setSelectedCourses = usePreferenceStore(
+    (state) => state.setSelectedCourses,
+  );
+
   return (
     <EmotionCacheProvider>
       <Select
-        className={className}
         classNames={{
-          container: () => "w-full",
-          menuList: () => "shadow-lg rounded-lg",
+          container: () => `w-full flex flex-col ${className}`,
+          menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg",
           input: () => "py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
+          noOptionsMessage: () => "p-4 text-text-light",
         }}
         name="course"
         value={selectedCourses.map((course) => ({

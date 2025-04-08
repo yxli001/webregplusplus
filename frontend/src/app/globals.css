@@ -11,6 +11,7 @@
     --primary-light: #1992d4;
     --primary-dark: #0b69a3;
 
+    --text-lighter: #ffffff;
     --text-light: #627d98;
     --text-dark: #334e68;
   }
@@ -28,6 +29,7 @@
     color: var(--text-light);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;
+    overflow-x: hidden;
   }
 
   ::-webkit-scrollbar {
