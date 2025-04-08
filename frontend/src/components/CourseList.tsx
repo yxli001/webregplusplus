@@ -1,12 +1,15 @@
 import { CourseWithSections } from "@/types/course";
 import Checkbox from "./Checkbox";
-import { useFilterStore, useCoursePreference } from "@/store/filterStore";
-import MultiSelectDropdown from "./MultiSelectDropdown";
+import {
+  usePreferenceStore,
+  useCoursePreference,
+} from "@/store/preferenceStore";
+import SelectDropdown from "@/components/DropdownSelect";
 import { memo, useCallback, useEffect, useMemo } from "react";
 
 const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
   const pref = useCoursePreference(course.id)!;
-  const updateCoursePreferences = useFilterStore(
+  const updateCoursePreferences = usePreferenceStore(
     (state) => state.updateCoursePreferences,
   );
 
@@ -14,25 +17,28 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
   useEffect(() => {
     // Check if we need to initialize
     const needsInitialization =
-      !pref.selectedMainSections.length || !pref.selectedSubSections.length;
+      !pref.selectedInstructors.length || !pref.selectedSubSections.length;
 
     if (needsInitialization) {
-      // Create a stable reference to avoid unnecessary updates
-      const initialMainSections = course.mainSections.map(
-        (section) => section.letter,
+      // Get unique instructors
+      const uniqueInstructors = Array.from(
+        new Set(course.mainSections.map((section) => section.instructor)),
       );
 
-      // Get all non-required subsections from all main sections
-      const initialSubSections = course.mainSections.flatMap((section) =>
-        section.subSections
-          .filter((subSection) => !subSection.isRequired)
-          .map((subSection) => `${section.letter}${subSection.section}`),
-      );
+      // Get all subsections from sections with the first instructor
+      const firstInstructor = uniqueInstructors[0];
+      const initialSubSections = course.mainSections
+        .filter((section) => section.instructor === firstInstructor)
+        .flatMap((section) =>
+          section.subSections
+            .filter((subSection) => !subSection.isRequired)
+            .map((subSection) => `${section.letter}${subSection.section}`),
+        );
 
       // Only update if we have valid data
-      if (initialMainSections.length > 0) {
+      if (uniqueInstructors.length > 0) {
         updateCoursePreferences(course.id, {
-          selectedMainSections: initialMainSections,
+          selectedInstructors: [firstInstructor],
           selectedSubSections: initialSubSections,
         });
       }
@@ -44,69 +50,67 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
     updateCoursePreferences(course.id, { included: !pref.included });
   }, [course.id, pref.included, updateCoursePreferences]);
 
-  const handleMainSectionChange = useCallback(
+  const handleInstructorChange = useCallback(
     (selected: string[]) => {
       // Skip if no change
       if (
-        JSON.stringify(selected) === JSON.stringify(pref.selectedMainSections)
+        JSON.stringify(selected) === JSON.stringify(pref.selectedInstructors)
       ) {
         return;
       }
 
-      // Get the previous selection
-      const previousSelection = pref.selectedMainSections;
+      // Get all subsections from sections with the selected instructors
+      const newSubSections = course.mainSections
+        .filter((section) => selected.includes(section.instructor))
+        .flatMap((section) =>
+          section.subSections
+            .filter((subSection) => !subSection.isRequired)
+            .map((subSection) => `${section.letter}${subSection.section}`),
+        );
 
-      // Find which main sections were added (newly selected)
-      const newlySelected = selected.filter(
-        (section) => !previousSelection.includes(section),
+      // Get subsections from previously selected instructors
+      const previouslyAvailableSubSections = course.mainSections
+        .filter((section) =>
+          pref.selectedInstructors.includes(section.instructor),
+        )
+        .flatMap((section) =>
+          section.subSections
+            .filter((subSection) => !subSection.isRequired)
+            .map((subSection) => `${section.letter}${subSection.section}`),
+        );
+
+      // Find subsections that are no longer available
+      const removedSubSections = previouslyAvailableSubSections.filter(
+        (subSection) => !newSubSections.includes(subSection),
       );
 
-      // Find which main sections were removed (deselected)
-      const deselected = previousSelection.filter(
-        (section) => !selected.includes(section),
+      // Find subsections that are newly available
+      const addedSubSections = newSubSections.filter(
+        (subSection) => !previouslyAvailableSubSections.includes(subSection),
       );
 
-      // Start with the current subsection selection
-      let updatedSubSections = [...pref.selectedSubSections];
-
-      // Remove subsections from deselected main sections
-      if (deselected.length > 0) {
-        updatedSubSections = updatedSubSections.filter((section) => {
-          const mainSectionLetter = section.charAt(0);
-          return !deselected.includes(mainSectionLetter);
-        });
-      }
-
-      // Add all non-required subsections from newly selected main sections
-      if (newlySelected.length > 0) {
-        const newSubSections = course.mainSections
-          .filter((section) => newlySelected.includes(section.letter))
-          .flatMap((section) => {
-            // Skip if the section has no subsections
-            if (!section.subSections || !section.subSections.length) {
-              return [];
-            }
-
-            return section.subSections
-              .filter((subSection) => !subSection.isRequired)
-              .map((subSection) => `${section.letter}${subSection.section}`);
-          });
-
-        // Only add new subsections if there are any
-        if (newSubSections.length > 0) {
-          updatedSubSections = [
-            ...new Set([...updatedSubSections, ...newSubSections]),
-          ];
-        }
-      }
+      // Preserve existing subsection selections that are still valid
+      // and add newly available subsections
+      const updatedSubSections = [
+        ...pref.selectedSubSections.filter(
+          (subSection) => !removedSubSections.includes(subSection),
+        ),
+        ...addedSubSections,
+      ];
 
       // Update the preferences
       updateCoursePreferences(course.id, {
-        selectedMainSections: selected,
+        selectedInstructors: selected,
         selectedSubSections: updatedSubSections,
       });
     },
-    [course.id, course.mainSections, pref, updateCoursePreferences],
+    [
+      course.id,
+      course.mainSections,
+      pref.selectedInstructors,
+      pref.selectedSubSections,
+      updateCoursePreferences,
+    ],
   );
 
   const handleSubSectionChange = useCallback(
@@ -123,44 +127,47 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
     [course.id, pref.selectedSubSections, updateCoursePreferences],
   );
 
-  const mainSectionOptions = useMemo(
-    () =>
-      course.mainSections.map((section) => ({
-        label: section.instructor,
-        value: section.letter,
-      })),
-    [course.mainSections],
-  );
+  const instructorOptions = useMemo(() => {
+    const uniqueInstructors = Array.from(
+      new Set(course.mainSections.map((section) => section.instructor)),
+    );
+    return uniqueInstructors.map((instructor) => ({
+      label: instructor,
+      value: instructor,
+    }));
+  }, [course.mainSections]);
 
   const subSectionOptions = useMemo(() => {
-    // If there are no selected main sections, return an empty array
-    if (!pref.selectedMainSections.length) {
+    // If there are no selected instructors, return an empty array
+    if (!pref.selectedInstructors.length) {
       return [];
     }
 
-    // Get all subsections from selected main sections
-    const allSubSections = pref.selectedMainSections.flatMap((section) => {
-      const mainSection = course.mainSections.find((s) => s.letter === section);
+    // Get all subsections from sections with selected instructors
+    const allSubSections = course.mainSections
+      .filter((section) =>
+        pref.selectedInstructors.includes(section.instructor),
+      )
+      .flatMap((section) => {
+        // If no subsections, return an empty array
+        if (!section.subSections.length) {
+          return [];
+        }
 
-      // If no main section is found or it has no subsections, return an empty array
-      if (!mainSection || !mainSection.subSections.length) {
-        return [];
-      }
-
-      return (
-        mainSection.subSections
-          // Filter out required subsections
-          .filter((subSection) => !subSection.isRequired)
-          .map((subSection) => ({
-            label: `${section}${subSection.section} | ${subSection.type} | ${subSection.days} | ${subSection.startTime}-${subSection.endTime}`,
-            value: `${section}${subSection.section}`,
-          }))
-      );
-    });
+        return (
+          section.subSections
+            // Filter out required subsections
+            .filter((subSection) => !subSection.isRequired)
+            .map((subSection) => ({
+              label: `${section.letter}${subSection.section} | ${subSection.type} | ${subSection.days} | ${subSection.startTime}-${subSection.endTime}`,
+              value: `${section.letter}${subSection.section}`,
+            }))
+        );
+      });
 
     // Sort alphabetically by section value (e.g., "A01", "A02", "B01", etc.)
     return allSubSections.sort((a, b) => a.value.localeCompare(b.value));
-  }, [course.mainSections, pref.selectedMainSections]);
+  }, [course.mainSections, pref.selectedInstructors]);
 
   return (
     <div className="w-full flex flex-col rounded-md border border-text-light px-4 sm:px-6 py-4 gap-4">
@@ -181,21 +188,23 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
 
       <div className="flex flex-col gap-1">
         <p className="text-md text-text-light">Instructor</p>
-        <MultiSelectDropdown
-          options={mainSectionOptions}
-          value={pref.selectedMainSections}
-          onChange={handleMainSectionChange}
+        <SelectDropdown
+          options={instructorOptions}
+          value={pref.selectedInstructors}
+          onChange={handleInstructorChange}
           placeholder="Select Instructor"
+          multiple
         />
       </div>
 
       <div className="flex flex-col gap-1">
         <p className="text-md text-text-light">Sections</p>
-        <MultiSelectDropdown
+        <SelectDropdown
           options={subSectionOptions}
           value={pref.selectedSubSections}
           onChange={handleSubSectionChange}
           placeholder="Select Sections"
+          multiple
         />
       </div>
     </div>
@@ -205,10 +214,10 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
 CourseCard.displayName = "CourseCard";
 
 const CourseList = memo(() => {
-  const courseDetails = useFilterStore((state) => state.courseDetails);
+  const courseDetails = usePreferenceStore((state) => state.courseDetails);
 
   return (
-    <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
       {courseDetails.map((course) => (
         <CourseCard key={course.id} course={course} />
       ))}

@@ -4,7 +4,9 @@ import { getCourseDetails, getCourses } from "@/api/courses";
 import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
 import CourseList from "@/components/CourseList";
-import { useFilterStore } from "@/store/filterStore";
+import Preferences from "@/components/Preferences";
+import Calendar from "@/icons/Calendar";
+import { usePreferenceStore } from "@/store/preferenceStore";
 import { Course } from "@/types/course";
 import { useEffect, useState } from "react";
 
@@ -19,7 +21,7 @@ const Section = ({ title, children }: SectionProps) => {
       <h1 className="text-lg font-bold text-text-dark border-b border-border px-5 py-3">
         {title}
       </h1>
-      <div className="w-full py-8 px-5">{children}</div>
+      <div className="w-full p-8">{children}</div>
     </div>
   );
 };
@@ -27,8 +29,18 @@ const Section = ({ title, children }: SectionProps) => {
 export default function Home() {
   const [allCourses, setAllCourses] = useState<Course[]>([]);
 
-  const selectedCourses = useFilterStore((state) => state.selectedCourses);
-  const setCourseDetails = useFilterStore((state) => state.setCourseDetails);
+  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const setCourseDetails = usePreferenceStore(
+    (state) => state.setCourseDetails,
+  );
+  const courseDetails = usePreferenceStore((state) => state.courseDetails);
+
+  const coursePreferences = usePreferenceStore(
+    (state) => state.coursePreferences,
+  );
+  const schedulePreferences = usePreferenceStore(
+    (state) => state.schedulePreferences,
+  );
 
   const handleFetchCourseDetails = () => {
     if (selectedCourses.length < 1) {
@@ -61,7 +73,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-5 ">
+    <div className="w-full flex flex-col gap-10">
       {/* Course Selection */}
       <Section title="Select Your Courses">
         <div className="w-full flex items-center justify-center gap-4">
@@ -71,9 +83,27 @@ export default function Home() {
       </Section>
 
       {/* Instructor/Section Selection */}
-      <Section title="Course List">
-        <CourseList />
-      </Section>
+      {courseDetails.length > 0 && (
+        <>
+          <Section title="Course List">
+            <CourseList />
+          </Section>
+
+          <Section title="Filters">
+            <Preferences />
+          </Section>
+
+          <Button
+            icon={<Calendar />}
+            label="Update Schedule"
+            className="self-end"
+            onClick={() => {
+              console.log(coursePreferences);
+              console.log(schedulePreferences);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

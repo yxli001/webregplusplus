@@ -3,41 +3,65 @@
 import { useState, useEffect, useRef } from "react";
 import UpDownArrows from "@/icons/UpDownArrows";
 import Checkbox from "@/components/Checkbox";
+import Radio from "@/components/Radio";
 
-interface DropdownProps {
+interface BaseDropdownProps {
   options: { label: string; value: string }[];
-  value: string[];
-  onChange: (value: string[]) => void;
   placeholder?: string;
   className?: string;
 }
 
-const MultiSelectDropdown = ({
+interface SingleSelectDropdownProps extends BaseDropdownProps {
+  multiple?: false;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+interface MultiSelectDropdownProps extends BaseDropdownProps {
+  multiple: true;
+  value: string[];
+  onChange: (value: string[]) => void;
+  minSelected?: number;
+}
+
+type DropdownSelectProps = SingleSelectDropdownProps | MultiSelectDropdownProps;
+
+const DropdownSelect = ({
   options,
   value,
   onChange,
   placeholder = "Select an option",
   className = "",
-}: DropdownProps) => {
+  multiple = false,
+  ...props
+}: DropdownSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [initialized, setInitialized] = useState(false);
 
+  const values = Array.isArray(value) ? value : [value];
+
   useEffect(() => {
-    if (!initialized && options.length > 0) {
-      onChange(options.map((option) => option.value));
+    if (!initialized && options.length > 0 && multiple) {
+      onChange(options.map((option) => option.value) as string & string[]);
       setInitialized(true);
     }
-  }, [options, onChange, initialized]);
+  }, [options, onChange, initialized, multiple]);
 
   const getLabel = () => {
-    if (value.length === options.length) {
-      return "All Selected";
-    } else if (value.length > 0) {
-      return "Custom";
+    if (multiple) {
+      if (values.length === options.length) {
+        return "All Selected";
+      } else if (values.length > 0) {
+        return "Custom";
+      }
     } else {
-      return placeholder;
+      const selectedOption = options.find((opt) => opt.value === value);
+      if (selectedOption) {
+        return selectedOption.label;
+      }
     }
+    return placeholder;
   };
 
   const toggleDropdown = () => {
@@ -45,10 +69,18 @@ const MultiSelectDropdown = ({
   };
 
   const handleOptionClick = (optionValue: string) => {
-    if (value.includes(optionValue)) {
-      onChange(value.filter((v) => v !== optionValue));
+    if (multiple) {
+      const minSelected = (props as MultiSelectDropdownProps).minSelected ?? 1;
+      if (values.includes(optionValue)) {
+        if (values.length <= minSelected) {
+          return;
+        }
+        onChange(values.filter((v) => v !== optionValue) as string & string[]);
+      } else {
+        onChange([...values, optionValue] as string & string[]);
+      }
     } else {
-      onChange([...value, optionValue]);
+      onChange(optionValue as string & string[]);
     }
   };
 
@@ -87,10 +119,18 @@ const MultiSelectDropdown = ({
                 className="p-2 cursor-pointer flex items-center gap-2 hover:bg-gray-100"
                 onClick={() => handleOptionClick(option.value)}
               >
-                <Checkbox
-                  checked={value.includes(option.value)}
-                  onChange={() => {}}
-                />
+                {multiple ? (
+                  <Checkbox
+                    checked={values.includes(option.value)}
+                    onChange={() => {}}
+                  />
+                ) : (
+                  <Radio
+                    checked={value === option.value}
+                    onChange={() => {}}
+                    name="dropdown-option"
+                  />
+                )}
                 <span className="truncate text-sm sm:text-base flex-1">
                   {option.label}
                 </span>
@@ -107,4 +147,4 @@ const MultiSelectDropdown = ({
   );
 };
 
-export default MultiSelectDropdown;
+export default DropdownSelect;

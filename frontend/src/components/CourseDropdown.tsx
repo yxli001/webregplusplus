@@ -16,7 +16,7 @@ import { Course } from "@/types/course";
 import Check from "@/icons/Check";
 import Search from "@/icons/Search";
 import Cross from "@/icons/Cross";
-import { useFilterStore } from "@/store/filterStore";
+import { usePreferenceStore } from "@/store/preferenceStore";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
 const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
@@ -113,8 +113,8 @@ const CourseDropdown = ({
   maxCourses = 5,
   className = "",
 }: CourseDropdownProps) => {
-  const selectedCourses = useFilterStore((state) => state.selectedCourses);
-  const setSelectedCourses = useFilterStore(
+  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const setSelectedCourses = usePreferenceStore(
     (state) => state.setSelectedCourses,
   );
 

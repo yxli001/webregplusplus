@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { PrimeReactProvider } from "primereact/api";
 
 import "./globals.css";
+import "primereact/resources/primereact.min.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
@@ -22,10 +24,12 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Navbar />
-        <div className="w-[80%] mx-auto pt-10 flex flex-col items-center">
-          {children}
-        </div>
+        <PrimeReactProvider value={{ unstyled: true }}>
+          <Navbar />
+          <div className="w-[80%] mx-auto py-10 flex flex-col items-center">
+            {children}
+          </div>
+        </PrimeReactProvider>
       </body>
     </html>
   );
