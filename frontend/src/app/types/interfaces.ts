@@ -1,30 +1,30 @@
 // type SectionType = "DI" | "LA";
 
-//   export interface Course {
-//   id: number;
-//   subject: string;
-//   code: number;
-// }
+export interface Course {
+  id: string;
+  subject: string;
+  code: number;
+}
 
 export interface Lecture {
-  id: number;
+  id: string;
+  type: string; // Lecture or Section
   lecture_letter: string;
-  course_id: number;
+  course_id: string;
   instructor: string;
-  days: string[];
+  days: string;
   start_time: string; // Storing as string since it's in HH:mm format
   end_time: string;
   location: string;
 }
 
 export interface Section {
-  id: number;
+  id: string;
   section_id: string;
-  lecture_id: number;
-  meeting_type: string; // "Discussion" or "Lab"
-  days: string[];
+  lecture_id: string;
+  type: string; // Discussion or Lab
+  days: string;
   location: string;
-  available_seats: number;
   start_time: string;
   end_time: string;
   is_required: boolean;

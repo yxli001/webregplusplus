@@ -28,7 +28,6 @@ interface Event {
 
 export default function ScheduleDisplay() {
   const [events, setEvents] = useState<Event[][]>([]);
-
   useEffect(() => {
     async function fetchSchedule() {
       const userPreferences: Preferences = {
@@ -39,7 +38,7 @@ export default function ScheduleDisplay() {
         avoidBackToBack: false,
       };
       const schedules: Schedule[] = await generateOptimalSchedule(
-        [1, 2, 4],
+        ["1", "2", "4"],
         userPreferences,
       );
       if (schedules.length === 0) {
