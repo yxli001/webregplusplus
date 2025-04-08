@@ -52,8 +52,6 @@ const MultiSelectDropdown = ({
     }
   };
 
-  const isSelected = (optionValue: string) => value.includes(optionValue);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -90,10 +88,10 @@ const MultiSelectDropdown = ({
                 onClick={() => handleOptionClick(option.value)}
               >
                 <Checkbox
-                  checked={isSelected(option.value)}
-                  onChange={() => handleOptionClick(option.value)}
+                  checked={value.includes(option.value)}
+                  onChange={() => {}}
                 />
-                <span className="truncate text-sm sm:text-base">
+                <span className="truncate text-sm sm:text-base flex-1">
                   {option.label}
                 </span>
               </div>
