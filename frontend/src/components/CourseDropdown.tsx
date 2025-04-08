@@ -16,6 +16,7 @@ import { Course } from "@/types/course";
 import Check from "@/icons/Check";
 import Search from "@/icons/Search";
 import Cross from "@/icons/Cross";
+import { useFilterStore } from "@/store/filterStore";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
 const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
@@ -95,8 +96,6 @@ const ClearIndicator = ({
 
 interface CourseDropdownProps {
   courses: Course[];
-  selectedCourses: Course[];
-  setSelectedCourses: (courses: Course[]) => void;
   maxCourses?: number;
   className?: string;
 }
@@ -104,20 +103,21 @@ interface CourseDropdownProps {
 /**
  * Dropdown to select courses
  *
- * @param props.selectedCourses - State of currently selected courses
- * @param props.setSelectedCourses - Function to set the selected courses
  * @param props.courses - List of courses to display in the dropdown
  * @param props.maxCourses - Maximum number of courses to select
  *
  * @returns CourseDropdown component
  */
 const CourseDropdown = ({
-  selectedCourses,
-  setSelectedCourses,
   courses,
   maxCourses = 5,
   className = "",
 }: CourseDropdownProps) => {
+  const selectedCourses = useFilterStore((state) => state.selectedCourses);
+  const setSelectedCourses = useFilterStore(
+    (state) => state.setSelectedCourses,
+  );
+
   return (
     <EmotionCacheProvider>
       <Select

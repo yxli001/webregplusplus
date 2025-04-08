@@ -29,6 +29,7 @@
     color: var(--text-light);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;
+    overflow: hidden;
   }
 
   ::-webkit-scrollbar {

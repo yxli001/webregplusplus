@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Webreg++",
@@ -20,7 +21,12 @@ export default function RootLayout({
           content="emotion-insertion-point"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        <div className="w-[80%] mx-auto pt-10 flex flex-col items-center">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
