@@ -23,7 +23,7 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
   try {
     logger.info("Starting Puppeteer browser...");
-    browser = await puppeteer.launch({ headless: true }); // Set to false if debugging
+    browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
 
     const page = await browser.newPage();
 
@@ -35,6 +35,9 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
     logger.info("Waiting for checkboxes to load...");
     await page.waitForSelector("input[id^=schedOption]");
+
+    logger.info("Selecting SP25 term...");
+    await page.select("select#selectedTerm", "SP25");
 
     logger.info("Checking all options...");
     await page.evaluate(() => {

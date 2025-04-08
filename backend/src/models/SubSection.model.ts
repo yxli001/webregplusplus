@@ -25,6 +25,7 @@ type SubSectionAttributes = {
   endTime: string;
   location: string;
   mainSectionId: string;
+  isRequired: boolean;
 };
 
 // Define the creation attributes of the School model
@@ -78,6 +79,10 @@ class SubSection extends Model<
   @AllowNull(false)
   @Column({ type: DataType.UUID, field: "main_section_id" })
   mainSectionId: string;
+
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isRequired: boolean;
 
   @CreatedAt
   @Column({ type: DataType.DATE, field: "created_at" })
