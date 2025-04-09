@@ -122,8 +122,8 @@ const CourseDropdown = ({
     <EmotionCacheProvider>
       <Select
         classNames={{
-          container: () => `w-full flex flex-col ${className}`,
-          menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg",
+          container: () => `w-full flex flex-col overflow-visible ${className}`,
+          menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
           input: () => "py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
