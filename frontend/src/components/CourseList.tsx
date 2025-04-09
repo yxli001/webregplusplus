@@ -5,9 +5,9 @@ import {
 } from "@/store/preferenceStore";
 import SelectDropdown from "@/components/DropdownSelect";
 import { memo, useCallback, useEffect, useMemo } from "react";
-import { CourseResponse } from "@/types/interfaces_api";
+import { CourseWithSections } from "@/types/course";
 
-const CourseCard = memo(({ course }: { course: CourseResponse }) => {
+const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
   const pref = useCoursePreference(course.id)!;
   const updateCoursePreferences = usePreferenceStore(
     (state) => state.updateCoursePreferences,

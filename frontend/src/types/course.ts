@@ -1,5 +1,3 @@
-import { MainSectionResponse } from "@/types/interfaces_api";
-
 export interface CourseJSON {
   id: string;
   subject: string;
@@ -9,22 +7,27 @@ export interface CourseJSON {
 }
 
 export interface CourseWithSectionsJSON extends CourseJSON {
-  mainSections: MainSectionResponse[];
+  mainSections: MainSectionJSON[];
 }
 
 export interface MainSectionJSON {
+  id: string;
   type: string;
   letter: string;
   days: string;
   startTime: string;
   endTime: string;
   instructor: string;
-  sections: SubSectionJSON[];
+  subSections: SubSectionJSON[];
   location: string;
   exams: ExamJSON[];
+  createdAt: string;
+  updatedAt: string;
+  courseId: string;
 }
 
 export interface SubSectionJSON {
+  id: string;
   type: string;
   section: string;
   days: string;
@@ -32,14 +35,21 @@ export interface SubSectionJSON {
   endTime: string;
   isRequired: boolean;
   location: string;
+  createdAt: string;
+  updatedAt: string;
+  mainSectionId: string;
 }
 
 export interface ExamJSON {
+  id: string;
   type: string;
   date: string;
   startTime: string;
   endTime: string;
   location: string;
+  createdAt: string;
+  updatedAt: string;
+  mainSectionId: string;
 }
 
 export interface Course {
@@ -55,6 +65,7 @@ export interface CourseWithSections extends Course {
 }
 
 export type MainSection = {
+  id: string;
   type: MainSectionType;
   letter: string;
   days: string;
@@ -64,9 +75,13 @@ export type MainSection = {
   subSections: SubSection[];
   location: string;
   exams: Exam[];
+  createdAt: Date;
+  updatedAt: Date;
+  courseId: string;
 };
 
 export type SubSection = {
+  id: string;
   type: SubSectionType;
   section: string;
   days: string;
@@ -74,14 +89,21 @@ export type SubSection = {
   endTime: string;
   isRequired: boolean;
   location: string;
+  createdAt: Date;
+  updatedAt: Date;
+  mainSectionId: string;
 };
 
 export type Exam = {
+  id: string;
   type: ExamType;
   date: Date;
   startTime: string;
   endTime: string;
   location: string;
+  createdAt: Date;
+  updatedAt: Date;
+  mainSectionId: string;
 };
 
 export enum MainSectionType {
