@@ -15,7 +15,7 @@ import app from "./app";
 const connectDB = async () => {
   try {
     const sequelizeConfig: SequelizeOptions = {
-      models: [__dirname + "/models/*.model.ts"],
+      models: [__dirname + "/models/*.model.{ts,js}"],
       dialect: "postgres",
       host: env.POSTGRES_HOST,
       port: parseInt(env.POSTGRES_PORT),
