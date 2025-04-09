@@ -47,6 +47,9 @@ export async function scrapeSchedule(): Promise<Course[]> {
       });
     });
 
+    logger.info("Selecting Spring 2025 quarter...");
+    await page.select("#selectedTerm", "SP25");
+
     logger.info("Selecting all subjects...");
     await page.evaluate(() => {
       const subjectOptions = document.querySelectorAll(

@@ -75,6 +75,10 @@ class SubSection extends Model<
   @Column(DataType.STRING)
   location: string;
 
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isRequired: boolean;
+
   @ForeignKey(() => MainSection)
   @AllowNull(false)
   @Column({ type: DataType.UUID, field: "main_section_id" })

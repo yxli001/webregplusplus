@@ -1,4 +1,11 @@
-import { Lecture, Schedule, Section } from "../types/interfaces";
+import {
+  CourseResponse,
+  Course,
+  Exam,
+  MainSection,
+  SubSection,
+  Schedule,
+} from "../types/interfaces_api";
 
 export function timeToIndex(
   time: string,
@@ -9,7 +16,30 @@ export function timeToIndex(
   return (hours * 60 + minutes - startTime) / interval;
 }
 
-export function convertDaysToNumbers(days: string[]): number[] {
+export function convertTo24Hr(time: string): string {
+  const match = time.match(/(\d+):(\d+)([ap])/i);
+  if (!match) return time;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, h, m, period] = match;
+  let hour = parseInt(h);
+  if (period.toLowerCase() === "p" && hour !== 12) hour += 12;
+  if (period.toLowerCase() === "a" && hour === 12) hour = 0;
+  return `${hour.toString().padStart(2, "0")}:${m}`;
+}
+// export function convertDaysToNumbers(days: string[]): number[] {
+//   const mapping: { [key: string]: number } = {
+//     Su: 0,
+//     M: 1,
+//     Tu: 2,
+//     W: 3,
+//     Th: 4,
+//     F: 5,
+//     Sa: 6,
+//   };
+//   return days.map((day) => mapping[day]).filter((num) => num !== undefined);
+// }
+
+export function convertDaysToNumbers(days: string): number[] {
   const mapping: { [key: string]: number } = {
     Su: 0,
     M: 1,
@@ -19,35 +49,92 @@ export function convertDaysToNumbers(days: string[]): number[] {
     F: 5,
     Sa: 6,
   };
-  return days.map((day) => mapping[day]).filter((num) => num !== undefined);
-}
 
-export function createLectureLookup(
-  lectures: Lecture[],
-): Map<number, Lecture[]> {
-  const lectureMap = new Map<number, Lecture[]>();
-  lectures.forEach((lecture) => {
-    if (!lectureMap.has(lecture.course_id)) {
-      lectureMap.set(lecture.course_id, []);
+  const pattern = /Su|Tu|Th|Sa|M|W|F/g;
+  const matches = days.match(pattern) || [];
+
+  return matches.map((day) => mapping[day]);
+}
+export async function createMainSectionLookup(
+  mainSections: MainSection[],
+): Promise<Map<string, MainSection[]>> {
+  const mainSectionMap = new Map<string, MainSection[]>();
+  mainSections.forEach((mainSection) => {
+    if (!mainSectionMap.has(mainSection.course_id)) {
+      mainSectionMap.set(mainSection.course_id, []);
     }
-    lectureMap.get(lecture.course_id)!.push(lecture);
+    mainSectionMap.get(mainSection.course_id)!.push(mainSection);
   });
 
-  return lectureMap;
+  return mainSectionMap;
 }
 
-export function createSectionLookup(
-  sections: Section[],
-): Map<number, Section[]> {
-  const sectionMap = new Map<number, Section[]>();
-  sections.forEach((section) => {
-    if (!sectionMap.has(section.lecture_id)) {
-      sectionMap.set(section.lecture_id, []);
+export async function createSubSectionLookup(
+  subSections: SubSection[],
+): Promise<Map<string, SubSection[]>> {
+  const sectionMap = new Map<string, SubSection[]>();
+  subSections.forEach((subSection) => {
+    if (!sectionMap.has(subSection.main_section_id)) {
+      sectionMap.set(subSection.main_section_id, []);
     }
-    sectionMap.get(section.lecture_id)!.push(section);
+    sectionMap.get(subSection.main_section_id)!.push(subSection);
   });
 
   return sectionMap;
+}
+
+export async function parseAvailableCourses(coursesResponse: CourseResponse[]) {
+  const output = {
+    courses: [] as Course[],
+    mainSection: [] as MainSection[],
+    subSection: [] as SubSection[],
+    exams: [] as Exam[],
+  };
+
+  for (const course of coursesResponse) {
+    output.courses.push({
+      id: course.id,
+      subject: course.subject,
+      code: course.code,
+    });
+
+    for (const mainSection of course.mainSections) {
+      output.mainSection.push({
+        id: mainSection.id,
+        letter: mainSection.letter,
+        type: mainSection.type,
+        course_id: course.id,
+        instructor: mainSection.instructor,
+        days: mainSection.days,
+        start_time: convertTo24Hr(mainSection.startTime),
+        end_time: convertTo24Hr(mainSection.endTime),
+        exam: mainSection.exams.map((exam) => ({
+          id: exam.id,
+          type: exam.type,
+          date: exam.date,
+          start_time: convertTo24Hr(exam.startTime),
+          end_time: convertTo24Hr(exam.endTime),
+          location: exam.location,
+          main_section_id: mainSection.id,
+        })),
+        location: mainSection.location,
+      });
+      for (const subSection of mainSection.subSections) {
+        output.subSection.push({
+          id: subSection.id,
+          section: subSection.section,
+          main_section_id: mainSection.id,
+          type: subSection.type,
+          days: subSection.days,
+          location: subSection.location,
+          start_time: convertTo24Hr(subSection.startTime),
+          end_time: convertTo24Hr(subSection.endTime),
+          is_required: subSection.isRequired,
+        });
+      }
+    }
+  }
+  return output;
 }
 
 export function hashSchedule(schedule: Schedule): string {

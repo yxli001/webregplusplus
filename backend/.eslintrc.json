@@ -53,6 +53,14 @@
         "varsIgnorePattern": "^_"
       }
     ],
+    "ignorePatterns": [
+      // Add this:
+      "dist",
+      "node_modules",
+      "coverage",
+      "build",
+      "out"
+    ],
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "array-callback-return": "error",
     "eqeqeq": "error",

@@ -24,8 +24,7 @@
 
   html,
   body {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
     color: var(--text-light);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;
@@ -49,6 +48,47 @@
   }
 }
 
+/* --- Custom Event Colors & Rounded Corners --- */
+.fc-event {
+  background-color: #1976d2 !important; /* similar to UCSD blue */
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px !important;
+  cursor: pointer;
+}
+
+/* --- Custom Column Headers (Days) --- */
+.fc-col-header-cell {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 0;
+}
+
+/* --- Time Labels (7 AM to 10 PM) --- */
+.fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* --- Hide borders to clean up look --- */
+.fc-scrollgrid,
+.fc-scrollgrid-section,
+.fc-scrollgrid-sync-table,
+.fc-timegrid-slot,
+.fc-timegrid-col {
+  border: none !important;
+}
+
+/* --- Make it compact like WebReg --- */
+.fc .fc-timegrid-slot {
+  height: 2.2em;
+}
+
+.fc-now-indicator-line,
+.fc-now-indicator-arrow {
+  display: none !important;
+}
 /*
 @media (prefers-color-scheme: dark) {
   :root {
