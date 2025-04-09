@@ -39,6 +39,26 @@ export function convertTo24Hr(time: string): string {
 //   return days.map((day) => mapping[day]).filter((num) => num !== undefined);
 // }
 
+export function computePreferredDays(selectedDays: string[]): number[] {
+  const scores = new Array(7).fill(0);
+  for (const day of selectedDays) {
+    const dayScoreMap: Record<string, { index: number; score: number }> = {
+      Su: { index: 0, score: 0 },
+      M: { index: 1, score: 6 },
+      Tu: { index: 2, score: 9 },
+      W: { index: 3, score: 6 },
+      Th: { index: 4, score: 9 },
+      F: { index: 5, score: 6 },
+      Sa: { index: 6, score: 0 },
+    };
+    const mapping = dayScoreMap[day];
+    if (mapping) {
+      scores[mapping.index] = mapping.score;
+    }
+  }
+  return scores;
+}
+
 export function convertDaysToNumbers(days: string): number[] {
   const mapping: { [key: string]: number } = {
     Su: 0,

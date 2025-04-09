@@ -2,6 +2,7 @@
 
 import { getCourseDetails, getCourses } from "@/api/courses";
 import {
+  computePreferredDays,
   createMainSectionLookup,
   createSubSectionLookup,
   parseAvailableCourses,
@@ -118,26 +119,7 @@ export default function Home() {
           compact: 4,
           "extremely-compact": 2,
         };
-        const dayScoreMap: Record<string, { index: number; score: number }> = {
-          Su: { index: 0, score: 0 },
-          M: { index: 1, score: 6 },
-          Tu: { index: 2, score: 9 },
-          W: { index: 3, score: 6 },
-          Th: { index: 4, score: 9 },
-          F: { index: 5, score: 6 },
-          Sa: { index: 6, score: 0 },
-        };
 
-        function computePreferredDays(selectedDays: string[]): number[] {
-          const scores = new Array(7).fill(0);
-          for (const day of selectedDays) {
-            const mapping = dayScoreMap[day];
-            if (mapping) {
-              scores[mapping.index] = mapping.score;
-            }
-          }
-          return scores;
-        }
         const userPreferences: Preferences = {
           preferredStart: schedulePreferences.preferredStart, // e.g. "09:00"
           preferredEnd: schedulePreferences.preferredEnd, // e.g. "15:00"
@@ -148,20 +130,15 @@ export default function Home() {
           avoidBackToBack: schedulePreferences.avoidBackToBack,
           //blockInstructor: "Watts, Edward J.",
         };
-        console.log(userPreferences);
         const availableCourses = await parseAvailableCourses(courseDetails);
 
         const courses = availableCourses.courses;
         const courseIds: string[] = courses.map((course) => course.id);
-        console.log(courseIds);
         const mainSections = availableCourses.mainSection;
         const subSections = availableCourses.subSection;
 
         const mainSectionMap = await createMainSectionLookup(mainSections);
         const subSectionMap = await createSubSectionLookup(subSections);
-        console.log(availableCourses);
-        console.log(courseDetails);
-        console.log(courseIds);
         const schedules: Schedule[] = await generateOptimalSchedule(
           courseIds,
           userPreferences,
