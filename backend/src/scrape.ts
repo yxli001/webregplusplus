@@ -36,14 +36,10 @@ export async function scrapeSchedule(): Promise<Course[]> {
     serverLogger.info("Selecting Spring 2025 quarter...");
     await page.select("#selectedTerm", "SP25");
 
+    await page.waitForNetworkIdle();
+
     serverLogger.info("Waiting for subject list to load...");
     await page.waitForSelector("select#selectedSubjects option");
-
-    serverLogger.info("Waiting for checkboxes to load...");
-    await page.waitForSelector("input[id^=schedOption]");
-
-    serverLogger.info("Selecting SP25 term...");
-    await page.select("select#selectedTerm", "SP25");
 
     serverLogger.info("Selecting all subjects...");
     await page.evaluate(() => {
@@ -55,6 +51,9 @@ export async function scrapeSchedule(): Promise<Course[]> {
         (option as HTMLOptionElement).selected = true;
       });
     });
+
+    serverLogger.info("Waiting for checkboxes to load...");
+    await page.waitForSelector("input[id^=schedOption]");
 
     serverLogger.info("Checking all options...");
     await page.evaluate(() => {
