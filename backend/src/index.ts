@@ -1,4 +1,4 @@
-import "module-alias/register";
+import "tsconfig-paths/register";
 import { envType } from "@/util/envConfig";
 import cron from "node-cron";
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";

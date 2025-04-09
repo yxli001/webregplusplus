@@ -110,5 +110,7 @@
     "paths": {
       "@/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src/**/*"], // Include all files in the `src` directory
+  "exclude": ["node_modules"] // Exclude `node_modules` from compilation
 }

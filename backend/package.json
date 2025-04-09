@@ -3,14 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
-  "_moduleAliases": {
-    "@": "src"
-  },
   "scripts": {
-    "build": "pnpm install --frozen-lockfile && npx tsc",
-    "start": "node dist/index.js",
-    "dev": "NODE_ENV=development nodemon src/index.ts",
-    "dev-staging": "NODE_ENV=staging nodemon src/index.ts",
+    "build": "npx tsc",
+    "start": "ts-node --project ./tsconfig.json -r tsconfig-paths/register dist/index.js",
+    "prestart": "pnpm run build",
+    "dev": "NODE_ENV=development nodemon",
+    "dev-staging": "NODE_ENV=staging nodemon",
     "lint-check": "eslint . && prettier --check .",
     "lint-fix": "eslint . --fix && prettier --write .",
     "prepare": "cd .. && husky",
