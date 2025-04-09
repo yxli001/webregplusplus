@@ -5,7 +5,7 @@ import {
   MainSection,
   SubSection,
   Schedule,
-} from "../types/interfaces_api";
+} from "@/types/interfaces_api";
 
 export function timeToIndex(
   time: string,

@@ -1,4 +1,4 @@
-import { SubSection, Preferences, Schedule } from "@/app/types/interfaces_api";
+import { SubSection, Preferences, Schedule } from "@/types/interfaces_api";
 import {
   convertDaysToNumbers,
   timeToIndex,

@@ -5,16 +5,16 @@ import {
   createMainSectionLookup,
   createSubSectionLookup,
   parseAvailableCourses,
-} from "../app/util/helper";
-import generateOptimalSchedule from "@/app/lib/scheduler";
-import { convertDaysToNumbers } from "../app/util/helper";
+} from "@/util/helper";
+import generateOptimalSchedule from "@/lib/scheduler";
+import { convertDaysToNumbers } from "@/util/helper";
 import {
   CourseResponse,
   MainSection,
   Preferences,
   Schedule,
   SubSection,
-} from "../app/types/interfaces_api";
+} from "../types/interfaces_api";
 import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
 import CourseList from "@/components/CourseList";
@@ -227,9 +227,11 @@ export default function Home() {
     },
     [],
   );
+
   useEffect(() => {
     console.log("Updated events:", events);
   }, [events]);
+
   return (
     <div className="w-full flex flex-col gap-10">
       {/* Course Selection */}
@@ -240,14 +242,15 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Instructor/Section Selection */}
       {courseDetails.length > 0 && (
         <>
+          {/* Instructor/Section Selection */}
           <Section title="Course List">
             <CourseList />
           </Section>
 
-          <Section title="Filters">
+          {/* Preferences */}
+          <Section title="Preferences">
             <PreferencesComponent />
           </Section>
 
@@ -259,9 +262,11 @@ export default function Home() {
               handleAutoScheduler(courseDetails, schedulePreferences)
             }
           />
-          <ScheduleDisplay events={events} />
         </>
       )}
+
+      {/* Schedule Display */}
+      {events.length > 0 && <ScheduleDisplay events={events} />}
     </div>
   );
 }

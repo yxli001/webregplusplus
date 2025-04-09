@@ -1,4 +1,4 @@
-import { MainSectionResponse } from "@/app/types/interfaces_api";
+import { MainSectionResponse } from "@/types/interfaces_api";
 
 export interface CourseJSON {
   id: string;

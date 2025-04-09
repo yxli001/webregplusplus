@@ -6,7 +6,7 @@ import {
   MainSectionType,
 } from "@/types/course";
 import { APIResult, get, handleAPIError } from "./requests";
-import { CourseResponse } from "@/app/types/interfaces_api";
+import { CourseResponse } from "@/types/interfaces_api";
 
 /**
  * Parses a CourseJSON object into a Course object.

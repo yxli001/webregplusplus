@@ -1,4 +1,4 @@
-import { CourseResponse } from "@/app/types/interfaces_api";
+import { CourseResponse } from "@/types/interfaces_api";
 import { Course } from "@/types/course";
 import { SpreadPreference } from "@/types/preferences";
 import { create } from "zustand";
