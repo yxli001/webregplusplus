@@ -23,7 +23,7 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
   try {
     serverLogger.info("Starting Puppeteer browser...");
-    browser = await puppeteer.launch({ headless: false, browser: "chrome" }); // Set to false if debugging
+    browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
 
     const page = await browser.newPage();
 
