@@ -1,4 +1,4 @@
-import ScheduleDisplay from "@/app/components/ScheduleDisplay";
+import ScheduleDisplay from "@/components/ScheduleDisplay";
 
 export default async function SchedulePage() {
   return (

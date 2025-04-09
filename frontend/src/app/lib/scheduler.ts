@@ -1,12 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { brandon_wi24 } from "./brandon_wi24";
 import { SubSection, Preferences, Schedule } from "@/app/types/interfaces_api";
 import {
   convertDaysToNumbers,
   timeToIndex,
   hashSchedule,
 } from "../util/helper";
-import { brandon_sp24_api } from "./brandon_sp24_api";
 import { MainSection } from "../types/interfaces_api";
 
 const START_TIME = 8 * 60;
@@ -14,15 +11,11 @@ const TIME_INTERVAL = 10;
 const TOTAL_MINUTES = (22 - 8) * 60;
 const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
 
-// const sample1 = brandon_wi24;
-const sample2 = brandon_sp24_api;
-console.log(sample2);
-
 function isValidEntry(
   schedule: (MainSection | SubSection)[],
   newEntry: MainSection | SubSection,
 ): boolean {
-  console.log(newEntry);
+  //   console.log(newEntry);
   for (let i = 0; i < schedule.length; i++) {
     //console.log(schedule[i]);
     const existingClass = schedule[i];
@@ -73,6 +66,7 @@ function isValidTimegrid(
   newEntry: MainSection | SubSection,
   timeGrid: boolean[][],
 ): boolean {
+  //   console.log(newEntry);
   const days = convertDaysToNumbers(newEntry.days);
   const startIdx = timeToIndex(newEntry.start_time, START_TIME, TIME_INTERVAL);
   const endIdx = timeToIndex(newEntry.end_time, START_TIME, TIME_INTERVAL);
@@ -230,11 +224,12 @@ export async function generateRandomSchedule(
   ); // Track occupied time slots
 
   for (const courseId of courseIds) {
+    // console.log(courseId);
     const mainSections = mainSectionMap.get(courseId) || [];
-    console.log(mainSections);
+    // console.log(mainSections);
     const mainSection =
       mainSections[Math.floor(Math.random() * mainSections.length)];
-    console.log(mainSection);
+    // console.log(mainSection);
     if (!isValidTimegrid(mainSection, timeGrid)) return [];
 
     schedule.push(mainSection);
@@ -281,6 +276,9 @@ export async function generateSchedules(
       subSectionmap,
     );
     if (newSchedule.length != 0) {
+      console.log(newSchedule);
+      console.log(preferences);
+      console.log(calculateFitness(newSchedule, preferences));
       schedules.push({
         classes: newSchedule,
         fitness: calculateFitness(newSchedule, preferences),
@@ -308,11 +306,11 @@ function mutateSection(
 ) {
   // Check if the selected entry is a required subSection
   if (selectedEntry.is_required) {
-    console.log(
-      ` SubSection Mutation Skipped: Required subSection ${JSON.stringify(
-        selectedEntry,
-      )} cannot be replaced.`,
-    );
+    // console.log(
+    //   ` SubSection Mutation Skipped: Required subSection ${JSON.stringify(
+    //     selectedEntry,
+    //   )} cannot be replaced.`,
+    // );
     return false;
   }
 
@@ -348,28 +346,28 @@ function mutateSection(
         isValidEntry(schedule, newSection)
       ) {
         schedule[randomIndex] = newSection;
-        console.log(
-          ` SubSection Mutation: Replaced ${JSON.stringify(
-            selectedEntry,
-          )} with ${JSON.stringify(newSection)}.`,
-        );
+        // console.log(
+        //   ` SubSection Mutation: Replaced ${JSON.stringify(
+        //     selectedEntry,
+        //   )} with ${JSON.stringify(newSection)}.`,
+        // );
         return true;
       } else {
-        console.log(
-          ` Attempt ${attempts + 1}: SubSection mutation failed due to conflict or invalid match.`,
-        );
+        // console.log(
+        //   ` Attempt ${attempts + 1}: SubSection mutation failed due to conflict or invalid match.`,
+        // );
       }
       attempts++;
     }
-    console.log(
-      ` No valid subSection found after ${maxRetries} attempts for subSection ${JSON.stringify(
-        selectedEntry,
-      )}. Keeping original subSection.`,
-    );
+    // console.log(
+    //   ` No valid subSection found after ${maxRetries} attempts for subSection ${JSON.stringify(
+    //     selectedEntry,
+    //   )}. Keeping original subSection.`,
+    // );
   } else {
-    console.log(
-      ` No available subSections found for main_section_id ${selectedEntry.main_section_id}. Mutation skipped.`,
-    );
+    // console.log(
+    //   ` No available subSections found for main_section_id ${selectedEntry.main_section_id}. Mutation skipped.`,
+    // );
   }
 
   return false;
@@ -417,21 +415,21 @@ function mutateMainSection(
         // Check if the new subSection is valid before adding it
         if (isValidEntry(updatedSchedule, newSection)) {
           updatedSchedule.push(newSection);
-          console.log(
-            `🔄 MainSection Mutation: Replaced ${JSON.stringify(
-              selectedEntry,
-            )} with ${JSON.stringify(newMainSection)} and added subSection ${JSON.stringify(
-              newSection,
-            )}.`,
-          );
+          //   console.log(
+          //     `🔄 MainSection Mutation: Replaced ${JSON.stringify(
+          //       selectedEntry,
+          //     )} with ${JSON.stringify(newMainSection)} and added subSection ${JSON.stringify(
+          //       newSection,
+          //     )}.`,
+          //   );
         } else {
-          console.log(` Optional subSection addition skipped due to conflict.`);
+          //   console.log(` Optional subSection addition skipped due to conflict.`);
         }
       }
 
       return true;
     } else {
-      console.log(` MainSection mutation failed due to conflict.`);
+      //   console.log(` MainSection mutation failed due to conflict.`);
     }
   }
   return false;
@@ -507,8 +505,8 @@ export default async function generateOptimalSchedule(
   mainSectionMap: Map<string, MainSection[]>,
   subSectionMap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {
-  console.log(mainSectionMap);
-  console.log(subSectionMap);
+  //   console.log(mainSectionMap);
+  //   console.log(subSectionMap);
   let scheduleList = await generateSchedules(
     5,
     courseId,

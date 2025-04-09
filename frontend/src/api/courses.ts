@@ -1,12 +1,12 @@
 import {
   Course,
   CourseJSON,
-  CourseWithSections,
   CourseWithSectionsJSON,
   ExamType,
   MainSectionType,
 } from "@/types/course";
 import { APIResult, get, handleAPIError } from "./requests";
+import { CourseResponse } from "@/app/types/interfaces_api";
 
 /**
  * Parses a CourseJSON object into a Course object.
@@ -26,13 +26,12 @@ const parseCourse = (course: CourseJSON): Course => {
  * @param course - The CourseWithSectionsJSON
  * @returns The parsed CourseWithSections object
  */
+//TODO: Make sure that typing is consistent
 const parseCourseWithSections = (
   course: CourseWithSectionsJSON,
-): CourseWithSections => {
+): CourseResponse => {
   return {
     ...course,
-    createdAt: new Date(course.createdAt),
-    updatedAt: new Date(course.updatedAt),
     mainSections: course.mainSections.map((section) => ({
       ...section,
       type: section.type as MainSectionType,
@@ -41,7 +40,7 @@ const parseCourseWithSections = (
       exams: section.exams.map((exam) => ({
         ...exam,
         type: exam.type as ExamType,
-        date: new Date(exam.date),
+        date: exam.date,
         startTime: exam.startTime,
         endTime: exam.endTime,
       })),
@@ -70,7 +69,7 @@ const getCourses: () => Promise<APIResult<Course[]>> = async () => {
 
 const getCourseDetails: (
   courseNames: string[],
-) => Promise<APIResult<CourseWithSections[]>> = async (courseNames) => {
+) => Promise<APIResult<CourseResponse[]>> = async (courseNames) => {
   try {
     const response = await get("/api/course/details", {
       courses: courseNames.join(","),

@@ -87,7 +87,6 @@ const updateSchedules = async () => {
           section: sub.section,
           type: sub.type,
           mainSectionId: newMain.id,
-          isRequired: sub.isRequired,
         });
       }
 
