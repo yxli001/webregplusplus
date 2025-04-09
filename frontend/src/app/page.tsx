@@ -112,11 +112,11 @@ export default function Home() {
       async function fetchSchedule() {
         console.log(schedulePreferences);
         const spreadMap: Record<string, number> = {
-          "really spread out": 10,
-          "slightly spread out": 8,
+          "really-spread-out": 10,
+          "slightly-spread-out": 8,
           neutral: 6,
           compact: 4,
-          "extremely compact": 2,
+          "extremely-compact": 2,
         };
         const dayScoreMap: Record<string, { index: number; score: number }> = {
           Su: { index: 0, score: 0 },
@@ -145,7 +145,7 @@ export default function Home() {
             schedulePreferences.preferredDays,
           ),
           spread: spreadMap[schedulePreferences.spread.toLowerCase()],
-          avoidBackToBack: false,
+          avoidBackToBack: schedulePreferences.avoidBackToBack,
           //blockInstructor: "Watts, Edward J.",
         };
         console.log(userPreferences);

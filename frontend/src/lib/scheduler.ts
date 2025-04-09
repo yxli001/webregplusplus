@@ -206,7 +206,7 @@ export function calculateFitness(
       const spreadDiff = Math.abs(
         duration - preferences.spread / TIME_INTERVAL,
       );
-      score += Math.floor(5 / spreadDiff);
+      score += Math.floor(10 / spreadDiff);
     }
   }
 
