@@ -24,7 +24,8 @@
 
   html,
   body {
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     color: var(--text-light);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;

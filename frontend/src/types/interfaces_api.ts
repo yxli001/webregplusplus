@@ -88,7 +88,7 @@ export interface Preferences {
   preferredDays: number[]; // { "M": 6, "Tu": 9, "W": 6, "Th": 9, "F": 6 }
   spread: number;
   avoidBackToBack: boolean;
-  blockInstructor: string;
+  //blockInstructor: string;
 }
 
 export interface Schedule {

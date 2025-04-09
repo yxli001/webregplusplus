@@ -1,4 +1,5 @@
-import { Course, CourseWithSections } from "@/types/course";
+import { CourseResponse } from "@/types/interfaces_api";
+import { Course } from "@/types/course";
 import { SpreadPreference } from "@/types/preferences";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
@@ -17,7 +18,7 @@ type CoursePreference = {
   selectedSubSections: string[];
 };
 
-type SchedulePreferences = {
+export type SchedulePreferences = {
   spread: SpreadPreference;
   avoidBackToBack: boolean;
   excludedTimeSlots: TimeSlot[];
@@ -28,13 +29,13 @@ type SchedulePreferences = {
 
 type PreferenceState = {
   selectedCourses: Course[];
-  courseDetails: CourseWithSections[];
+  courseDetails: CourseResponse[];
   coursePreferences: CoursePreference[];
   schedulePreferences: SchedulePreferences;
 
   // Actions
   setSelectedCourses: (courses: Course[]) => void;
-  setCourseDetails: (details: CourseWithSections[]) => void;
+  setCourseDetails: (details: CourseResponse[]) => void;
   removeCourse: (id: string) => void;
   updateCoursePreferences: (
     id: string,

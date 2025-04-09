@@ -1,3 +1,5 @@
+import { MainSectionResponse } from "@/types/interfaces_api";
+
 export interface CourseJSON {
   id: string;
   subject: string;
@@ -7,7 +9,7 @@ export interface CourseJSON {
 }
 
 export interface CourseWithSectionsJSON extends CourseJSON {
-  mainSections: MainSection[];
+  mainSections: MainSectionResponse[];
 }
 
 export interface MainSectionJSON {
