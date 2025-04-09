@@ -1,7 +1,7 @@
 import "module-alias/register";
-import "dotenv/config";
+import { envType } from "@/util/envConfig";
 import cron from "node-cron";
-import { Sequelize } from "sequelize-typescript";
+import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { serverLogger, dbLogger } from "@/util/logger";
 import env from "@/util/validateEnv";
 import { scrapeSchedule } from "@/scrape";
@@ -14,8 +14,7 @@ import app from "./app";
 
 const connectDB = async () => {
   try {
-    // Connect to Postgres
-    const sequelize = new Sequelize({
+    const sequelizeConfig: SequelizeOptions = {
       models: [__dirname + "/models/*.model.ts"],
       dialect: "postgres",
       host: env.POSTGRES_HOST,
@@ -23,11 +22,23 @@ const connectDB = async () => {
       database: env.POSTGRES_DB,
       username: env.POSTGRES_USER,
       password: env.POSTGRES_PASSWORD,
-      ssl: true,
       logging: (sql) => {
         dbLogger.debug(sql); // Log SQL queries to the database log file
       },
-    });
+    };
+
+    // Conditionally add `dialectOptions` for staging and production
+    if (envType === "staging" || envType === "production") {
+      sequelizeConfig.dialectOptions = {
+        ssl: {
+          require: true, // Use SSL in staging and production
+          rejectUnauthorized: false, // Allow self-signed certificates
+        },
+      };
+    }
+
+    // Connect to Postgres
+    const sequelize = new Sequelize(sequelizeConfig);
 
     // Test DB Connection
     await sequelize.authenticate();
@@ -106,7 +117,7 @@ const scheduleJobs = () => {
   serverLogger.info("Scheduling schedule update job");
 
   cron.schedule(
-    "0 0 * * *",
+    "0 0 * * 0",
     async () => {
       serverLogger.info("Starting schedule update job...");
       await updateSchedules();
