@@ -9,7 +9,8 @@
   "scripts": {
     "build": "pnpm run check-git-hooks && npx tsc",
     "start": "node dist/index.ts",
-    "dev": "nodemon src/index.ts",
+    "dev": "NODE_ENV=development nodemon src/index.ts",
+    "dev-staging": "NODE_ENV=staging nodemon src/index.ts",
     "lint-check": "eslint . && prettier --check .",
     "lint-fix": "eslint . --fix && prettier --write .",
     "prepare": "cd .. && husky",
