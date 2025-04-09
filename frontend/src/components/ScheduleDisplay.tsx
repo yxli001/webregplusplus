@@ -1,22 +1,8 @@
 "use client"; // Ensure it's a client component
 
 import FullCalendar from "@fullcalendar/react";
-// import {
-//   createMainSectionLookup,
-//   createSubSectionLookup,
-//   parseAvailableCourses,
-// } from "../app/util/helper";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid";
-// import { useEffect, useState } from "react";
-// import generateOptimalSchedule from "@/app/lib/scheduler";
-// import { convertDaysToNumbers } from "../app/util/helper";
-// import {
-//   MainSection,
-//   Preferences,
-//   Schedule,
-//   SubSection,
-// } from "../app/types/interfaces_api";
 
 interface Event {
   id: string;

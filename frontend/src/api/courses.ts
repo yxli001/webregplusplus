@@ -1,12 +1,13 @@
 import {
   Course,
   CourseJSON,
+  CourseWithSections,
   CourseWithSectionsJSON,
   ExamType,
   MainSectionType,
+  SubSectionType,
 } from "@/types/course";
 import { APIResult, get, handleAPIError } from "./requests";
-import { CourseResponse } from "@/types/interfaces_api";
 
 /**
  * Parses a CourseJSON object into a Course object.
@@ -26,12 +27,13 @@ const parseCourse = (course: CourseJSON): Course => {
  * @param course - The CourseWithSectionsJSON
  * @returns The parsed CourseWithSections object
  */
-//TODO: Make sure that typing is consistent
 const parseCourseWithSections = (
   course: CourseWithSectionsJSON,
-): CourseResponse => {
+): CourseWithSections => {
   return {
     ...course,
+    createdAt: new Date(course.createdAt),
+    updatedAt: new Date(course.updatedAt),
     mainSections: course.mainSections.map((section) => ({
       ...section,
       type: section.type as MainSectionType,
@@ -40,10 +42,18 @@ const parseCourseWithSections = (
       exams: section.exams.map((exam) => ({
         ...exam,
         type: exam.type as ExamType,
-        date: exam.date,
-        startTime: exam.startTime,
-        endTime: exam.endTime,
+        createdAt: new Date(exam.createdAt),
+        updatedAt: new Date(exam.updatedAt),
+        date: new Date(exam.date),
       })),
+      subSections: section.subSections.map((subSection) => ({
+        ...subSection,
+        type: subSection.type as SubSectionType,
+        createdAt: new Date(subSection.createdAt),
+        updatedAt: new Date(subSection.updatedAt),
+      })),
+      createdAt: new Date(section.createdAt),
+      updatedAt: new Date(section.updatedAt),
     })),
   };
 };
@@ -69,7 +79,7 @@ const getCourses: () => Promise<APIResult<Course[]>> = async () => {
 
 const getCourseDetails: (
   courseNames: string[],
-) => Promise<APIResult<CourseResponse[]>> = async (courseNames) => {
+) => Promise<APIResult<CourseWithSections[]>> = async (courseNames) => {
   try {
     const response = await get("/api/course/details", {
       courses: courseNames.join(","),
@@ -78,7 +88,7 @@ const getCourseDetails: (
 
     return {
       success: true,
-      data: data.map(parseCourseWithSections),
+      data: data.map((course) => parseCourseWithSections(course)),
     };
   } catch (error) {
     return handleAPIError(error);
