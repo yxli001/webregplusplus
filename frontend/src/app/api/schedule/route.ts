@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { DateTime } from "luxon";
-import { Lecture } from "@/app/types/interfaces";
 import { dummyCourses } from "@/app/lib/dummy_courses"; // JSON file
 
 export async function GET() {

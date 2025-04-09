@@ -25,6 +25,7 @@ type SubSectionAttributes = {
   endTime: string;
   location: string;
   mainSectionId: string;
+  isRequired: boolean;
 };
 
 // Define the creation attributes of the School model
@@ -73,6 +74,10 @@ class SubSection extends Model<
   @AllowNull(false)
   @Column(DataType.STRING)
   location: string;
+
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isRequired: boolean;
 
   @ForeignKey(() => MainSection)
   @AllowNull(false)

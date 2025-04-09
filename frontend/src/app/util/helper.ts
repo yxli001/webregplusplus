@@ -1,5 +1,11 @@
-import { Lecture, Schedule, Section } from "../types/interfaces";
-import { MainSection, SubSection } from "../types/interfaces_api";
+import {
+  CourseResponse,
+  Course,
+  Exam,
+  MainSection,
+  SubSection,
+  Schedule,
+} from "../types/interfaces_api";
 
 export function timeToIndex(
   time: string,
@@ -49,38 +55,9 @@ export function convertDaysToNumbers(days: string): number[] {
 
   return matches.map((day) => mapping[day]);
 }
-
-export function createLectureLookup(
-  lectures: Lecture[],
-): Map<string, Lecture[]> {
-  const lectureMap = new Map<string, Lecture[]>();
-  lectures.forEach((lecture) => {
-    if (!lectureMap.has(lecture.course_id)) {
-      lectureMap.set(lecture.course_id, []);
-    }
-    lectureMap.get(lecture.course_id)!.push(lecture);
-  });
-
-  return lectureMap;
-}
-
-export function createSectionLookup(
-  sections: Section[],
-): Map<string, Section[]> {
-  const sectionMap = new Map<string, Section[]>();
-  sections.forEach((section) => {
-    if (!sectionMap.has(section.lecture_id)) {
-      sectionMap.set(section.lecture_id, []);
-    }
-    sectionMap.get(section.lecture_id)!.push(section);
-  });
-
-  return sectionMap;
-}
-
-export function createMainSectionLookup(
+export async function createMainSectionLookup(
   mainSections: MainSection[],
-): Map<string, MainSection[]> {
+): Promise<Map<string, MainSection[]>> {
   const mainSectionMap = new Map<string, MainSection[]>();
   mainSections.forEach((mainSection) => {
     if (!mainSectionMap.has(mainSection.course_id)) {
@@ -92,9 +69,9 @@ export function createMainSectionLookup(
   return mainSectionMap;
 }
 
-export function createSubSectionLookup(
+export async function createSubSectionLookup(
   subSections: SubSection[],
-): Map<string, SubSection[]> {
+): Promise<Map<string, SubSection[]>> {
   const sectionMap = new Map<string, SubSection[]>();
   subSections.forEach((subSection) => {
     if (!sectionMap.has(subSection.main_section_id)) {
@@ -104,6 +81,60 @@ export function createSubSectionLookup(
   });
 
   return sectionMap;
+}
+
+export async function parseAvailableCourses(coursesResponse: CourseResponse[]) {
+  const output = {
+    courses: [] as Course[],
+    mainSection: [] as MainSection[],
+    subSection: [] as SubSection[],
+    exams: [] as Exam[],
+  };
+
+  for (const course of coursesResponse) {
+    output.courses.push({
+      id: course.id,
+      subject: course.subject,
+      code: course.code,
+    });
+
+    for (const mainSection of course.mainSections) {
+      output.mainSection.push({
+        id: mainSection.id,
+        letter: mainSection.letter,
+        type: mainSection.type,
+        course_id: course.id,
+        instructor: mainSection.instructor,
+        days: mainSection.days,
+        start_time: convertTo24Hr(mainSection.startTime),
+        end_time: convertTo24Hr(mainSection.endTime),
+        exam: mainSection.exams.map((exam) => ({
+          id: exam.id,
+          type: exam.type,
+          date: exam.date,
+          start_time: convertTo24Hr(exam.startTime),
+          end_time: convertTo24Hr(exam.endTime),
+          location: exam.location,
+          main_section_id: mainSection.id,
+        })),
+        location: mainSection.location,
+      });
+      for (const subSection of mainSection.subSections) {
+        output.subSection.push({
+          id: subSection.id,
+          section: subSection.section,
+          main_section_id: mainSection.id,
+          type: subSection.type,
+          days: subSection.days,
+          location: subSection.location,
+          start_time: convertTo24Hr(subSection.startTime),
+          end_time: convertTo24Hr(subSection.endTime),
+          is_required: subSection.isRequired,
+        });
+      }
+    }
+  }
+  return output;
 }
 
 export function hashSchedule(schedule: Schedule): string {

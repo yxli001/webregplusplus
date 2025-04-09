@@ -82,6 +82,7 @@ const updateSchedules = async () => {
           days: sub.days,
           startTime: sub.startTime,
           endTime: sub.endTime,
+          isRequired: sub.isRequired,
           location: sub.location,
           section: sub.section,
           type: sub.type,

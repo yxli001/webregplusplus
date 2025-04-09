@@ -81,3 +81,17 @@ export interface Exam {
   location: string;
   main_section_id: string;
 }
+
+export interface Preferences {
+  preferredStart: string; // e.g. "09:00"
+  preferredEnd: string; // e.g. "15:00"
+  preferredDays: number[]; // { "M": 6, "Tu": 9, "W": 6, "Th": 9, "F": 6 }
+  spread: number;
+  avoidBackToBack: boolean;
+  blockInstructor: string;
+}
+
+export interface Schedule {
+  classes: (MainSection | SubSection)[];
+  fitness: number;
+}

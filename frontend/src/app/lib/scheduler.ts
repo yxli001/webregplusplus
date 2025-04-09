@@ -1,26 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { brandon_wi24 } from "./brandon_wi24";
-import {
-  Lecture,
-  Preferences,
-  Section,
-  Schedule,
-} from "@/app/types/interfaces";
-import {
-  Course,
-  CourseResponse,
-  Exam,
-  SubSection,
-} from "@/app/types/interfaces_api";
+import { SubSection, Preferences, Schedule } from "@/app/types/interfaces_api";
 import {
   convertDaysToNumbers,
-  convertTo24Hr,
   timeToIndex,
-  //   createLectureLookup,
-  //   createSectionLookup,
   hashSchedule,
-  createMainSectionLookup,
-  createSubSectionLookup,
 } from "../util/helper";
 import { brandon_sp24_api } from "./brandon_sp24_api";
 import { MainSection } from "../types/interfaces_api";
@@ -33,65 +17,10 @@ const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
 // const sample1 = brandon_wi24;
 const sample2 = brandon_sp24_api;
 console.log(sample2);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function parseAvailableCourses(coursesResponse: CourseResponse[]) {
-  const output = {
-    courses: [] as Course[],
-    mainSection: [] as MainSection[],
-    subSection: [] as SubSection[],
-    exams: [] as Exam[],
-  };
 
-  for (const course of coursesResponse) {
-    output.courses.push({
-      id: course.id,
-      subject: course.subject,
-      code: course.code,
-    });
-
-    for (const mainSection of course.mainSections) {
-      output.mainSection.push({
-        id: mainSection.id,
-        letter: mainSection.letter,
-        type: mainSection.type,
-        course_id: course.id,
-        instructor: mainSection.instructor,
-        days: mainSection.days,
-        start_time: convertTo24Hr(mainSection.startTime),
-        end_time: convertTo24Hr(mainSection.endTime),
-        exam: mainSection.exams.map((exam) => ({
-          id: exam.id,
-          type: exam.type,
-          date: exam.date,
-          start_time: convertTo24Hr(exam.startTime),
-          end_time: convertTo24Hr(exam.endTime),
-          location: exam.location,
-          main_section_id: mainSection.id,
-        })),
-        location: mainSection.location,
-      });
-
-      for (const section of mainSection.subSections) {
-        output.subSection.push({
-          id: section.id,
-          section: section.section,
-          main_section_id: mainSection.id,
-          type: section.type,
-          days: section.days,
-          location: section.location,
-          start_time: convertTo24Hr(section.startTime),
-          end_time: convertTo24Hr(section.endTime),
-          is_required: section.isRequired,
-        });
-      }
-    }
-  }
-
-  return output;
-}
 function isValidEntry(
-  schedule: (Lecture | Section)[],
-  newEntry: Lecture | Section,
+  schedule: (MainSection | SubSection)[],
+  newEntry: MainSection | SubSection,
 ): boolean {
   console.log(newEntry);
   for (let i = 0; i < schedule.length; i++) {
@@ -141,7 +70,7 @@ function isValidEntry(
 }
 
 function isValidTimegrid(
-  newEntry: Lecture | Section,
+  newEntry: MainSection | SubSection,
   timeGrid: boolean[][],
 ): boolean {
   const days = convertDaysToNumbers(newEntry.days);
@@ -171,9 +100,9 @@ function isValidTimegrid(
 // generate schedule loop
 
 export function calculateFitness(
-  schedule: (Lecture | Section)[],
+  schedule: (MainSection | SubSection)[],
   preferences: Preferences,
-  changedClasses?: (Lecture | Section)[],
+  changedClasses?: (MainSection | SubSection)[],
 ): number {
   let score = 0;
   const earliest = Array(7).fill(10000);
@@ -292,26 +221,27 @@ export function calculateFitness(
 
 export async function generateRandomSchedule(
   courseIds: string[],
-  lectureMap: Map<string, Lecture[]>,
-  sectionMap: Map<string, Section[]>,
-): Promise<(Lecture | Section)[]> {
-  const schedule: (Lecture | Section)[] = [];
+  mainSectionMap: Map<string, MainSection[]>,
+  subSectionMap: Map<string, SubSection[]>,
+): Promise<(MainSection | SubSection)[]> {
+  const schedule: (MainSection | SubSection)[] = [];
   const timeGrid = Array.from({ length: 7 }, () =>
     Array(TIME_SLOTS).fill(false),
   ); // Track occupied time slots
 
   for (const courseId of courseIds) {
-    const lectures = lectureMap.get(courseId) || [];
+    const mainSections = mainSectionMap.get(courseId) || [];
+    console.log(mainSections);
+    const mainSection =
+      mainSections[Math.floor(Math.random() * mainSections.length)];
+    console.log(mainSection);
+    if (!isValidTimegrid(mainSection, timeGrid)) return [];
 
-    const lecture = lectures[Math.floor(Math.random() * lectures.length)];
+    schedule.push(mainSection);
 
-    if (!isValidTimegrid(lecture, timeGrid)) return [];
-
-    schedule.push(lecture);
-
-    const sections = sectionMap.get(lecture.id) || [];
-    const requiredSections = sections.filter((s) => s.is_required);
-    const optionalSections = sections.filter((s) => !s.is_required);
+    const subSections = subSectionMap.get(mainSection.id) || [];
+    const requiredSections = subSections.filter((s) => s.is_required);
+    const optionalSections = subSections.filter((s) => !s.is_required);
 
     const optionalSection = optionalSections.length
       ? optionalSections[Math.floor(Math.random() * optionalSections.length)]
@@ -337,8 +267,8 @@ export async function generateSchedules(
   quantity: number,
   courseId: string[],
   preferences: Preferences,
-  lectureMap: Map<string, Lecture[]>,
-  sectionMap: Map<string, Section[]>,
+  mainSectionMap: Map<string, MainSection[]>,
+  subSectionmap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {
   const schedules: Schedule[] = [];
   let validSchedules = 0;
@@ -347,8 +277,8 @@ export async function generateSchedules(
     iterations++;
     const newSchedule = await generateRandomSchedule(
       courseId,
-      lectureMap,
-      sectionMap,
+      mainSectionMap,
+      subSectionmap,
     );
     if (newSchedule.length != 0) {
       schedules.push({
@@ -370,106 +300,113 @@ export function selectParents(schedules: Schedule[]): Schedule[] {
   return selectedSchedules;
 }
 function mutateSection(
-  schedule: (Lecture | Section)[],
-  selectedEntry: Section,
+  schedule: (MainSection | SubSection)[],
+  selectedEntry: SubSection,
   randomIndex: number,
-  sectionMap: Map<string, Section[]>,
+  subSectionMap: Map<string, SubSection[]>,
   maxRetries = 5,
 ) {
-  // Check if the selected entry is a required section
+  // Check if the selected entry is a required subSection
   if (selectedEntry.is_required) {
     console.log(
-      ` Section Mutation Skipped: Required section ${JSON.stringify(
+      ` SubSection Mutation Skipped: Required subSection ${JSON.stringify(
         selectedEntry,
       )} cannot be replaced.`,
     );
     return false;
   }
 
-  // Get available optional sections for the correct lecture
+  // Get available optional subSections for the correct mainSection
   const availableSections = (
-    sectionMap.get(selectedEntry.lecture_id) || []
+    subSectionMap.get(selectedEntry.main_section_id) || []
   ).filter(
-    (section) =>
-      !section.is_required && // Only allow non-required sections
-      section.id !== selectedEntry.id && // Avoid replacing with itself
-      section.lecture_id === selectedEntry.lecture_id && // Ensure it's the same lecture
+    (subSection) =>
+      !subSection.is_required && // Only allow non-required subSections
+      subSection.id !== selectedEntry.id && // Avoid replacing with itself
+      subSection.main_section_id === selectedEntry.main_section_id && // Ensure it's the same mainSection
       schedule.every(
         (entry) =>
-          entry.id !== section.id ||
-          ("lecture_id" in entry && entry.lecture_id !== section.lecture_id),
-      ), // Prevent adding duplicate sections
+          entry.id !== subSection.id ||
+          ("main_section_id" in entry &&
+            entry.main_section_id !== subSection.main_section_id),
+      ), // Prevent adding duplicate subSections
   );
 
-  // Handle valid available sections
+  // Handle valid available subSections
   if (availableSections.length > 0) {
     let attempts = 0;
-    let newSection: Section | null = null;
+    let newSection: SubSection | null = null;
 
     while (attempts < maxRetries) {
       newSection =
         availableSections[Math.floor(Math.random() * availableSections.length)];
 
-      // Double-check that new section is valid and has no conflicts
+      // Double-check that new subSection is valid and has no conflicts
       if (
         newSection &&
-        selectedEntry.lecture_id === newSection.lecture_id &&
+        selectedEntry.main_section_id === newSection.main_section_id &&
         isValidEntry(schedule, newSection)
       ) {
         schedule[randomIndex] = newSection;
         console.log(
-          ` Section Mutation: Replaced ${JSON.stringify(
+          ` SubSection Mutation: Replaced ${JSON.stringify(
             selectedEntry,
           )} with ${JSON.stringify(newSection)}.`,
         );
         return true;
       } else {
         console.log(
-          ` Attempt ${attempts + 1}: Section mutation failed due to conflict or invalid match.`,
+          ` Attempt ${attempts + 1}: SubSection mutation failed due to conflict or invalid match.`,
         );
       }
       attempts++;
     }
     console.log(
-      ` No valid section found after ${maxRetries} attempts for section ${JSON.stringify(
+      ` No valid subSection found after ${maxRetries} attempts for subSection ${JSON.stringify(
         selectedEntry,
-      )}. Keeping original section.`,
+      )}. Keeping original subSection.`,
     );
   } else {
     console.log(
-      ` No available sections found for lecture_id ${selectedEntry.lecture_id}. Mutation skipped.`,
+      ` No available subSections found for main_section_id ${selectedEntry.main_section_id}. Mutation skipped.`,
     );
   }
 
   return false;
 }
 
-function mutateLecture(
-  schedule: (Lecture | Section)[],
-  selectedEntry: Lecture,
+function mutateMainSection(
+  schedule: (MainSection | SubSection)[],
+  selectedEntry: MainSection,
   randomIndex: number,
-  lectureMap: Map<string, Lecture[]>,
-  sectionMap: Map<string, Section[]>,
+  mainSectionMap: Map<string, MainSection[]>,
+  subSectionMap: Map<string, SubSection[]>,
 ): boolean {
-  const availableLectures = lectureMap.get(selectedEntry.course_id) || [];
-  if (availableLectures.length > 1) {
-    const newLecture =
-      availableLectures[Math.floor(Math.random() * availableLectures.length)];
+  const availableMainSections =
+    mainSectionMap.get(selectedEntry.course_id) || [];
+  if (availableMainSections.length > 1) {
+    const newMainSection =
+      availableMainSections[
+        Math.floor(Math.random() * availableMainSections.length)
+      ];
 
-    //  Check if the new lecture is valid and has no conflicts
-    if (isValidEntry(schedule, newLecture)) {
-      //  Replace lecture if valid
-      schedule[randomIndex] = newLecture;
+    //  Check if the new mainSection is valid and has no conflicts
+    if (isValidEntry(schedule, newMainSection)) {
+      //  Replace mainSection if valid
+      schedule[randomIndex] = newMainSection;
 
-      // Remove any sections tied to the old lecture
+      // Remove any subSections tied to the old mainSection
       const updatedSchedule = schedule.filter(
-        (sec) => !("lecture_id" in sec && sec.lecture_id === selectedEntry.id),
+        (sec) =>
+          !(
+            "main_section_id" in sec && sec.main_section_id === selectedEntry.id
+          ),
       );
 
-      // Add a new optional section for the new lecture if available
-      const availableSections = (sectionMap.get(newLecture.id) || []).filter(
-        (section) => !section.is_required,
-      );
+      // Add a new optional subSection for the new mainSection if available
+      const availableSections = (
+        subSectionMap.get(newMainSection.id) || []
+      ).filter((subSection) => !subSection.is_required);
 
       if (availableSections.length > 0) {
         const newSection =
@@ -477,24 +414,24 @@ function mutateLecture(
             Math.floor(Math.random() * availableSections.length)
           ];
 
-        // Check if the new section is valid before adding it
+        // Check if the new subSection is valid before adding it
         if (isValidEntry(updatedSchedule, newSection)) {
           updatedSchedule.push(newSection);
           console.log(
-            `🔄 Lecture Mutation: Replaced ${JSON.stringify(
+            `🔄 MainSection Mutation: Replaced ${JSON.stringify(
               selectedEntry,
-            )} with ${JSON.stringify(newLecture)} and added section ${JSON.stringify(
+            )} with ${JSON.stringify(newMainSection)} and added subSection ${JSON.stringify(
               newSection,
             )}.`,
           );
         } else {
-          console.log(` Optional section addition skipped due to conflict.`);
+          console.log(` Optional subSection addition skipped due to conflict.`);
         }
       }
 
       return true;
     } else {
-      console.log(` Lecture mutation failed due to conflict.`);
+      console.log(` MainSection mutation failed due to conflict.`);
     }
   }
   return false;
@@ -505,8 +442,8 @@ export function mutate(
   preferences: Preferences,
   cache: Map<string, number>,
   temperature: number,
-  lectureMap: Map<string, Lecture[]>,
-  sectionMap: Map<string, Section[]>,
+  mainSectionMap: Map<string, MainSection[]>,
+  subSectionMap: Map<string, SubSection[]>,
 ) {
   const originalFitness = calculateFitness(schedule.classes, preferences);
   let newSchedule = [...schedule.classes];
@@ -520,16 +457,16 @@ export function mutate(
     const randomIndex = Math.floor(Math.random() * mutatedSchedule.length);
     const selectedEntry = mutatedSchedule[randomIndex];
 
-    // Mutate Section or Lecture
-    if ("lecture_id" in selectedEntry) {
-      mutateSection(mutatedSchedule, selectedEntry, randomIndex, sectionMap);
+    // Mutate SubSection or MainSection
+    if ("main_section_id" in selectedEntry) {
+      mutateSection(mutatedSchedule, selectedEntry, randomIndex, subSectionMap);
     } else {
-      mutateLecture(
+      mutateMainSection(
         mutatedSchedule,
         selectedEntry,
         randomIndex,
-        lectureMap,
-        sectionMap,
+        mainSectionMap,
+        subSectionMap,
       );
     }
 
@@ -567,18 +504,17 @@ export function mutate(
 export default async function generateOptimalSchedule(
   courseId: string[],
   preferences: Preferences,
+  mainSectionMap: Map<string, MainSection[]>,
+  subSectionMap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {
-  const output = parseAvailableCourses(sample2);
-  //   const lectureMap = createLectureLookup(sample1.lectures);
-  //   const sectionMap = createSectionLookup(sample1.sections);
-  const mainSectionMap = createMainSectionLookup(output.mainSection);
-  const subSectionMap = createSubSectionLookup(output.subSection);
+  console.log(mainSectionMap);
+  console.log(subSectionMap);
   let scheduleList = await generateSchedules(
-    2,
+    5,
     courseId,
     preferences,
-    lectureMap,
-    sectionMap,
+    mainSectionMap,
+    subSectionMap,
   );
   const cache = new Map<string, number>();
 
@@ -589,7 +525,7 @@ export default async function generateOptimalSchedule(
     // }
     const parents = selectParents(scheduleList);
     const children = parents.map((parent) =>
-      mutate(parent, preferences, cache, 10, lectureMap, sectionMap),
+      mutate(parent, preferences, cache, 10, mainSectionMap, subSectionMap),
     );
     scheduleList = [...parents, ...children];
 
