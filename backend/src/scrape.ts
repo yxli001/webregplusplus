@@ -23,12 +23,18 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
   try {
     serverLogger.info("Starting Puppeteer browser...");
-    browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
+    browser = await puppeteer.launch({ headless: false, browser: "chrome" }); // Set to false if debugging
 
     const page = await browser.newPage();
 
     serverLogger.info("Navigating to the webpage...");
     await page.goto(SCHEDULE_OF_CLASSES_URL, { waitUntil: "domcontentloaded" });
+
+    serverLogger.info("Waiting for quarter selector to load...");
+    await page.waitForSelector("#selectedTerm");
+
+    serverLogger.info("Selecting Spring 2025 quarter...");
+    await page.select("#selectedTerm", "SP25");
 
     serverLogger.info("Waiting for subject list to load...");
     await page.waitForSelector("select#selectedSubjects option");
@@ -39,17 +45,6 @@ export async function scrapeSchedule(): Promise<Course[]> {
     serverLogger.info("Selecting SP25 term...");
     await page.select("select#selectedTerm", "SP25");
 
-    serverLogger.info("Checking all options...");
-    await page.evaluate(() => {
-      const checkboxes = document.querySelectorAll("input[id^='schedOption']");
-      checkboxes.forEach((checkbox) => {
-        (checkbox as HTMLInputElement).checked = true;
-      });
-    });
-
-    serverLogger.info("Selecting Spring 2025 quarter...");
-    await page.select("#selectedTerm", "SP25");
-
     serverLogger.info("Selecting all subjects...");
     await page.evaluate(() => {
       const subjectOptions = document.querySelectorAll(
@@ -58,6 +53,14 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
       subjectOptions.forEach((option) => {
         (option as HTMLOptionElement).selected = true;
+      });
+    });
+
+    serverLogger.info("Checking all options...");
+    await page.evaluate(() => {
+      const checkboxes = document.querySelectorAll("input[id^='schedOption']");
+      checkboxes.forEach((checkbox) => {
+        (checkbox as HTMLInputElement).checked = true;
       });
     });
 

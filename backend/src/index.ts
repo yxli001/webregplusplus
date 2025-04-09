@@ -136,7 +136,7 @@ const startServer = async () => {
   await connectDB();
 
   // scheduleJobs();
-  // updateSchedules();
+  updateSchedules();
 
   app.listen(env.PORT, () => {
     serverLogger.info(`Server listening on port ${env.PORT}`);
