@@ -87,6 +87,7 @@ const updateSchedules = async () => {
           section: sub.section,
           type: sub.type,
           mainSectionId: newMain.id,
+          isRequired: sub.isRequired,
         });
       }
 
@@ -110,7 +111,7 @@ const scheduleJobs = () => {
   logger.info("Scheduling schedule update job");
 
   cron.schedule(
-    "* * * * *",
+    "0 0 * * *",
     async () => {
       logger.info("Starting schedule update job...");
       await updateSchedules();
@@ -128,6 +129,7 @@ const startServer = async () => {
   await connectDB();
 
   // scheduleJobs();
+  // updateSchedules();
 
   app.listen(env.PORT, () => {
     logger.info(`Server listening on port ${env.PORT}`);

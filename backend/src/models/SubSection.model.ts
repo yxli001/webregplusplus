@@ -84,6 +84,10 @@ class SubSection extends Model<
   @Column({ type: DataType.UUID, field: "main_section_id" })
   mainSectionId: string;
 
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isRequired: boolean;
+
   @CreatedAt
   @Column({ type: DataType.DATE, field: "created_at" })
   createdAt: Date;
