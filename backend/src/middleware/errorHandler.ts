@@ -1,4 +1,4 @@
-import logger from "@/util/logger";
+import { serverLogger } from "@/util/logger";
 import { NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
@@ -18,14 +18,14 @@ const errorHandler = (
     // error.status is unique to the http error class, it allows us to pass status codes with errors
     statusCode = error.status;
     errorMessage = error.message;
-    logger.error(
+    serverLogger.error(
       `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin}`,
     );
   }
   // prefer custom http errors but if they don't exist, fallback to default
   else if (error instanceof Error) {
     errorMessage = error.message;
-    logger.error(
+    serverLogger.error(
       `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin}`,
     );
   }

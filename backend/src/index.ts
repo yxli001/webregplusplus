@@ -2,7 +2,7 @@ import "module-alias/register";
 import "dotenv/config";
 import cron from "node-cron";
 import { Sequelize } from "sequelize-typescript";
-import logger from "@/util/logger";
+import { serverLogger, dbLogger } from "@/util/logger";
 import env from "@/util/validateEnv";
 import { scrapeSchedule } from "@/scrape";
 import { coursesToString } from "./util/courses";
@@ -24,13 +24,9 @@ const connectDB = async () => {
       username: env.POSTGRES_USER,
       password: env.POSTGRES_PASSWORD,
       ssl: true,
-      // dialectOptions: {
-      //   ssl: {
-      //     require: true,
-      //     rejectUnauthorized: false,
-      //     ca: fs.readFileSync(join(__dirname, "..", "ca.pem")).toString(),
-      //   },
-      // },
+      logging: (sql) => {
+        dbLogger.debug(sql); // Log SQL queries to the database log file
+      },
     });
 
     // Test DB Connection
@@ -53,11 +49,11 @@ const updateSchedules = async () => {
   // await SubSection.drop({ cascade: true });
   // await Exam.drop({ cascade: true });
 
-  logger.info("Updating schedules...");
+  serverLogger.info("Updating schedules...");
 
   const courses = await scrapeSchedule();
 
-  logger.debug("\nScraped Courses: \n" + coursesToString(courses));
+  serverLogger.debug("\nScraped Courses: \n" + coursesToString(courses));
 
   for (const course of courses) {
     const newCourse = await Course.create({
@@ -107,12 +103,12 @@ const updateSchedules = async () => {
 // Schedules scraping job to run every minute
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scheduleJobs = () => {
-  logger.info("Scheduling schedule update job");
+  serverLogger.info("Scheduling schedule update job");
 
   cron.schedule(
     "0 0 * * *",
     async () => {
-      logger.info("Starting schedule update job...");
+      serverLogger.info("Starting schedule update job...");
       await updateSchedules();
     },
     {
@@ -121,7 +117,7 @@ const scheduleJobs = () => {
     },
   );
 
-  logger.info("Schedule update job scheduled");
+  serverLogger.info("Schedule update job scheduled");
 };
 
 const startServer = async () => {
@@ -131,7 +127,7 @@ const startServer = async () => {
   // updateSchedules();
 
   app.listen(env.PORT, () => {
-    logger.info(`Server listening on port ${env.PORT}`);
+    serverLogger.info(`Server listening on port ${env.PORT}`);
   });
 };
 

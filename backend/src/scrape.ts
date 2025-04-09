@@ -1,5 +1,5 @@
 import puppeteer, { Browser } from "puppeteer";
-import logger from "@/util/logger";
+import { serverLogger } from "@/util/logger";
 import {
   Course,
   MainSection,
@@ -22,24 +22,24 @@ export async function scrapeSchedule(): Promise<Course[]> {
   let browser: Browser | null = null;
 
   try {
-    logger.info("Starting Puppeteer browser...");
+    serverLogger.info("Starting Puppeteer browser...");
     browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
 
     const page = await browser.newPage();
 
-    logger.info("Navigating to the webpage...");
+    serverLogger.info("Navigating to the webpage...");
     await page.goto(SCHEDULE_OF_CLASSES_URL, { waitUntil: "domcontentloaded" });
 
-    logger.info("Waiting for subject list to load...");
+    serverLogger.info("Waiting for subject list to load...");
     await page.waitForSelector("select#selectedSubjects option");
 
-    logger.info("Waiting for checkboxes to load...");
+    serverLogger.info("Waiting for checkboxes to load...");
     await page.waitForSelector("input[id^=schedOption]");
 
-    logger.info("Selecting SP25 term...");
+    serverLogger.info("Selecting SP25 term...");
     await page.select("select#selectedTerm", "SP25");
 
-    logger.info("Checking all options...");
+    serverLogger.info("Checking all options...");
     await page.evaluate(() => {
       const checkboxes = document.querySelectorAll("input[id^='schedOption']");
       checkboxes.forEach((checkbox) => {
@@ -47,10 +47,10 @@ export async function scrapeSchedule(): Promise<Course[]> {
       });
     });
 
-    logger.info("Selecting Spring 2025 quarter...");
+    serverLogger.info("Selecting Spring 2025 quarter...");
     await page.select("#selectedTerm", "SP25");
 
-    logger.info("Selecting all subjects...");
+    serverLogger.info("Selecting all subjects...");
     await page.evaluate(() => {
       const subjectOptions = document.querySelectorAll(
         "select#selectedSubjects option",
@@ -61,10 +61,10 @@ export async function scrapeSchedule(): Promise<Course[]> {
       });
     });
 
-    logger.info("Searching...");
+    serverLogger.info("Searching...");
     await page.click("#socFacSubmit");
 
-    logger.info("Waiting for page numbers...");
+    serverLogger.info("Waiting for page numbers...");
     await page.waitForSelector("tr > td[align='right']");
 
     const numPages = await page.evaluate(() => {
@@ -83,14 +83,14 @@ export async function scrapeSchedule(): Promise<Course[]> {
           .trim() || "1",
       );
     });
-    logger.info(`Total pages: ${numPages}`);
+    serverLogger.info(`Total pages: ${numPages}`);
 
     const courses: Course[] = [];
 
     for (let batchStart = 0; batchStart < numPages; batchStart += BATCH_SIZE) {
       const batchEnd = Math.min(batchStart + BATCH_SIZE, numPages);
 
-      logger.info(`Processing pages ${batchStart + 1} to ${batchEnd}`);
+      serverLogger.info(`Processing pages ${batchStart + 1} to ${batchEnd}`);
 
       const pages = await Promise.all(
         Array.from({ length: batchEnd - batchStart }, async (_, i) => {
@@ -292,7 +292,7 @@ export async function scrapeSchedule(): Promise<Course[]> {
 
       pageCoursesArray.forEach((pageCourses) => {
         if (!pageCourses || pageCourses.length === 0) {
-          logger.info("No courses found.");
+          serverLogger.info("No courses found.");
           return;
         }
 
@@ -316,21 +316,21 @@ export async function scrapeSchedule(): Promise<Course[]> {
     }
 
     if (!courses) {
-      logger.error("No courses found.");
+      serverLogger.error("No courses found.");
       return [];
     }
 
-    logger.debug(`Found ${courses.length} courses.\n`);
+    serverLogger.debug(`Found ${courses.length} courses.\n`);
 
     return courses;
   } catch (error) {
-    logger.error(`Scraping failed: ${(error as Error).stack}`);
+    serverLogger.error(`Scraping failed: ${(error as Error).stack}`);
 
     return [];
   } finally {
     if (browser) {
       await browser.close();
-      logger.info("Closed Puppeteer browser.");
+      serverLogger.info("Closed Puppeteer browser.");
     }
   }
 }
