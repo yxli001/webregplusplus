@@ -11,11 +11,12 @@ import MainSection from "./models/MainSection.model";
 import SubSection from "./models/SubSection.model";
 import Exam from "./models/Exam.model";
 import app from "./app";
+import path from "path";
 
 const connectDB = async () => {
   try {
     const sequelizeConfig: SequelizeOptions = {
-      models: [__dirname + "/models/*.model.{ts,js}"],
+      models: [path.join(__dirname, "/models/*.model.{ts,js}")],
       dialect: "postgres",
       host: env.POSTGRES_HOST,
       port: parseInt(env.POSTGRES_PORT),
