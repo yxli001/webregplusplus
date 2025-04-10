@@ -190,7 +190,9 @@ export default function Home() {
               daysOfWeek: convertDaysToNumbers(entry.days),
               extendedProps: {
                 instructor: mainSection?.instructor || "TBA",
-                location: mainSection?.location || "TBD",
+                location: isMain
+                  ? mainSection?.location
+                  : entry?.location || "TBD",
                 meeting_type: isMain ? "Lecture" : "Section",
               },
             };
