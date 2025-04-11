@@ -255,27 +255,28 @@ export async function generateRandomSchedule(
     schedule.push(mainSection);
 
     const subSections = subSectionMap.get(mainSection.id) || [];
-    const requiredSections = subSections.filter((s) => s.isRequired);
-    const optionalSections = subSections.filter((s) => !s.isRequired);
+    if (subSections.length !== 0) {
+      const requiredSections = subSections.filter((s) => s.isRequired);
+      const optionalSections = subSections.filter((s) => !s.isRequired);
 
-    const optionalSection = optionalSections.length
-      ? optionalSections[Math.floor(Math.random() * optionalSections.length)]
-      : null;
+      const optionalSection = optionalSections.length
+        ? optionalSections[Math.floor(Math.random() * optionalSections.length)]
+        : null;
 
-    for (const requiredSection of requiredSections) {
-      if (requiredSection && isValidTimegrid(requiredSection, timeGrid)) {
-        schedule.push(requiredSection);
+      for (const requiredSection of requiredSections) {
+        if (requiredSection && isValidTimegrid(requiredSection, timeGrid)) {
+          schedule.push(requiredSection);
+        } else {
+          return [];
+        }
+      }
+      if (optionalSection && isValidTimegrid(optionalSection, timeGrid)) {
+        schedule.push(optionalSection);
       } else {
         return [];
       }
     }
-    if (optionalSection && isValidTimegrid(optionalSection, timeGrid)) {
-      schedule.push(optionalSection);
-    } else {
-      return [];
-    }
   }
-
   return schedule;
 }
 export async function generateSchedules(
@@ -317,7 +318,7 @@ export function selectParents(schedules: Schedule[]): Schedule[] {
   );
   return selectedSchedules;
 }
-function mutateSection(
+function mutateSubSection(
   schedule: (MainSection | SubSection)[],
   selectedEntry: SubSection,
   randomIndex: number,
@@ -335,7 +336,7 @@ function mutateSection(
   }
 
   // Get available optional subSections for the correct mainSection
-  const availableSections = (
+  const availableSubSections = (
     subSectionMap.get(selectedEntry.mainSectionId) || []
   ).filter(
     (subSection) =>
@@ -351,13 +352,15 @@ function mutateSection(
   );
 
   // Handle valid available subSections
-  if (availableSections.length > 0) {
+  if (availableSubSections.length > 0) {
     let attempts = 0;
     let newSection: SubSection | null = null;
 
     while (attempts < maxRetries) {
       newSection =
-        availableSections[Math.floor(Math.random() * availableSections.length)];
+        availableSubSections[
+          Math.floor(Math.random() * availableSubSections.length)
+        ];
 
       // Double-check that new subSection is valid and has no conflicts
       if (
@@ -419,35 +422,48 @@ function mutateMainSection(
           !("mainSectionId" in sec && sec.mainSectionId === selectedEntry.id),
       );
 
+      const requiredSubSections = (
+        subSectionMap.get(newMainSection.id) || []
+      ).filter((subSection) => subSection.isRequired);
       // Add a new optional subSection for the new mainSection if available
-      const availableSections = (
+      const availableSubSections = (
         subSectionMap.get(newMainSection.id) || []
       ).filter((subSection) => !subSection.isRequired);
 
-      if (availableSections.length > 0) {
-        const newSection =
-          availableSections[
-            Math.floor(Math.random() * availableSections.length)
-          ];
-
-        // Check if the new subSection is valid before adding it
-        if (isValidEntry(updatedSchedule, newSection)) {
-          updatedSchedule.push(newSection);
-          //   console.log(
-          //     `🔄 MainSection Mutation: Replaced ${JSON.stringify(
-          //       selectedEntry,
-          //     )} with ${JSON.stringify(newMainSection)} and added subSection ${JSON.stringify(
-          //       newSection,
-          //     )}.`,
-          //   );
-        } else {
-          //   console.log(` Optional subSection addition skipped due to conflict.`);
+      if (requiredSubSections.length > 0) {
+        for (const requiredSubSection of requiredSubSections) {
+          if (isValidEntry(updatedSchedule, requiredSubSection)) {
+            updatedSchedule.push(requiredSubSection);
+          } else {
+            return false;
+          }
         }
-      }
+        if (availableSubSections.length > 0) {
+          const newSection =
+            availableSubSections[
+              Math.floor(Math.random() * availableSubSections.length)
+            ];
 
-      return true;
-    } else {
-      //   console.log(` MainSection mutation failed due to conflict.`);
+          // Check if the new subSection is valid before adding it
+          if (isValidEntry(updatedSchedule, newSection)) {
+            updatedSchedule.push(newSection);
+            //   console.log(
+            //     `🔄 MainSection Mutation: Replaced ${JSON.stringify(
+            //       selectedEntry,
+            //     )} with ${JSON.stringify(newMainSection)} and added subSection ${JSON.stringify(
+            //       newSection,
+            //     )}.`,
+            //   );
+          } else {
+            //   console.log(` Optional subSection addition skipped due to conflict.`);
+            return false;
+          }
+        }
+
+        return true;
+      } else {
+        //   console.log(` MainSection mutation failed due to conflict.`);
+      }
     }
   }
   return false;
@@ -472,20 +488,28 @@ export function mutate(
     const mutatedSchedule = [...newSchedule];
     const randomIndex = Math.floor(Math.random() * mutatedSchedule.length);
     const selectedEntry = mutatedSchedule[randomIndex];
-
+    let success = false;
     // Mutate SubSection or MainSection
-    if ("mainSectionId" in selectedEntry) {
-      mutateSection(mutatedSchedule, selectedEntry, randomIndex, subSectionMap);
-    } else {
-      mutateMainSection(
+    if ("main_section_id" in selectedEntry) {
+      success = mutateSubSection(
         mutatedSchedule,
-        selectedEntry,
+        selectedEntry as SubSection,
+        randomIndex,
+        subSectionMap,
+      );
+    } else {
+      success = mutateMainSection(
+        mutatedSchedule,
+        selectedEntry as MainSection,
         randomIndex,
         mainSectionMap,
         subSectionMap,
       );
     }
 
+    if (!success) {
+      continue;
+    }
     const hash = hashSchedule({ classes: mutatedSchedule, fitness: 0 });
     if (cache.has(hash)) {
       newFitness = cache.get(hash)!;
@@ -523,8 +547,8 @@ export default async function generateOptimalSchedule(
   mainSectionMap: Map<string, MainSection[]>,
   subSectionMap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {
-  //   console.log(mainSectionMap);
-  //   console.log(subSectionMap);
+  console.log(mainSectionMap);
+  console.log(subSectionMap);
   let scheduleList = await generateSchedules(
     5,
     courseId,

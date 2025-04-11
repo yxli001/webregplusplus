@@ -101,6 +101,9 @@ The scheduling logic in `scheduler.ts` works by:
 
 This results in an optimized schedule that balances user preferences and constraints.
 
+## Issues
+If you select a class which has a location, time, instructor listed as TBA, it will not show in the scheduler and hence create a schedule with missing values.
+
 ## Screenshots
 
 _Screenshots will be added soon._
