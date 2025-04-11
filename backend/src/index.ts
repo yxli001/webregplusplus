@@ -1,4 +1,3 @@
-
 import "tsconfig-paths/register";
 import { envType } from "@/util/envConfig";
 import cron from "node-cron";

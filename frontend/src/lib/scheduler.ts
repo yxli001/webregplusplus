@@ -256,8 +256,8 @@ export async function generateRandomSchedule(
 
     const subSections = subSectionMap.get(mainSection.id) || [];
     if (subSections.length !== 0) {
-      const requiredSections = subSections.filter((s) => s.is_required);
-      const optionalSections = subSections.filter((s) => !s.is_required);
+      const requiredSections = subSections.filter((s) => s.isRequired);
+      const optionalSections = subSections.filter((s) => !s.isRequired);
 
       const optionalSection = optionalSections.length
         ? optionalSections[Math.floor(Math.random() * optionalSections.length)]
@@ -337,8 +337,7 @@ function mutateSubSection(
 
   // Get available optional subSections for the correct mainSection
   const availableSubSections = (
-    subSectionMap.get(selectedEntry.main_section_id) || []
-
+    subSectionMap.get(selectedEntry.mainSectionId) || []
   ).filter(
     (subSection) =>
       !subSection.isRequired && // Only allow non-required subSections
@@ -425,7 +424,7 @@ function mutateMainSection(
 
       const requiredSubSections = (
         subSectionMap.get(newMainSection.id) || []
-      ).filter((subSection) => subSection.is_required);
+      ).filter((subSection) => subSection.isRequired);
       // Add a new optional subSection for the new mainSection if available
       const availableSubSections = (
         subSectionMap.get(newMainSection.id) || []
@@ -494,14 +493,14 @@ export function mutate(
     if ("main_section_id" in selectedEntry) {
       success = mutateSubSection(
         mutatedSchedule,
-        selectedEntry,
+        selectedEntry as SubSection,
         randomIndex,
         subSectionMap,
       );
     } else {
       success = mutateMainSection(
         mutatedSchedule,
-        selectedEntry,
+        selectedEntry as MainSection,
         randomIndex,
         mainSectionMap,
         subSectionMap,
