@@ -2,20 +2,12 @@
 
 import { getCourseDetails, getCourses } from "@/api/courses";
 import {
-  computePreferredDays,
   createMainSectionLookup,
   createSubSectionLookup,
   parseAvailableCourses,
 } from "@/util/helper";
-import generateOptimalSchedule from "@/lib/scheduler";
+import generateOptimalSchedule, { Schedule } from "@/lib/scheduler";
 import { convertDaysToNumbers } from "@/util/helper";
-import {
-  CourseResponse,
-  MainSection,
-  Preferences,
-  Schedule,
-  SubSection,
-} from "../types/interfaces_api";
 import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
 import CourseList from "@/components/CourseList";
@@ -25,7 +17,12 @@ import {
   SchedulePreferences,
   usePreferenceStore,
 } from "@/store/preferenceStore";
-import { Course } from "@/types/course";
+import {
+  Course,
+  CourseWithSections,
+  MainSection,
+  SubSection,
+} from "@/types/course";
 import { useCallback, useEffect, useState } from "react";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 
@@ -67,10 +64,6 @@ export default function Home() {
   );
   const courseDetails = usePreferenceStore((state) => state.courseDetails);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const coursePreferences = usePreferenceStore(
-    (state) => state.coursePreferences,
-  );
   const schedulePreferences = usePreferenceStore(
     (state) => state.schedulePreferences,
   );
@@ -107,33 +100,16 @@ export default function Home() {
 
   const handleAutoScheduler = useCallback(
     (
-      courseDetails: CourseResponse[],
+      courseDetails: CourseWithSections[],
       schedulePreferences: SchedulePreferences,
     ) => {
       async function fetchSchedule() {
         console.log(schedulePreferences);
-        const spreadMap: Record<string, number> = {
-          "really-spread-out": 10,
-          "slightly-spread-out": 8,
-          neutral: 6,
-          compact: 4,
-          "extremely-compact": 2,
-        };
 
-        const userPreferences: Preferences = {
-          preferredStart: schedulePreferences.preferredStart, // e.g. "09:00"
-          preferredEnd: schedulePreferences.preferredEnd, // e.g. "15:00"
-          preferredDays: computePreferredDays(
-            schedulePreferences.preferredDays,
-          ),
-          spread: spreadMap[schedulePreferences.spread.toLowerCase()],
-          avoidBackToBack: schedulePreferences.avoidBackToBack,
-          //blockInstructor: "Watts, Edward J.",
-        };
         const availableCourses = await parseAvailableCourses(courseDetails);
 
         const courses = availableCourses.courses;
-        const courseIds: string[] = courses.map((course) => course.id);
+        const courseIds: string[] = courses.map((course) => course.id!);
         const mainSections = availableCourses.mainSection;
         const subSections = availableCourses.subSection;
 
@@ -141,7 +117,7 @@ export default function Home() {
         const subSectionMap = await createSubSectionLookup(subSections);
         const schedules: Schedule[] = await generateOptimalSchedule(
           courseIds,
-          userPreferences,
+          schedulePreferences,
           mainSectionMap,
           subSectionMap,
         );
@@ -161,19 +137,19 @@ export default function Home() {
 
             // If it's a MainSection, grab course directly
             const course = isMain
-              ? courses.find((course) => course.id === entry.course_id)
+              ? courses.find((course) => course.id === entry.courseId)
               : courses.find(
                   (course) =>
                     course.id ===
                     mainSections.find(
-                      (mainSection) => mainSection.id === entry.main_section_id,
-                    )?.course_id,
+                      (mainSection) => mainSection.id === entry.mainSectionId,
+                    )?.courseId,
                 );
 
             const mainSection = isMain
               ? (entry as MainSection)
               : mainSections.find(
-                  (mainSection) => mainSection.id === entry.main_section_id,
+                  (mainSection) => mainSection.id === entry.mainSectionId,
                 );
 
             const title = `${course?.subject || "?"} ${course?.code || "?"} | ${
@@ -185,8 +161,8 @@ export default function Home() {
             return {
               id: (i + 1).toString(),
               title,
-              startTime: entry.start_time,
-              endTime: entry.end_time,
+              startTime: entry.startTime,
+              endTime: entry.endTime,
               daysOfWeek: convertDaysToNumbers(entry.days),
               extendedProps: {
                 instructor: mainSection?.instructor || "TBA",

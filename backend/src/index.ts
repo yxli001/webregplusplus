@@ -1,4 +1,5 @@
-import "module-alias/register";
+
+import "tsconfig-paths/register";
 import { envType } from "@/util/envConfig";
 import cron from "node-cron";
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
@@ -11,11 +12,12 @@ import MainSection from "./models/MainSection.model";
 import SubSection from "./models/SubSection.model";
 import Exam from "./models/Exam.model";
 import app from "./app";
+import path from "path";
 
 const connectDB = async () => {
   try {
     const sequelizeConfig: SequelizeOptions = {
-      models: [__dirname + "/models/*.model.ts"],
+      models: [path.join(__dirname, "/models/*.model.{ts,js}")],
       dialect: "postgres",
       host: env.POSTGRES_HOST,
       port: parseInt(env.POSTGRES_PORT),

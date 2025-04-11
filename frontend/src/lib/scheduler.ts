@@ -1,15 +1,21 @@
-import { SubSection, Preferences, Schedule } from "@/types/interfaces_api";
+import { MainSection, SubSection } from "@/types/course";
 import {
   convertDaysToNumbers,
   timeToIndex,
   hashSchedule,
+  computePreferredDays,
 } from "../util/helper";
-import { MainSection } from "../types/interfaces_api";
+import { SchedulePreferences } from "@/store/preferenceStore";
 
 const START_TIME = 8 * 60;
 const TIME_INTERVAL = 10;
 const TOTAL_MINUTES = (22 - 8) * 60;
 const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
+
+export interface Schedule {
+  classes: (MainSection | SubSection)[];
+  fitness: number;
+}
 
 function isValidEntry(
   schedule: (MainSection | SubSection)[],
@@ -27,22 +33,22 @@ function isValidEntry(
       if (newEntry.days.includes(existingClass.days[j])) {
         // Convert start & end times to comparable indexes
         const existingStartIdx = timeToIndex(
-          existingClass.start_time,
+          existingClass.startTime,
           START_TIME,
           TIME_INTERVAL,
         );
         const existingEndIdx = timeToIndex(
-          existingClass.end_time,
+          existingClass.endTime,
           START_TIME,
           TIME_INTERVAL,
         );
         const newStartIdx = timeToIndex(
-          newEntry.start_time,
+          newEntry.startTime,
           START_TIME,
           TIME_INTERVAL,
         );
         const newEndIdx = timeToIndex(
-          newEntry.end_time,
+          newEntry.endTime,
           START_TIME,
           TIME_INTERVAL,
         );
@@ -68,8 +74,8 @@ function isValidTimegrid(
 ): boolean {
   //   console.log(newEntry);
   const days = convertDaysToNumbers(newEntry.days);
-  const startIdx = timeToIndex(newEntry.start_time, START_TIME, TIME_INTERVAL);
-  const endIdx = timeToIndex(newEntry.end_time, START_TIME, TIME_INTERVAL);
+  const startIdx = timeToIndex(newEntry.startTime, START_TIME, TIME_INTERVAL);
+  const endIdx = timeToIndex(newEntry.endTime, START_TIME, TIME_INTERVAL);
   for (const day of days) {
     for (let i = startIdx; i < endIdx; i++) {
       if (timeGrid[day][i]) return false;
@@ -95,9 +101,23 @@ function isValidTimegrid(
 
 export function calculateFitness(
   schedule: (MainSection | SubSection)[],
-  preferences: Preferences,
+  preferences: SchedulePreferences,
   changedClasses?: (MainSection | SubSection)[],
 ): number {
+  const spreadMap: Record<string, number> = {
+    "really-spread-out": 10,
+    "slightly-spread-out": 8,
+    neutral: 6,
+    compact: 4,
+    "extremely-compact": 2,
+  };
+
+  const updatedPreferences = {
+    ...preferences,
+    preferredDays: computePreferredDays(preferences.preferredDays),
+    spread: spreadMap[preferences.spread],
+  };
+
   let score = 0;
   const earliest = Array(7).fill(10000);
   const latest = Array(7).fill(0);
@@ -107,25 +127,25 @@ export function calculateFitness(
 
   for (const [i, currClass] of classes.entries()) {
     const startIdx = timeToIndex(
-      currClass.start_time,
+      currClass.startTime,
       START_TIME,
       TIME_INTERVAL,
     );
-    const endIdx = timeToIndex(currClass.end_time, START_TIME, TIME_INTERVAL);
+    const endIdx = timeToIndex(currClass.endTime, START_TIME, TIME_INTERVAL);
     const currClassDays = convertDaysToNumbers(currClass.days);
 
     // Preferred time check
     if (
-      currClass.start_time >= preferences.preferredStart &&
-      currClass.end_time <= preferences.preferredEnd
+      currClass.startTime >= updatedPreferences.preferredStart &&
+      currClass.endTime <= updatedPreferences.preferredEnd
     ) {
       score += 8;
     }
 
     // Preferred days check
     for (const day of currClassDays) {
-      if (preferences.preferredDays[day]) {
-        score += preferences.preferredDays[day];
+      if (updatedPreferences.preferredDays[day]) {
+        score += updatedPreferences.preferredDays[day];
       }
       if (startIdx < earliest[day]) {
         earliest[day] = startIdx;
@@ -140,12 +160,12 @@ export function calculateFitness(
         if (currClass === schedule[j]) continue;
         const other = schedule[j];
         const otherStartIdx = timeToIndex(
-          other.start_time,
+          other.startTime,
           START_TIME,
           TIME_INTERVAL,
         );
         const otherEndIdx = timeToIndex(
-          other.end_time,
+          other.endTime,
           START_TIME,
           TIME_INTERVAL,
         );
@@ -156,7 +176,7 @@ export function calculateFitness(
 
         if (sharedDays.length > 0) {
           // Back-To-Back Preference
-          if (preferences.avoidBackToBack) {
+          if (updatedPreferences.avoidBackToBack) {
             if (
               Math.abs(startIdx - otherEndIdx) <= 1 ||
               Math.abs(endIdx - otherStartIdx) <= 1
@@ -170,12 +190,12 @@ export function calculateFitness(
       for (let j = i + 1; j < schedule.length; j++) {
         const other = schedule[j];
         const otherStartIdx = timeToIndex(
-          other.start_time,
+          other.startTime,
           START_TIME,
           TIME_INTERVAL,
         );
         const otherEndIdx = timeToIndex(
-          other.end_time,
+          other.endTime,
           START_TIME,
           TIME_INTERVAL,
         );
@@ -186,7 +206,7 @@ export function calculateFitness(
 
         if (sharedDays.length > 0) {
           // Back-To-Back Preference
-          if (preferences.avoidBackToBack) {
+          if (updatedPreferences.avoidBackToBack) {
             if (
               Math.abs(startIdx - otherEndIdx) <= 1 ||
               Math.abs(endIdx - otherStartIdx) <= 1
@@ -204,7 +224,7 @@ export function calculateFitness(
     if (earliest[i] !== 10000 && latest[i] !== 0) {
       const duration = latest[i] - earliest[i];
       const spreadDiff = Math.abs(
-        duration - preferences.spread / TIME_INTERVAL,
+        duration - updatedPreferences.spread / TIME_INTERVAL,
       );
       score += Math.floor(10 / spreadDiff);
     }
@@ -262,7 +282,7 @@ export async function generateRandomSchedule(
 export async function generateSchedules(
   quantity: number,
   courseId: string[],
-  preferences: Preferences,
+  preferences: SchedulePreferences,
   mainSectionMap: Map<string, MainSection[]>,
   subSectionmap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {
@@ -306,7 +326,7 @@ function mutateSubSection(
   maxRetries = 5,
 ) {
   // Check if the selected entry is a required subSection
-  if (selectedEntry.is_required) {
+  if (selectedEntry.isRequired) {
     // console.log(
     //   ` SubSection Mutation Skipped: Required subSection ${JSON.stringify(
     //     selectedEntry,
@@ -318,16 +338,17 @@ function mutateSubSection(
   // Get available optional subSections for the correct mainSection
   const availableSubSections = (
     subSectionMap.get(selectedEntry.main_section_id) || []
+
   ).filter(
     (subSection) =>
-      !subSection.is_required && // Only allow non-required subSections
+      !subSection.isRequired && // Only allow non-required subSections
       subSection.id !== selectedEntry.id && // Avoid replacing with itself
-      subSection.main_section_id === selectedEntry.main_section_id && // Ensure it's the same mainSection
+      subSection.mainSectionId === selectedEntry.mainSectionId && // Ensure it's the same mainSection
       schedule.every(
         (entry) =>
           entry.id !== subSection.id ||
-          ("main_section_id" in entry &&
-            entry.main_section_id !== subSection.main_section_id),
+          ("mainSectionId" in entry &&
+            entry.mainSectionId !== subSection.mainSectionId),
       ), // Prevent adding duplicate subSections
   );
 
@@ -345,7 +366,7 @@ function mutateSubSection(
       // Double-check that new subSection is valid and has no conflicts
       if (
         newSection &&
-        selectedEntry.main_section_id === newSection.main_section_id &&
+        selectedEntry.mainSectionId === newSection.mainSectionId &&
         isValidEntry(schedule, newSection)
       ) {
         schedule[randomIndex] = newSection;
@@ -384,7 +405,7 @@ function mutateMainSection(
   subSectionMap: Map<string, SubSection[]>,
 ): boolean {
   const availableMainSections =
-    mainSectionMap.get(selectedEntry.course_id) || [];
+    mainSectionMap.get(selectedEntry.courseId) || [];
   if (availableMainSections.length > 1) {
     const newMainSection =
       availableMainSections[
@@ -399,9 +420,7 @@ function mutateMainSection(
       // Remove any subSections tied to the old mainSection
       const updatedSchedule = schedule.filter(
         (sec) =>
-          !(
-            "main_section_id" in sec && sec.main_section_id === selectedEntry.id
-          ),
+          !("mainSectionId" in sec && sec.mainSectionId === selectedEntry.id),
       );
 
       const requiredSubSections = (
@@ -410,7 +429,7 @@ function mutateMainSection(
       // Add a new optional subSection for the new mainSection if available
       const availableSubSections = (
         subSectionMap.get(newMainSection.id) || []
-      ).filter((subSection) => !subSection.is_required);
+      ).filter((subSection) => !subSection.isRequired);
 
       if (requiredSubSections.length > 0) {
         for (const requiredSubSection of requiredSubSections) {
@@ -453,7 +472,7 @@ function mutateMainSection(
 
 export function mutate(
   schedule: Schedule,
-  preferences: Preferences,
+  preferences: SchedulePreferences,
   cache: Map<string, number>,
   temperature: number,
   mainSectionMap: Map<string, MainSection[]>,
@@ -525,7 +544,7 @@ export function mutate(
 
 export default async function generateOptimalSchedule(
   courseId: string[],
-  preferences: Preferences,
+  preferences: SchedulePreferences,
   mainSectionMap: Map<string, MainSection[]>,
   subSectionMap: Map<string, SubSection[]>,
 ): Promise<Schedule[]> {

@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.ts",
   "_moduleAliases": {
-    "@": "src"
+    "@": "dist"
   },
   "scripts": {
-    "build": "pnpm run check-git-hooks && npx tsc",
-    "start": "node dist/index.ts",
-    "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-    "dev-staging": "NODE_ENV=staging nodemon src/index.ts",
+
+    "build": "npx tsc",
+    "start": "NODE_ENV=staging node -r module-alias/register dist/index.js",
+    "prestart": "pnpm run build",
+    "dev": "NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
+    "dev-staging": "NODE_ENV=staging ts-node -r tsconfig-paths/register src/index.ts",
     "lint-check": "eslint . && prettier --check .",
     "lint-fix": "eslint . --fix && prettier --write .",
     "prepare": "cd .. && husky",
@@ -55,6 +57,7 @@
     "puppeteer": "^24.2.0",
     "sequelize": "^6.37.5",
     "sequelize-typescript": "^2.1.6",
+    "tsconfig-paths": "^4.2.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.24.2"
