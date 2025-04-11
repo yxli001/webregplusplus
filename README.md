@@ -15,8 +15,8 @@ Try it live: [https://webregplusplus.tech](https://webregplusplus.tech)
 ## Tech Stack
 
 - Frontend: Next.js, TypeScript, TailwindCSS
-- Backend: Express.js, TypeScript
-- Deployment: Vercel (frontend), Render or similar (backend)
+- Backend: Express.js, TypeScript, PostgreSQL
+- Deployment: Vercel (frontend)
 
 ## Project Structure
 
@@ -44,21 +44,46 @@ cd webregplusplus
 
 **Frontend**
 
-cd frontend npm install
+cd frontend pnpm install
 
 **Backend**
 
-cd ../backend npm install
+cd ../backend pnpm install
 
 ### Run the app locally
 
 **Backend**
 
-pnpm run dev
+- In `index.ts`, uncomment the call to `updateSchedules()` on line 138
+- Start the server with `pnpm run dev`, it will now scrape schedule of classes and populate your local database
+- THIS SHOULD ONLY BE DONE ONCE (it may run multiple instances, be wary of this and make sure to end the program or it may populate your tables multiple times)
+- Comment out line 138 again
+- `pnpm run dev` will now give you access to the API Endpoints below
 
+
+API Endpoints:
+- GET `/api/course`
+    - No params
+    - Returns list of all courses, only containing the course subject and code 
+    - Intended to be used to generate the course dropdown list
+- GET `/api/course/details?courses=[courses]`
+    - Returns course full detail for the list of courses specified in the `courses` param
+    - `courses` param should be a string of comma separate course full names, e.g. `"CSE 100,CSE101,MATH183"`
+      
+Steps to test:
+- First configure a local PostgreSQL instance and put the following fields in the backend `.env` file
+    - `PORT`
+    - `FRONTEND_ORIGIN`
+    - `POSTGRES_HOST`
+    - `POSTGRES_PORT`
+    - `POSTGRES_USER`
+    - `POSTGRES_PASSWORD`
+    - `POSTGRES_DB`
+ 
+  
 
 **Frontend (in a separate terminal)**
-cd ../frontend pnpm run dev
+`cd ../frontend pnpm run dev`
 
 The app should now be running on `http://localhost:3000`.
 
@@ -66,7 +91,7 @@ Note: The frontend application runs slowly in dev mode. For a more optimized pro
 
 ## Algorithm Overview
 
-The scheduling logic in `mutate.ts` works by:
+The scheduling logic in `scheduler.ts` works by:
 
 - Generating 5 random schedules initially
 - Selecting a random lecture or subsection to mutate
