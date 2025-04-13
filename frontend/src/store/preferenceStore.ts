@@ -10,7 +10,7 @@ type TimeSlot = {
   endTime: string;
 };
 
-type CoursePreference = {
+export type CoursePreferences = {
   included: boolean;
   courseId: string;
   selectedInstructors: string[];
@@ -29,7 +29,7 @@ export type SchedulePreferences = {
 type PreferenceState = {
   selectedCourses: Course[];
   courseDetails: CourseWithSections[];
-  coursePreferences: CoursePreference[];
+  coursePreferences: CoursePreferences[];
   schedulePreferences: SchedulePreferences;
 
   // Actions
@@ -38,7 +38,7 @@ type PreferenceState = {
   removeCourse: (id: string) => void;
   updateCoursePreferences: (
     id: string,
-    update: Partial<CoursePreference>,
+    update: Partial<CoursePreferences>,
   ) => void;
 
   // Schedule Preferences Actions

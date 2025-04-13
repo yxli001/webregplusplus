@@ -1,4 +1,5 @@
 import { Schedule } from "@/lib/scheduler";
+import { CoursePreferences } from "@/store/preferenceStore";
 import {
   CourseWithSections,
   Exam,
@@ -104,6 +105,7 @@ export async function createSubSectionLookup(
 
 export async function parseAvailableCourses(
   coursesResponse: CourseWithSections[],
+  coursePreferences: CoursePreferences[],
 ) {
   const output = {
     courses: [] as CourseWithSections[],
@@ -113,11 +115,23 @@ export async function parseAvailableCourses(
   };
 
   for (const course of coursesResponse) {
+    if (
+      !coursePreferences.find((pref) => pref.courseId === course.id)?.included
+    ) {
+      continue;
+    }
     output.courses.push({
       ...course,
     });
 
     for (const mainSection of course.mainSections) {
+      if (
+        !coursePreferences
+          .find((pref) => pref.courseId === course.id)
+          ?.selectedInstructors.find((pref) => pref === mainSection.instructor)
+      ) {
+        continue;
+      }
       output.mainSection.push({
         // TODO: refactor so that we dont store the subSections twice
         ...mainSection,
@@ -130,6 +144,15 @@ export async function parseAvailableCourses(
         })),
       });
       for (const subSection of mainSection.subSections) {
+        if (
+          !coursePreferences
+            .find((pref) => pref.courseId === course.id)
+            ?.selectedSubSections.find(
+              (pref) => pref === `${mainSection.letter}${subSection.section}`,
+            )
+        ) {
+          continue;
+        }
         output.subSection.push({
           ...subSection,
           startTime: convertTo24Hr(subSection.startTime),
