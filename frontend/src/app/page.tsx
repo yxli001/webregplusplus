@@ -14,6 +14,7 @@ import CourseList from "@/components/CourseList";
 import PreferencesComponent from "@/components/Preferences";
 import Calendar from "@/icons/Calendar";
 import {
+  CoursePreferences,
   SchedulePreferences,
   usePreferenceStore,
 } from "@/store/preferenceStore";
@@ -57,13 +58,18 @@ const Section = ({ title, children }: SectionProps) => {
 
 export default function Home() {
   const [allCourses, setAllCourses] = useState<Course[]>([]);
+  const [algorithmRan, setAlgorithmRan] = useState(false);
   const [events, setEvents] = useState<Event[][]>([]);
+
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setCourseDetails = usePreferenceStore(
     (state) => state.setCourseDetails,
   );
   const courseDetails = usePreferenceStore((state) => state.courseDetails);
 
+  const coursePreferences = usePreferenceStore(
+    (state) => state.coursePreferences,
+  );
   const schedulePreferences = usePreferenceStore(
     (state) => state.schedulePreferences,
   );
@@ -101,12 +107,17 @@ export default function Home() {
   const handleAutoScheduler = useCallback(
     (
       courseDetails: CourseWithSections[],
+      coursePreferences: CoursePreferences[],
       schedulePreferences: SchedulePreferences,
     ) => {
       async function fetchSchedule() {
+        console.log(coursePreferences);
         console.log(schedulePreferences);
 
-        const availableCourses = await parseAvailableCourses(courseDetails);
+        const availableCourses = await parseAvailableCourses(
+          courseDetails,
+          coursePreferences,
+        );
 
         const courses = availableCourses.courses;
         const courseIds: string[] = courses.map((course) => course.id!);
@@ -121,7 +132,10 @@ export default function Home() {
           mainSectionMap,
           subSectionMap,
         );
+        setAlgorithmRan(true);
+
         if (schedules.length === 0) {
+          alert("No valid schedules found. Please adjust your preferences.");
           console.log("No valid schedules found");
           return;
         }
@@ -214,14 +228,18 @@ export default function Home() {
             label="Update Schedule"
             className="self-end"
             onClick={() =>
-              handleAutoScheduler(courseDetails, schedulePreferences)
+              handleAutoScheduler(
+                courseDetails,
+                coursePreferences,
+                schedulePreferences,
+              )
             }
           />
         </>
       )}
 
       {/* Schedule Display */}
-      {events.length > 0 && <ScheduleDisplay events={events} />}
+      {algorithmRan && <ScheduleDisplay events={events} />}
     </div>
   );
 }

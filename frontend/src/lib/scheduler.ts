@@ -19,9 +19,44 @@ export interface Schedule {
 
 function isValidEntry(
   schedule: (MainSection | SubSection)[],
+  preferences: SchedulePreferences,
   newEntry: MainSection | SubSection,
 ): boolean {
   //   console.log(newEntry);
+  const excludedTimeSlots = preferences.excludedTimeSlots;
+  for (const slot of excludedTimeSlots) {
+    for (let j = 0; j < slot.days.length; j++) {
+      if (newEntry.days.includes(slot.days[j])) {
+        const excludedStartIdx = timeToIndex(
+          slot.startTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const excludedEndIdx = timeToIndex(
+          slot.endTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const newStartIdx = timeToIndex(
+          newEntry.startTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const newEndIdx = timeToIndex(
+          newEntry.endTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        if (
+          (newStartIdx >= excludedStartIdx && newStartIdx < excludedEndIdx) || // Starts inside another class
+          (excludedStartIdx >= newStartIdx && excludedStartIdx < newEndIdx) || // Another class starts inside new class
+          (newStartIdx === excludedStartIdx && newEndIdx === excludedEndIdx) // Complete overlap
+        ) {
+          return false; // Conflict found
+        }
+      }
+    }
+  }
   for (let i = 0; i < schedule.length; i++) {
     //console.log(schedule[i]);
     const existingClass = schedule[i];
@@ -235,6 +270,7 @@ export function calculateFitness(
 
 export async function generateRandomSchedule(
   courseIds: string[],
+  Preferences: SchedulePreferences,
   mainSectionMap: Map<string, MainSection[]>,
   subSectionMap: Map<string, SubSection[]>,
 ): Promise<(MainSection | SubSection)[]> {
@@ -242,6 +278,18 @@ export async function generateRandomSchedule(
   const timeGrid = Array.from({ length: 7 }, () =>
     Array(TIME_SLOTS).fill(false),
   ); // Track occupied time slots
+
+  const excludedTimeSlots = Preferences.excludedTimeSlots;
+  for (const slot of excludedTimeSlots) {
+    const days = convertDaysToNumbers(slot.days);
+    for (const day of days) {
+      const startIdx = timeToIndex(slot.startTime, START_TIME, TIME_INTERVAL);
+      const endIdx = timeToIndex(slot.endTime, START_TIME, TIME_INTERVAL);
+      for (let i = startIdx; i < endIdx; i++) {
+        timeGrid[day][i] = true;
+      }
+    }
+  }
 
   for (const courseId of courseIds) {
     // console.log(courseId);
@@ -293,6 +341,7 @@ export async function generateSchedules(
     iterations++;
     const newSchedule = await generateRandomSchedule(
       courseId,
+      preferences,
       mainSectionMap,
       subSectionmap,
     );
@@ -321,6 +370,7 @@ export function selectParents(schedules: Schedule[]): Schedule[] {
 function mutateSubSection(
   schedule: (MainSection | SubSection)[],
   selectedEntry: SubSection,
+  preferences: SchedulePreferences,
   randomIndex: number,
   subSectionMap: Map<string, SubSection[]>,
   maxRetries = 5,
@@ -366,7 +416,7 @@ function mutateSubSection(
       if (
         newSection &&
         selectedEntry.mainSectionId === newSection.mainSectionId &&
-        isValidEntry(schedule, newSection)
+        isValidEntry(schedule, preferences, newSection)
       ) {
         schedule[randomIndex] = newSection;
         // console.log(
@@ -399,6 +449,7 @@ function mutateSubSection(
 function mutateMainSection(
   schedule: (MainSection | SubSection)[],
   selectedEntry: MainSection,
+  preferences: SchedulePreferences,
   randomIndex: number,
   mainSectionMap: Map<string, MainSection[]>,
   subSectionMap: Map<string, SubSection[]>,
@@ -412,7 +463,7 @@ function mutateMainSection(
       ];
 
     //  Check if the new mainSection is valid and has no conflicts
-    if (isValidEntry(schedule, newMainSection)) {
+    if (isValidEntry(schedule, preferences, newMainSection)) {
       //  Replace mainSection if valid
       schedule[randomIndex] = newMainSection;
 
@@ -432,7 +483,7 @@ function mutateMainSection(
 
       if (requiredSubSections.length > 0) {
         for (const requiredSubSection of requiredSubSections) {
-          if (isValidEntry(updatedSchedule, requiredSubSection)) {
+          if (isValidEntry(updatedSchedule, preferences, requiredSubSection)) {
             updatedSchedule.push(requiredSubSection);
           } else {
             return false;
@@ -445,7 +496,7 @@ function mutateMainSection(
             ];
 
           // Check if the new subSection is valid before adding it
-          if (isValidEntry(updatedSchedule, newSection)) {
+          if (isValidEntry(updatedSchedule, preferences, newSection)) {
             updatedSchedule.push(newSection);
             //   console.log(
             //     `🔄 MainSection Mutation: Replaced ${JSON.stringify(
@@ -494,6 +545,7 @@ export function mutate(
       success = mutateSubSection(
         mutatedSchedule,
         selectedEntry as SubSection,
+        preferences,
         randomIndex,
         subSectionMap,
       );
@@ -501,6 +553,7 @@ export function mutate(
       success = mutateMainSection(
         mutatedSchedule,
         selectedEntry as MainSection,
+        preferences,
         randomIndex,
         mainSectionMap,
         subSectionMap,
