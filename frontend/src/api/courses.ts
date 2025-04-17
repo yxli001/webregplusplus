@@ -44,7 +44,7 @@ const parseCourseWithSections = (
         type: exam.type as ExamType,
         createdAt: new Date(exam.createdAt),
         updatedAt: new Date(exam.updatedAt),
-        date: new Date(exam.date),
+        date: exam.date,
       })),
       subSections: section.subSections.map((subSection) => ({
         ...subSection,
