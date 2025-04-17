@@ -9,6 +9,7 @@ export enum SubSectionType {
   DI = "DI",
   LA = "LA",
   ST = "ST",
+  FW = "FW",
 }
 
 export enum ExamType {
@@ -47,7 +48,7 @@ export type SubSection = {
 
 export type Exam = {
   type: ExamType;
-  date: Date;
+  date: string;
   startTime: string;
   endTime: string;
   location: string;

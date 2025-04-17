@@ -111,7 +111,7 @@ export async function scrapeSchedule(): Promise<Course[]> {
         pages.map((page) =>
           page.evaluate(
             (MainSectionType, SubSectionType) => {
-              const acceptableSections = ["SE", "LE", "LA", "DI", "ST"];
+              const unacceptableSections = ["IT"];
 
               const scrapedCourses: Course[] = [];
 
@@ -186,36 +186,50 @@ export async function scrapeSchedule(): Promise<Course[]> {
                   course.name = courseName || "";
                 }
 
-                // Section (could be 10 cells, but everything would be TBA)
-                if (row.className === "sectxt" && cells.length == 13) {
+                // Section
+                if (row.className === "sectxt" && cells.length >= 10) {
                   const sectionId = (cells[2].textContent || "").trim();
                   const sectionType = (cells[3].textContent || "").trim();
                   const sectionCode = (cells[4].textContent || "").trim();
-                  const days = (cells[5].textContent || "").trim();
-                  const time = (cells[6].textContent || "").trim();
-                  const instructor = (
-                    (cells[9].querySelector("a")
-                      ? cells[9].querySelector("a")!.textContent
-                      : cells[9].textContent) || ""
-                  ).trim();
-
-                  const location = `${(cells[7].textContent || "").trim()} ${(cells[8].textContent || "").trim()}`;
+                  let days, startTime, endTime, instructor, location;
 
                   // Not a section type we care about
-                  if (!acceptableSections.includes(sectionType)) continue;
+                  if (unacceptableSections.includes(sectionType)) continue;
 
-                  // Time TBA
-                  if (time === "TBA") continue;
+                  // Times are TBA
+                  if (cells.length == 10) {
+                    days = "TBA";
+                    startTime = "TBA";
+                    endTime = "TBA";
+                    location = "TBA";
+                    instructor = (
+                      (cells[6].querySelector("a")
+                        ? cells[6].querySelector("a")!.textContent
+                        : cells[6].textContent) || ""
+                    ).trim();
+                  }
+                  // Times are not TBA
+                  else {
+                    const time = (cells[6].textContent || "").trim();
+
+                    startTime = time.split("-")[0].trim();
+                    endTime = time.split("-")[1].trim();
+                    days = (cells[5].textContent || "").trim();
+                    instructor = (
+                      (cells[9].querySelector("a")
+                        ? cells[9].querySelector("a")!.textContent
+                        : cells[9].textContent) || ""
+                    ).trim();
+                    location = `${(cells[7].textContent || "").trim()} ${(cells[8].textContent || "").trim()}`;
+                  }
 
                   // Main section
                   if (
-                    sectionType === MainSectionType.SE ||
-                    (Object.values(MainSectionType).includes(
+                    Object.values(MainSectionType).includes(
                       sectionType as MainSectionType,
                     ) &&
-                      sectionCode.substring(1) === "00")
+                    sectionCode.substring(1) === "00"
                   ) {
-                    const [startTime, endTime] = time.split("-");
                     const mainSection: MainSection = {
                       type: sectionType as MainSectionType,
                       letter: sectionCode.substring(0, 1),
@@ -228,13 +242,13 @@ export async function scrapeSchedule(): Promise<Course[]> {
                       endTime,
                     };
                     course.mainSections.push(mainSection);
-                  } // Subsection
+                  }
+                  // Subsection
                   else if (
                     Object.values(SubSectionType).includes(
                       sectionType as SubSectionType,
                     )
                   ) {
-                    const [startTime, endTime] = time.split("-");
                     const subSection: SubSection = {
                       type: sectionType as SubSectionType,
                       section: sectionCode.substring(1),
@@ -264,7 +278,7 @@ export async function scrapeSchedule(): Promise<Course[]> {
                   const [startTime, endTime] = examTime.split("-");
                   const exam = {
                     type: examType as ExamType,
-                    date: new Date(examDate),
+                    date: examDate,
                     startTime,
                     endTime,
                     location: examLocation,
