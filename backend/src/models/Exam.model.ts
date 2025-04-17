@@ -19,7 +19,7 @@ import { ExamType } from "@/types";
 type ExamAttributes = {
   id: string;
   type: ExamType;
-  date: Date;
+  date: string;
   startTime: string;
   endTime: string;
   location: string;
@@ -51,8 +51,8 @@ class Exam extends Model<ExamAttributes, ExamCreationAttributes> {
   type: ExamType;
 
   @AllowNull(false)
-  @Column(DataType.DATEONLY)
-  date: Date;
+  @Column(DataType.STRING)
+  date: string;
 
   @AllowNull(false)
   @Column({ type: DataType.STRING, field: "start_time" })

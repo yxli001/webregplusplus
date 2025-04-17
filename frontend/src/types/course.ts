@@ -97,7 +97,7 @@ export type SubSection = {
 export type Exam = {
   id: string;
   type: ExamType;
-  date: Date;
+  date: string;
   startTime: string;
   endTime: string;
   location: string;
