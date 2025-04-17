@@ -8,6 +8,7 @@ export enum MainSectionType {
 export enum SubSectionType {
   DI = "DI",
   LA = "LA",
+  ST = "ST",
 }
 
 export enum ExamType {
