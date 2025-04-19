@@ -24,6 +24,7 @@ type CourseAttributes = {
   id: string;
   subject: string;
   code: string;
+  quarterId: string;
 };
 
 // Define the creation attributes of the School model
