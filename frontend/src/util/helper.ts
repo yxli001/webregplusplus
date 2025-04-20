@@ -177,3 +177,18 @@ export function hashSchedule(schedule: Schedule): string {
   }
   return hash.toString();
 }
+
+// FA24 -> Fall 2024
+export function quarterNameToString(quarter: string) {
+  const quarterMap: Record<string, string> = {
+    FA: "Fall",
+    WI: "Winter",
+    SP: "Spring",
+  };
+
+  const year = quarter.slice(2);
+
+  const quarterName = quarterMap[quarter.slice(0, 2)];
+
+  return `${quarterName} 20${year}`;
+}

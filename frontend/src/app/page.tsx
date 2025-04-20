@@ -1,10 +1,11 @@
 "use client";
 
-import { getCourseDetails, getCourses } from "@/api/courses";
+import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
 import {
   createMainSectionLookup,
   createSubSectionLookup,
   parseAvailableCourses,
+  quarterNameToString,
 } from "@/util/helper";
 import generateOptimalSchedule, { Schedule } from "@/lib/scheduler";
 import { convertDaysToNumbers } from "@/util/helper";
@@ -22,10 +23,12 @@ import {
   Course,
   CourseWithSections,
   MainSection,
+  Quarter,
   SubSection,
 } from "@/types/course";
 import { useCallback, useEffect, useState } from "react";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
+import DropdownSelect from "@/components/DropdownSelect";
 
 interface SectionProps {
   title: string;
@@ -57,11 +60,17 @@ const Section = ({ title, children }: SectionProps) => {
 };
 
 export default function Home() {
+  const [allQuarters, setAllQuarters] = useState<Quarter[]>([]);
+  const [selectedQuarter, setSelectedQuarter] = useState<string>("");
+
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [algorithmRan, setAlgorithmRan] = useState(false);
   const [events, setEvents] = useState<Event[][]>([]);
 
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const setSelectedCourses = usePreferenceStore(
+    (state) => state.setSelectedCourses,
+  );
   const setCourseDetails = usePreferenceStore(
     (state) => state.setCourseDetails,
   );
@@ -81,6 +90,7 @@ export default function Home() {
 
     const fetchDetails = async () => {
       const res = await getCourseDetails(
+        selectedQuarter,
         selectedCourses.map((course) => `${course.subject} ${course.code}`),
       );
 
@@ -93,16 +103,35 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      const res = await getCourses();
+    const fetchQuarters = async () => {
+      const res = await getQuarters();
 
       if (res.success) {
-        setAllCourses(res.data);
+        setAllQuarters(res.data);
+      }
+    };
+
+    fetchQuarters();
+  }, []);
+
+  useEffect(() => {
+    setSelectedCourses([]);
+    setCourseDetails([]);
+    setEvents([]);
+    setAlgorithmRan(false);
+
+    const fetchCourses = async () => {
+      if (selectedQuarter) {
+        const res = await getCourses(selectedQuarter);
+
+        if (res.success) {
+          setAllCourses(res.data);
+        }
       }
     };
 
     fetchCourses();
-  }, []);
+  }, [selectedQuarter]);
 
   const handleAutoScheduler = useCallback(
     (
@@ -203,43 +232,62 @@ export default function Home() {
 
   return (
     <div className="w-full flex flex-col gap-10">
-      {/* Course Selection */}
-      <Section title="Select Your Courses">
-        <div className="w-full flex items-center justify-center gap-4">
-          <CourseDropdown className="max-w-[30rem]" courses={allCourses} />
-          <Button label="Search" onClick={handleFetchCourseDetails} />
-        </div>
+      {/* Quarter Selection */}
+      <Section title="Select a quarter">
+        <DropdownSelect
+          options={allQuarters.map((quarter) => ({
+            label: quarterNameToString(quarter.name),
+            value: quarter.name,
+          }))}
+          value={selectedQuarter}
+          onChange={(value) => {
+            setSelectedQuarter(value);
+          }}
+          closeOnSelect
+        />
       </Section>
 
-      {courseDetails.length > 0 && (
+      {selectedQuarter && (
         <>
-          {/* Instructor/Section Selection */}
-          <Section title="Course List">
-            <CourseList />
+          {/* Course Selection */}
+          <Section title="Select Your Courses">
+            <div className="w-full flex items-center justify-center gap-4">
+              <CourseDropdown className="max-w-[30rem]" courses={allCourses} />
+              <Button label="Search" onClick={handleFetchCourseDetails} />
+            </div>
           </Section>
 
-          {/* Preferences */}
-          <Section title="Preferences">
-            <PreferencesComponent />
-          </Section>
+          {courseDetails.length > 0 && (
+            <>
+              {/* Instructor/Section Selection */}
+              <Section title="Course List">
+                <CourseList />
+              </Section>
 
-          <Button
-            icon={<Calendar />}
-            label="Update Schedule"
-            className="self-end"
-            onClick={() =>
-              handleAutoScheduler(
-                courseDetails,
-                coursePreferences,
-                schedulePreferences,
-              )
-            }
-          />
+              {/* Preferences */}
+              <Section title="Preferences">
+                <PreferencesComponent />
+              </Section>
+
+              <Button
+                icon={<Calendar />}
+                label="Update Schedule"
+                className="self-end"
+                onClick={() =>
+                  handleAutoScheduler(
+                    courseDetails,
+                    coursePreferences,
+                    schedulePreferences,
+                  )
+                }
+              />
+            </>
+          )}
+
+          {/* Schedule Display */}
+          {algorithmRan && <ScheduleDisplay events={events} />}
         </>
       )}
-
-      {/* Schedule Display */}
-      {algorithmRan && <ScheduleDisplay events={events} />}
     </div>
   );
 }

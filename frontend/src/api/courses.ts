@@ -5,9 +5,24 @@ import {
   CourseWithSectionsJSON,
   ExamType,
   MainSectionType,
+  Quarter,
+  QuarterJSON,
   SubSectionType,
 } from "@/types/course";
 import { APIResult, get, handleAPIError } from "./requests";
+
+/**
+ * Parses a QuarterJSON object into a Quarter object.
+ * @param quarter - The QuarterJSON object to parse.
+ * @returns The parsed Quarter object.
+ */
+const parseQuarter = (quarter: QuarterJSON) => {
+  return {
+    ...quarter,
+    createdAt: new Date(quarter.createdAt),
+    updatedAt: new Date(quarter.updatedAt),
+  };
+};
 
 /**
  * Parses a CourseJSON object into a Course object.
@@ -59,13 +74,36 @@ const parseCourseWithSections = (
 };
 
 /**
+ * Fetches all quarters from the API.
+ *
+ * @returns A promise that resolves to an APIResult containing an array of quarter names.
+ */
+const getQuarters: () => Promise<APIResult<Quarter[]>> = async () => {
+  try {
+    const response = await get("/api/quarter");
+    const data = (await response.json()) as QuarterJSON[];
+
+    return {
+      success: true,
+      data: data.map((quarter) => parseQuarter(quarter)),
+    };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+/**
  * Fetches all courses from the API.
  *
  * @returns A promise that resolves to an APIResult containing an array of Course objects.
  */
-const getCourses: () => Promise<APIResult<Course[]>> = async () => {
+const getCourses: (quarter: string) => Promise<APIResult<Course[]>> = async (
+  quarter,
+) => {
   try {
-    const response = await get("/api/course");
+    const response = await get(`/api/course`, {
+      quarter,
+    });
     const data = (await response.json()) as CourseJSON[];
 
     return {
@@ -78,10 +116,15 @@ const getCourses: () => Promise<APIResult<Course[]>> = async () => {
 };
 
 const getCourseDetails: (
+  quarter: string,
   courseNames: string[],
-) => Promise<APIResult<CourseWithSections[]>> = async (courseNames) => {
+) => Promise<APIResult<CourseWithSections[]>> = async (
+  quarter,
+  courseNames,
+) => {
   try {
     const response = await get("/api/course/details", {
+      quarter,
       courses: courseNames.join(","),
     });
     const data = (await response.json()) as CourseWithSectionsJSON[];
@@ -95,4 +138,4 @@ const getCourseDetails: (
   }
 };
 
-export { getCourses, getCourseDetails };
+export { getQuarters, getCourses, getCourseDetails };

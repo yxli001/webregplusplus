@@ -1,7 +1,15 @@
+export interface QuarterJSON {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CourseJSON {
   id: string;
   subject: string;
   code: string;
+  quarterId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,10 +60,18 @@ export interface ExamJSON {
   mainSectionId: string;
 }
 
+export interface Quarter {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Course {
   id: string;
   subject: string;
   code: string;
+  quarterId: string;
   createdAt: Date;
   updatedAt: Date;
 }
