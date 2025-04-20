@@ -5,13 +5,13 @@ import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { serverLogger, dbLogger } from "@/util/logger";
 import env from "@/util/validateEnv";
 import { scrapeSchedule } from "@/scrape";
-import { coursesToString } from "./util/courses";
 import Course from "./models/Course.model";
 import MainSection from "./models/MainSection.model";
 import SubSection from "./models/SubSection.model";
 import Exam from "./models/Exam.model";
 import app from "./app";
 import path from "path";
+import Quarter from "./models/Quarter.model";
 
 const connectDB = async () => {
   try {
@@ -63,50 +63,57 @@ const updateSchedules = async () => {
 
   serverLogger.info("Updating schedules...");
 
-  const courses = await scrapeSchedule();
+  const quarters = await scrapeSchedule();
 
-  serverLogger.debug("\nScraped Courses: \n" + coursesToString(courses));
+  for (const quarter of quarters) {
+    serverLogger.info("Saving quarter: ", quarter.name);
 
-  for (const course of courses) {
-    const newCourse = await Course.create({
-      code: course.code,
-      subject: course.subject,
+    const newQuarter = await Quarter.create({
+      name: quarter.name,
     });
 
-    for (const main of course.mainSections) {
-      const newMain = await MainSection.create({
-        letter: main.letter,
-        days: main.days,
-        startTime: main.startTime,
-        endTime: main.endTime,
-        instructor: main.instructor,
-        location: main.location,
-        type: main.type,
-        courseId: newCourse.id,
+    for (const course of quarter.courses) {
+      const newCourse = await Course.create({
+        code: course.code,
+        subject: course.subject,
+        quarterId: newQuarter.id,
       });
 
-      for (const sub of main.sections) {
-        await SubSection.create({
-          days: sub.days,
-          startTime: sub.startTime,
-          endTime: sub.endTime,
-          isRequired: sub.isRequired,
-          location: sub.location,
-          section: sub.section,
-          type: sub.type,
-          mainSectionId: newMain.id,
+      for (const main of course.mainSections) {
+        const newMain = await MainSection.create({
+          letter: main.letter,
+          days: main.days,
+          startTime: main.startTime,
+          endTime: main.endTime,
+          instructor: main.instructor,
+          location: main.location,
+          type: main.type,
+          courseId: newCourse.id,
         });
-      }
 
-      for (const exam of main.exams) {
-        await Exam.create({
-          date: exam.date,
-          endTime: exam.endTime,
-          location: exam.location,
-          startTime: exam.startTime,
-          type: exam.type,
-          mainSectionId: newMain.id,
-        });
+        for (const sub of main.sections) {
+          await SubSection.create({
+            days: sub.days,
+            startTime: sub.startTime,
+            endTime: sub.endTime,
+            isRequired: sub.isRequired,
+            location: sub.location,
+            section: sub.section,
+            type: sub.type,
+            mainSectionId: newMain.id,
+          });
+        }
+
+        for (const exam of main.exams) {
+          await Exam.create({
+            date: exam.date,
+            endTime: exam.endTime,
+            location: exam.location,
+            startTime: exam.startTime,
+            type: exam.type,
+            mainSectionId: newMain.id,
+          });
+        }
       }
     }
   }

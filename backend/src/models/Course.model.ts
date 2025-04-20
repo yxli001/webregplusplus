@@ -11,16 +11,20 @@ import {
   AllowNull,
   Default,
   UpdatedAt,
+  BelongsTo,
+  ForeignKey,
 } from "sequelize-typescript";
 import MainSection from "./MainSection.model";
 import SubSection from "./SubSection.model";
 import Exam from "./Exam.model";
+import Quarter from "./Quarter.model";
 
 // All attributes
 type CourseAttributes = {
   id: string;
   subject: string;
   code: string;
+  quarterId: string;
 };
 
 // Define the creation attributes of the School model
@@ -67,6 +71,11 @@ class Course extends Model<CourseAttributes, CourseCreationAttributes> {
   @Column(DataType.STRING)
   code: string;
 
+  @ForeignKey(() => Quarter)
+  @AllowNull(false)
+  @Column({ type: DataType.UUID, field: "quarter_id" })
+  quarterId: string;
+
   @CreatedAt
   @Column({ type: DataType.DATE, field: "created_at" })
   createdAt: Date;
@@ -74,6 +83,10 @@ class Course extends Model<CourseAttributes, CourseCreationAttributes> {
   @UpdatedAt
   @Column({ type: DataType.DATE, field: "updated_at" })
   updatedAt: Date;
+
+  // Relationships
+  @BelongsTo(() => Quarter)
+  quarter: Quarter;
 
   @HasMany(() => MainSection)
   mainSections: MainSection[];

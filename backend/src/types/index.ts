@@ -1,3 +1,5 @@
+// Types used for the scraper
+
 export enum MainSectionType {
   LE = "LE",
   SE = "SE",
@@ -16,6 +18,11 @@ export enum ExamType {
   MI = "MI",
   FI = "FI",
 }
+
+export type Quarter = {
+  name: string;
+  courses: Course[];
+};
 
 export type Course = {
   subject: string;

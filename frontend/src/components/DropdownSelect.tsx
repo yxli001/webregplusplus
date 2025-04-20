@@ -9,6 +9,7 @@ interface BaseDropdownProps {
   options: { label: string; value: string }[];
   placeholder?: string;
   className?: string;
+  closeOnSelect?: boolean; // Add the new prop here
 }
 
 interface SingleSelectDropdownProps extends BaseDropdownProps {
@@ -33,6 +34,7 @@ const DropdownSelect = ({
   placeholder = "Select an option",
   className = "",
   multiple = false,
+  closeOnSelect = false, // Default to true
   ...props
 }: DropdownSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,6 +83,11 @@ const DropdownSelect = ({
       }
     } else {
       onChange(optionValue as string & string[]);
+    }
+
+    // Close the dropdown if closeOnSelect is true
+    if (closeOnSelect) {
+      setIsOpen(false);
     }
   };
 

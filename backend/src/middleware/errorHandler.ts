@@ -19,14 +19,14 @@ const errorHandler = (
     statusCode = error.status;
     errorMessage = error.message;
     serverLogger.error(
-      `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin}`,
+      `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin ? req.headers.origin : "Unknown Origin"}`,
     );
   }
   // prefer custom http errors but if they don't exist, fallback to default
   else if (error instanceof Error) {
     errorMessage = error.message;
     serverLogger.error(
-      `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin}`,
+      `${error.name}: ${error.message}\t${req.method}\t${req.url}\t${req.headers.origin ? req.headers.origin : "Unknown Origin"}`,
     );
   }
 
