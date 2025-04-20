@@ -9,6 +9,7 @@ import {
   AllowNull,
   Default,
   UpdatedAt,
+  Unique,
 } from "sequelize-typescript";
 
 // All attributes
@@ -37,6 +38,7 @@ class Quarter extends Model<QuarterAttributes, QuarterCreationAttributes> {
   id: string;
 
   @AllowNull(false)
+  @Unique
   @Column(DataType.STRING)
   name: string;
 
