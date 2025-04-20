@@ -4,6 +4,7 @@ import { log } from "./middleware/logger";
 import env from "./util/validateEnv";
 import errorHandler from "./middleware/errorHandler";
 import courseRouter from "./routes/course.routes";
+import quarterRouter from "./routes/quarter.routes";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(log);
 
 // Routes
 app.use("/api/course", courseRouter);
+app.use("/api/quarter", quarterRouter);
 
 /**
  * Error handler; all errors thrown by server are handled here.

@@ -1,6 +1,10 @@
 import Course from "@/models/Course.model";
+import Quarter from "@/models/Quarter.model";
 import validationErrorParser from "@/util/validationErrorParser";
-import { getCourseDetailsValidator } from "@/validators/course.validator";
+import {
+  getCourseDetailsValidator,
+  getCoursesValidator,
+} from "@/validators/course.validator";
 import { NextFunction, Request, Response, Router } from "express";
 import asyncHandler from "express-async-handler";
 import { matchedData, validationResult } from "express-validator";
@@ -10,20 +14,49 @@ const courseRouter = Router();
 
 type CourseQuery = {
   // comma-separate list of courses
+  quarter: string;
   courses: string;
 };
 
 /**
- * GET /api/courses
+ * GET /api/course?quarter=SP25
  *
- * Return all courses with no details
+ * Return all courses in a quarter with no details
  */
 courseRouter.get(
   "/",
+  getCoursesValidator,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const results = validationResult(req);
+
+      if (!results.isEmpty()) {
+        next(createHttpError(400, validationErrorParser(results)));
+        return;
+      }
+
+      const { quarter } = matchedData(req, {
+        locations: ["query"],
+      }) as CourseQuery;
+
+      // Check if quarter is valid
+      const foundQuarter = await Quarter.findOne({
+        where: {
+          name: quarter,
+        },
+      });
+
+      if (!foundQuarter) {
+        next(createHttpError(404, `Quarter ${quarter} not found`));
+        return;
+      }
+
       // Get all courses
-      const courses = await Course.findAll();
+      const courses = await Course.findAll({
+        where: {
+          quarterId: foundQuarter.id,
+        },
+      });
 
       res.status(200).json(courses);
     } catch (error: unknown) {
@@ -33,7 +66,7 @@ courseRouter.get(
 );
 
 /**
- * GET /api/courses/details?courses="COURSE 1,COURSE 2,COURSE 3..."
+ * GET /api/course/details?quarter=SP25&courses="COURSE 1,COURSE 2,COURSE 3..."
  *
  * Get details for a list of courses
  */
@@ -48,11 +81,22 @@ courseRouter.get(
       return;
     }
 
-    const { courses } = matchedData(req, {
+    const { courses, quarter } = matchedData(req, {
       locations: ["query"],
     }) as CourseQuery;
 
     try {
+      const foundQuarter = await Quarter.findOne({
+        where: {
+          name: quarter,
+        },
+      });
+
+      if (!foundQuarter) {
+        next(createHttpError(404, `Quarter ${quarter} not found`));
+        return;
+      }
+
       const coursesList = courses.split(",").map((course) => course.trim());
 
       const resCourses = [];
@@ -61,6 +105,7 @@ courseRouter.get(
           where: {
             subject: course.split(" ")[0],
             code: course.split(" ")[1],
+            quarterId: foundQuarter.id,
           },
         });
 

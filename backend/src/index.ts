@@ -45,7 +45,7 @@ const connectDB = async () => {
     await sequelize.authenticate();
 
     // Sync models with database
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
 
     console.log("Database connection established.");
   } catch (error) {
@@ -143,7 +143,7 @@ const startServer = async () => {
   await connectDB();
 
   // scheduleJobs();
-  updateSchedules();
+  // updateSchedules();
 
   app.listen(env.PORT, () => {
     serverLogger.info(`Server listening on port ${env.PORT}`);
