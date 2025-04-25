@@ -51,12 +51,11 @@ const connectDB = async (): Promise<Sequelize> => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scheduleJobs = (sequelize: Sequelize) => {
   serverLogger.info("Scheduling schedule update job");
 
   cron.schedule(
-    "0 0 * * 0",
+    "0 0 * * *",
     async () => {
       serverLogger.info("Starting schedule update job...");
       await updateSchedules(sequelize);
@@ -71,11 +70,9 @@ const scheduleJobs = (sequelize: Sequelize) => {
 };
 
 const startServer = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sequelize = await connectDB();
 
-  // scheduleJobs(sequelize);
-  // updateSchedules(sequelize);
+  scheduleJobs(sequelize);
 
   app.listen(env.PORT, () => {
     serverLogger.info(`Server listening on port ${env.PORT}`);

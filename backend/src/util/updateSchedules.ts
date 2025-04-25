@@ -3,23 +3,46 @@ import SubSection from "@/models/SubSection.model";
 import Exam from "@/models/Exam.model";
 import MainSection from "@/models/MainSection.model";
 import Course from "@/models/Course.model";
-import Quarter from "@/models/Quarter.model";
+import QuarterModel from "@/models/Quarter.model";
 import { serverLogger } from "./logger";
 import { Sequelize } from "sequelize";
+import { Quarter } from "@/types";
+
+const RETRY_DELAY = 1000 * 60 * 2; // 2 minutes
 
 const updateSchedules = async (sequelize: Sequelize) => {
   serverLogger.info("Updating schedules...");
 
-  const quarters = await scrapeSchedule();
+  try {
+    const quarters = await scrapeSchedule();
 
-  if (quarters.length === 0) {
-    serverLogger.info("Scraping schedule data failed.");
+    if (quarters.length === 0) {
+      serverLogger.info("Scraping schedule data failed.");
 
-    return;
+      return;
+    }
+
+    serverLogger.info(
+      "Scraped schedule data:" + JSON.stringify(quarters.map((q) => q.name)),
+    );
+
+    await saveQuarters(sequelize, quarters);
+  } catch (error) {
+    serverLogger.error("Error updating schedules:", (error as Error).stack);
+
+    serverLogger.info(
+      `Retrying schedule update in ${RETRY_DELAY / 1000} seconds...`,
+    );
+
+    setTimeout(async () => {
+      serverLogger.info("Retrying schedule update...");
+
+      await updateSchedules(sequelize);
+    }, RETRY_DELAY);
   }
+};
 
-  serverLogger.info("Scraped schedule data:" + JSON.stringify(quarters));
-
+const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
   // Start transaction to replace all data
   const t = await sequelize.transaction();
 
@@ -49,7 +72,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
         restartIdentity: true,
         transaction: t,
       }),
-      Quarter.destroy({
+      QuarterModel.destroy({
         truncate: true,
         cascade: true,
         restartIdentity: true,
@@ -60,7 +83,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
     for (const quarter of quarters) {
       serverLogger.info(`Saving quarter: ${quarter.name}`);
 
-      const newQuarter = await Quarter.create(
+      const newQuarter = await QuarterModel.create(
         {
           name: quarter.name,
         },
@@ -148,6 +171,8 @@ const updateSchedules = async (sequelize: Sequelize) => {
       "Schedule update failed, rolled back:",
       (error as Error).stack,
     );
+
+    throw new Error("Database update failed");
   }
 };
 
