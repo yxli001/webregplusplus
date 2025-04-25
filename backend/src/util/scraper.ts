@@ -47,7 +47,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         .map((option) => option.value.trim());
     });
 
-    serverLogger.info(`Found quarters: ${quarters.join(", ")}`);
+    serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
     const quartersCourses: Quarter[] = [];
     for (const quarter of quarters) {
@@ -357,20 +357,20 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
           currQuarter.courses.push(...pageCourses);
         });
 
-        serverLogger.debug(
-          `Found ${currQuarter.courses.length} courses for ${currQuarter.name}\n`,
-        );
-
         // Close the pages after processing
         await Promise.all(pages.map((page) => page.close()));
       }
+
+      serverLogger.info(
+        `Found ${currQuarter.courses.length} courses for ${currQuarter.name}\n`,
+      );
 
       serverLogger.info("Navigating back to the search page...");
       await page.goto(SCHEDULE_OF_CLASSES_URL, {
         waitUntil: "domcontentloaded",
       });
 
-      serverLogger.info("Waiting for quarter selector to load...");
+      serverLogger.info("Waiting for quarter selector to load...\n");
       await page.waitForSelector("#selectedTerm");
 
       quartersCourses.push(currQuarter);

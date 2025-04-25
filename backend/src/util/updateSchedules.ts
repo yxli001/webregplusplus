@@ -1,0 +1,154 @@
+import { scrapeSchedule } from "./scraper";
+import SubSection from "@/models/SubSection.model";
+import Exam from "@/models/Exam.model";
+import MainSection from "@/models/MainSection.model";
+import Course from "@/models/Course.model";
+import Quarter from "@/models/Quarter.model";
+import { serverLogger } from "./logger";
+import { Sequelize } from "sequelize";
+
+const updateSchedules = async (sequelize: Sequelize) => {
+  serverLogger.info("Updating schedules...");
+
+  const quarters = await scrapeSchedule();
+
+  if (quarters.length === 0) {
+    serverLogger.info("Scraping schedule data failed.");
+
+    return;
+  }
+
+  serverLogger.info("Scraped schedule data:" + JSON.stringify(quarters));
+
+  // Start transaction to replace all data
+  const t = await sequelize.transaction();
+
+  try {
+    await Promise.all([
+      SubSection.destroy({
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+        transaction: t,
+      }),
+      Exam.destroy({
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+        transaction: t,
+      }),
+      MainSection.destroy({
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+        transaction: t,
+      }),
+      Course.destroy({
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+        transaction: t,
+      }),
+      Quarter.destroy({
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+        transaction: t,
+      }),
+    ]);
+
+    for (const quarter of quarters) {
+      serverLogger.info(`Saving quarter: ${quarter.name}`);
+
+      const newQuarter = await Quarter.create(
+        {
+          name: quarter.name,
+        },
+        {
+          transaction: t,
+        },
+      );
+
+      for (const course of quarter.courses) {
+        const newCourse = await Course.create(
+          {
+            code: course.code,
+            subject: course.subject,
+            quarterId: newQuarter.id,
+          },
+          {
+            transaction: t,
+          },
+        );
+
+        for (const main of course.mainSections) {
+          const newMain = await MainSection.create(
+            {
+              letter: main.letter,
+              days: main.days,
+              startTime: main.startTime,
+              endTime: main.endTime,
+              instructor: main.instructor,
+              location: main.location,
+              type: main.type,
+              courseId: newCourse.id,
+            },
+            {
+              transaction: t,
+            },
+          );
+
+          for (const sub of main.sections) {
+            await SubSection.create(
+              {
+                days: sub.days,
+                startTime: sub.startTime,
+                endTime: sub.endTime,
+                isRequired: sub.isRequired,
+                location: sub.location,
+                section: sub.section,
+                type: sub.type,
+                mainSectionId: newMain.id,
+              },
+              {
+                transaction: t,
+              },
+            );
+          }
+
+          for (const exam of main.exams) {
+            await Exam.create(
+              {
+                date: exam.date,
+                endTime: exam.endTime,
+                location: exam.location,
+                startTime: exam.startTime,
+                type: exam.type,
+                mainSectionId: newMain.id,
+              },
+              {
+                transaction: t,
+              },
+            );
+          }
+        }
+      }
+      serverLogger.info(`Saved quarter: ${quarter.name}`);
+    }
+
+    serverLogger.info("Committing transaction...");
+
+    await t.commit();
+
+    serverLogger.info("Schedules updated successfully.");
+  } catch (error) {
+    await t.rollback();
+
+    serverLogger.error(
+      "Schedule update failed, rolled back:",
+      (error as Error).stack,
+    );
+  }
+};
+
+export default updateSchedules;
