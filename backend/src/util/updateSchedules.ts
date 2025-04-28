@@ -17,9 +17,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
     const quarters = await scrapeSchedule();
 
     if (quarters.length === 0) {
-      serverLogger.info("Scraping schedule data failed.");
-
-      return;
+      throw new Error("Scraping schedule data failed");
     }
 
     serverLogger.info(
