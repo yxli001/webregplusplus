@@ -6,7 +6,7 @@ import { serverLogger, dbLogger } from "@/util/logger";
 import env from "@/util/validateEnv";
 import app from "./app";
 import path from "path";
-import updateSchedules from "./util/updateSchedules";
+import { updateSchedules } from "./jobs/updateSchedulesJob";
 
 const connectDB = async (): Promise<Sequelize> => {
   try {

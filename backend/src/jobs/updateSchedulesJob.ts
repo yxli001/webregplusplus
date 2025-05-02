@@ -1,19 +1,23 @@
-import { scrapeSchedule } from "./scraper";
+import { scrapeSchedule } from "@/util/scraper";
 import SubSection from "@/models/SubSection.model";
 import Exam from "@/models/Exam.model";
 import MainSection from "@/models/MainSection.model";
 import Course from "@/models/Course.model";
 import QuarterModel from "@/models/Quarter.model";
-import { serverLogger } from "./logger";
+import { serverLogger } from "@/util/logger";
 import { Sequelize } from "sequelize";
 import { Quarter } from "@/types";
 
 const RETRY_DELAY = 1000 * 60 * 2; // 2 minutes
 
 const updateSchedules = async (sequelize: Sequelize) => {
-  serverLogger.info("Updating schedules...");
-
   try {
+    serverLogger.info("Verifying database connection...");
+
+    await sequelize.authenticate();
+
+    serverLogger.info("Updating schedules...");
+
     const quarters = await scrapeSchedule();
 
     if (quarters.length === 0) {
@@ -174,4 +178,4 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
   }
 };
 
-export default updateSchedules;
+export { updateSchedules };
