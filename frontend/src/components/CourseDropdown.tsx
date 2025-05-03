@@ -110,7 +110,7 @@ interface CourseDropdownProps {
  */
 const CourseDropdown = ({
   courses,
-  maxCourses = 5,
+  maxCourses = 10,
   className = "",
 }: CourseDropdownProps) => {
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);

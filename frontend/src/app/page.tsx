@@ -2,8 +2,10 @@
 
 import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
 import {
-  createMainSectionLookup,
-  createSubSectionLookup,
+  createMainSectionByCourseIdLookup,
+  createMainSectionByIdLookup,
+  // createSubSectionByIdLookup,
+  createSubSectionByMainSectionIdLookup,
   parseAvailableCourses,
   quarterNameToString,
 } from "@/util/helper";
@@ -140,8 +142,9 @@ export default function Home() {
       schedulePreferences: SchedulePreferences,
     ) => {
       async function fetchSchedule() {
-        console.log(coursePreferences);
-        console.log(schedulePreferences);
+        console.log(courseDetails);
+        // console.log(coursePreferences);
+        // console.log(schedulePreferences);
 
         const availableCourses = await parseAvailableCourses(
           courseDetails,
@@ -153,13 +156,19 @@ export default function Home() {
         const mainSections = availableCourses.mainSection;
         const subSections = availableCourses.subSection;
 
-        const mainSectionMap = await createMainSectionLookup(mainSections);
-        const subSectionMap = await createSubSectionLookup(subSections);
+        const mainSectionByCourseIdMap =
+          await createMainSectionByCourseIdLookup(mainSections);
+        const subSectionByMainSectionIdMap =
+          await createSubSectionByMainSectionIdLookup(subSections);
+        const mainSectionByIdMap =
+          await createMainSectionByIdLookup(mainSections);
+        //const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
         const schedules: Schedule[] = await generateOptimalSchedule(
           courseIds,
           schedulePreferences,
-          mainSectionMap,
-          subSectionMap,
+          mainSectionByCourseIdMap,
+          subSectionByMainSectionIdMap,
+          mainSectionByIdMap,
         );
         setAlgorithmRan(true);
 
@@ -171,6 +180,7 @@ export default function Home() {
 
         for (const schedule of schedules) {
           console.log(schedule.classes);
+          console.log(schedule.exams);
           console.log(schedule.fitness);
         }
 
@@ -274,11 +284,14 @@ export default function Home() {
                 label="Update Schedule"
                 className="self-end"
                 onClick={() =>
-                  handleAutoScheduler(
-                    courseDetails,
-                    coursePreferences,
-                    schedulePreferences,
-                  )
+                  handleAutoScheduler(courseDetails, coursePreferences, {
+                    ...schedulePreferences,
+                    allowedConflicts: new Set([
+                      "87076c92-9f02-44fc-9d09-18d93ddd17c4",
+                      "1a5bf273-1eee-4168-b9d5-418641029fb8",
+                      "481a6a23-b0db-4ec0-b7b3-1d41f9082298",
+                    ]),
+                  })
                 }
               />
             </>
