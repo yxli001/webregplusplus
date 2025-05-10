@@ -15,8 +15,6 @@ import {
   ForeignKey,
 } from "sequelize-typescript";
 import MainSection from "./MainSection.model";
-import SubSection from "./SubSection.model";
-import Exam from "./Exam.model";
 import Quarter from "./Quarter.model";
 
 // All attributes
@@ -42,14 +40,6 @@ type CourseCreationAttributes = Optional<CourseAttributes, "id">;
     include: [
       {
         model: MainSection,
-        include: [
-          {
-            model: SubSection,
-          },
-          {
-            model: Exam,
-          },
-        ],
       },
     ],
   },
