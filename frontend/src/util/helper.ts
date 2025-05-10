@@ -1,11 +1,6 @@
 import { Schedule } from "@/lib/scheduler";
 import { CoursePreferences } from "@/store/preferenceStore";
-import {
-  CourseWithSections,
-  Exam,
-  MainSection,
-  SubSection,
-} from "@/types/course";
+import { CourseWithSections, MainSection, SubSection } from "@/types/course";
 
 export function timeToIndex(
   time: string,
@@ -75,7 +70,7 @@ export function convertDaysToNumbers(days: string): number[] {
 
   return matches.map((day) => mapping[day]);
 }
-export async function createMainSectionLookup(
+export async function createMainSectionByCourseIdLookup(
   mainSections: MainSection[],
 ): Promise<Map<string, MainSection[]>> {
   const mainSectionMap = new Map<string, MainSection[]>();
@@ -89,7 +84,7 @@ export async function createMainSectionLookup(
   return mainSectionMap;
 }
 
-export async function createSubSectionLookup(
+export async function createSubSectionByMainSectionIdLookup(
   subSections: SubSection[],
 ): Promise<Map<string, SubSection[]>> {
   const sectionMap = new Map<string, SubSection[]>();
@@ -103,6 +98,26 @@ export async function createSubSectionLookup(
   return sectionMap;
 }
 
+export function createMainSectionByIdLookup(
+  mainSections: MainSection[],
+): Map<string, MainSection> {
+  const map = new Map<string, MainSection>();
+  mainSections.forEach((ms) => {
+    map.set(ms.id, ms);
+  });
+  return map;
+}
+
+export function createSubSectionByIdLookup(
+  subSections: SubSection[],
+): Map<string, SubSection> {
+  const map = new Map<string, SubSection>();
+  subSections.forEach((sub) => {
+    map.set(sub.id, sub);
+  });
+  return map;
+}
+
 export async function parseAvailableCourses(
   coursesResponse: CourseWithSections[],
   coursePreferences: CoursePreferences[],
@@ -111,7 +126,6 @@ export async function parseAvailableCourses(
     courses: [] as CourseWithSections[],
     mainSection: [] as MainSection[],
     subSection: [] as SubSection[],
-    exams: [] as Exam[],
   };
 
   for (const course of coursesResponse) {
@@ -191,4 +205,8 @@ export function quarterNameToString(quarter: string) {
   const quarterName = quarterMap[quarter.slice(0, 2)];
 
   return `${quarterName} 20${year}`;
+}
+
+export function isTimeTBA(section: MainSection | SubSection) {
+  return section.startTime === "TBA" || section.endTime === "TBA";
 }
