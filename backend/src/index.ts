@@ -72,6 +72,7 @@ const scheduleJobs = (sequelize: Sequelize) => {
 const startServer = async () => {
   const sequelize = await connectDB();
 
+  updateSchedules(sequelize);
   scheduleJobs(sequelize);
 
   app.listen(env.PORT, () => {
