@@ -24,6 +24,7 @@ export type SchedulePreferences = {
   preferredDays: string[];
   preferredStart: string; // 24-hour format HH:mm
   preferredEnd: string; // 24-hour format HH:mm
+  allowedConflicts: Set<string>; // Array of sets of course IDs
 };
 
 type PreferenceState = {
@@ -42,7 +43,7 @@ type PreferenceState = {
   ) => void;
 
   // Schedule Preferences Actions
-  updateSchedulPreferences: (update: Partial<SchedulePreferences>) => void;
+  updateSchedulePreferences: (update: Partial<SchedulePreferences>) => void;
 };
 
 export const usePreferenceStore = create(
@@ -59,6 +60,7 @@ export const usePreferenceStore = create(
       preferredDays: [],
       preferredStart: "08:00",
       preferredEnd: "22:00",
+      allowedConflicts: new Set([]),
     },
 
     setSelectedCourses: (courses) =>
@@ -114,7 +116,7 @@ export const usePreferenceStore = create(
       })),
 
     // Schedule Preferences Actions
-    updateSchedulPreferences: (update) =>
+    updateSchedulePreferences: (update) =>
       set((state) => ({
         schedulePreferences: {
           ...state.schedulePreferences,

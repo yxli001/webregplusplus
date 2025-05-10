@@ -1,9 +1,10 @@
-import { MainSection, SubSection } from "@/types/course";
+import { Exam, MainSection, SubSection } from "@/types/course";
 import {
   convertDaysToNumbers,
   timeToIndex,
   hashSchedule,
   computePreferredDays,
+  isTimeTBA,
 } from "../util/helper";
 import { SchedulePreferences } from "@/store/preferenceStore";
 
@@ -14,15 +15,27 @@ const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
 
 export interface Schedule {
   classes: (MainSection | SubSection)[];
+  exams: Exam[];
   fitness: number;
 }
 
 function isValidEntry(
   schedule: (MainSection | SubSection)[],
   preferences: SchedulePreferences,
+  mainSectionByIdMap: Map<string, MainSection>,
   newEntry: MainSection | SubSection,
 ): boolean {
   //   console.log(newEntry);
+  if (isTimeTBA(newEntry)) {
+    return true;
+  }
+  const course_id =
+    "courseId" in newEntry
+      ? newEntry.courseId
+      : mainSectionByIdMap.get(newEntry.mainSectionId)!.courseId;
+  if (preferences.allowedConflicts.has(course_id)) {
+    return true; // Allow conflict
+  }
   const excludedTimeSlots = preferences.excludedTimeSlots;
   for (const slot of excludedTimeSlots) {
     for (let j = 0; j < slot.days.length; j++) {
@@ -47,10 +60,17 @@ function isValidEntry(
           START_TIME,
           TIME_INTERVAL,
         );
+        // if (
+        //   (newStartIdx >= excludedStartIdx && newStartIdx < excludedEndIdx) || // Starts inside another class
+        //   (excludedStartIdx >= newStartIdx && excludedStartIdx < newEndIdx) || // Another class starts inside new class
+        //   (newStartIdx === excludedStartIdx && newEndIdx === excludedEndIdx) // Complete overlap
+        // ) {
+        //   return false; // Conflict found
+        // }
+        // overlap check
         if (
-          (newStartIdx >= excludedStartIdx && newStartIdx < excludedEndIdx) || // Starts inside another class
-          (excludedStartIdx >= newStartIdx && excludedStartIdx < newEndIdx) || // Another class starts inside new class
-          (newStartIdx === excludedStartIdx && newEndIdx === excludedEndIdx) // Complete overlap
+          Math.max(excludedStartIdx, newStartIdx) <
+          Math.min(excludedEndIdx, newEndIdx)
         ) {
           return false; // Conflict found
         }
@@ -62,6 +82,13 @@ function isValidEntry(
     const existingClass = schedule[i];
     if (newEntry === existingClass) {
       continue; // skip self cuz im gonna be using this in a kinda weird way
+    }
+    const course_id =
+      "courseId" in newEntry
+        ? newEntry.courseId
+        : mainSectionByIdMap.get(newEntry.mainSectionId)!.courseId;
+    if (preferences.allowedConflicts.has(course_id)) {
+      continue; // Allow conflict
     }
     // Check if they share any common days
     for (let j = 0; j < existingClass.days.length; j++) {
@@ -89,10 +116,17 @@ function isValidEntry(
         );
 
         // Check if the new entry overlaps with the existing class
+        // if (
+        //   (newStartIdx >= existingStartIdx && newStartIdx < existingEndIdx) || // Starts inside another class
+        //   (existingStartIdx >= newStartIdx && existingStartIdx < newEndIdx) || // Another class starts inside new class
+        //   (newStartIdx === existingStartIdx && newEndIdx === existingEndIdx) // Complete overlap
+        // ) {
+        //   return false; // Conflict found
+        // }
+        // overlap check
         if (
-          (newStartIdx >= existingStartIdx && newStartIdx < existingEndIdx) || // Starts inside another class
-          (existingStartIdx >= newStartIdx && existingStartIdx < newEndIdx) || // Another class starts inside new class
-          (newStartIdx === existingStartIdx && newEndIdx === existingEndIdx) // Complete overlap
+          Math.max(existingStartIdx, newStartIdx) <
+          Math.min(existingEndIdx, newEndIdx)
         ) {
           return false; // Conflict found
         }
@@ -103,11 +137,78 @@ function isValidEntry(
   return true; // No conflicts found
 }
 
+function isValidExam(exams: Exam[], newExams: Exam[]) {
+  for (const newExam of newExams) {
+    for (let i = 0; i < exams.length; i++) {
+      //console.log(schedule[i]);
+      const existingExam = exams[i];
+      if (newExam === existingExam) {
+        continue; // skip self cuz im gonna be using this in a kinda weird way
+      }
+      // Check if they share any common days
+      if (newExam.date == existingExam.date) {
+        // Convert start & end times to comparable indexes
+        const existingStartIdx = timeToIndex(
+          existingExam.startTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const existingEndIdx = timeToIndex(
+          existingExam.endTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const newStartIdx = timeToIndex(
+          newExam.startTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+        const newEndIdx = timeToIndex(
+          newExam.endTime,
+          START_TIME,
+          TIME_INTERVAL,
+        );
+
+        // Check if the new entry overlaps with the existing class
+        // if (
+        //   (newStartIdx >= existingStartIdx && newStartIdx < existingEndIdx) || // Starts inside another class
+        //   (existingStartIdx >= newStartIdx && existingStartIdx < newEndIdx) || // Another class starts inside new class
+        //   (newStartIdx === existingStartIdx && newEndIdx === existingEndIdx) // Complete overlap
+        // ) {
+        //   return false; // Conflict found
+        // }
+
+        // overlap check
+        if (
+          Math.max(existingStartIdx, newStartIdx) <
+          Math.min(existingEndIdx, newEndIdx)
+        ) {
+          console.log("Conflict found: Exams");
+          return false; // Conflict found
+        }
+      }
+    }
+  }
+  return true; // No conflicts found
+}
 function isValidTimegrid(
   newEntry: MainSection | SubSection,
   timeGrid: boolean[][],
+  mainSectionByIdMap: Map<string, MainSection>,
+  preferences: SchedulePreferences,
 ): boolean {
   //   console.log(newEntry);
+  if (isTimeTBA(newEntry)) {
+    return true;
+  }
+  const course_id =
+    "courseId" in newEntry
+      ? newEntry.courseId
+      : mainSectionByIdMap.get(newEntry.mainSectionId)!.courseId;
+  // Allow conflict if course_id is in allowedConflicts
+  if (preferences.allowedConflicts.has(course_id)) {
+    return true;
+  }
   const days = convertDaysToNumbers(newEntry.days);
   const startIdx = timeToIndex(newEntry.startTime, START_TIME, TIME_INTERVAL);
   const endIdx = timeToIndex(newEntry.endTime, START_TIME, TIME_INTERVAL);
@@ -137,7 +238,7 @@ function isValidTimegrid(
 export function calculateFitness(
   schedule: (MainSection | SubSection)[],
   preferences: SchedulePreferences,
-  changedClasses?: (MainSection | SubSection)[],
+  // Possible to save O(n) time if we add an extension used when only single class is changed but i feel like the return aint worth.
 ): number {
   const spreadMap: Record<string, number> = {
     "really-spread-out": 10,
@@ -157,27 +258,27 @@ export function calculateFitness(
   const earliest = Array(7).fill(10000);
   const latest = Array(7).fill(0);
 
-  // Checks whole schedule if no change classes, else checks only changed classes O(N) vs O(1)
-  const classes = changedClasses ? changedClasses : schedule;
-
-  for (const [i, currClass] of classes.entries()) {
+  for (const currClass of schedule) {
     const startIdx = timeToIndex(
       currClass.startTime,
       START_TIME,
       TIME_INTERVAL,
     );
     const endIdx = timeToIndex(currClass.endTime, START_TIME, TIME_INTERVAL);
-    const currClassDays = convertDaysToNumbers(currClass.days);
 
     // Preferred time check
-    if (
-      currClass.startTime >= updatedPreferences.preferredStart &&
-      currClass.endTime <= updatedPreferences.preferredEnd
-    ) {
-      score += 8;
+    if (!isTimeTBA(currClass)) {
+      if (
+        currClass.startTime >= updatedPreferences.preferredStart &&
+        currClass.endTime <= updatedPreferences.preferredEnd
+      ) {
+        score += 8;
+      }
     }
 
     // Preferred days check
+    const currClassDays =
+      currClass.days !== "TBA" ? convertDaysToNumbers(currClass.days) : [];
     for (const day of currClassDays) {
       if (updatedPreferences.preferredDays[day]) {
         score += updatedPreferences.preferredDays[day];
@@ -189,65 +290,31 @@ export function calculateFitness(
         latest[day] = endIdx;
       }
     }
-    // Changed j = i+1 to j = 0 slower but don't need to customize as much, can be optimized later
-    if (changedClasses !== null) {
-      for (let j = 0; j < schedule.length; j++) {
-        if (currClass === schedule[j]) continue;
-        const other = schedule[j];
-        const otherStartIdx = timeToIndex(
-          other.startTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const otherEndIdx = timeToIndex(
-          other.endTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const otherDays = convertDaysToNumbers(other.days);
-        const sharedDays = currClassDays.filter((day) =>
-          otherDays.includes(day),
-        );
+    for (let j = 0; j < schedule.length; j++) {
+      if (currClass === schedule[j]) continue;
+      const other = schedule[j];
+      const otherStartIdx = timeToIndex(
+        other.startTime,
+        START_TIME,
+        TIME_INTERVAL,
+      );
+      const otherEndIdx = timeToIndex(other.endTime, START_TIME, TIME_INTERVAL);
+      const otherDays = convertDaysToNumbers(other.days);
+      const sharedDays = currClassDays.filter((day) => otherDays.includes(day));
 
-        if (sharedDays.length > 0) {
-          // Back-To-Back Preference
-          if (updatedPreferences.avoidBackToBack) {
-            if (
-              Math.abs(startIdx - otherEndIdx) <= 1 ||
-              Math.abs(endIdx - otherStartIdx) <= 1
-            ) {
-              score -= 5 * sharedDays.length;
-            }
-          }
+      if (sharedDays.length > 0) {
+        // Back-To-Back Preference
+
+        if (Math.max(startIdx, otherStartIdx) < Math.min(endIdx, otherEndIdx)) {
+          score = -100;
+          continue; // No need to keep checking other classes
         }
-      }
-    } else {
-      for (let j = i + 1; j < schedule.length; j++) {
-        const other = schedule[j];
-        const otherStartIdx = timeToIndex(
-          other.startTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const otherEndIdx = timeToIndex(
-          other.endTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const otherDays = convertDaysToNumbers(other.days);
-        const sharedDays = currClassDays.filter((day) =>
-          otherDays.includes(day),
-        );
-
-        if (sharedDays.length > 0) {
-          // Back-To-Back Preference
-          if (updatedPreferences.avoidBackToBack) {
-            if (
-              Math.abs(startIdx - otherEndIdx) <= 1 ||
-              Math.abs(endIdx - otherStartIdx) <= 1
-            ) {
-              score -= 5 * sharedDays.length;
-            }
+        if (updatedPreferences.avoidBackToBack) {
+          if (
+            Math.abs(startIdx - otherEndIdx) <= 1 ||
+            Math.abs(endIdx - otherStartIdx) <= 1
+          ) {
+            score -= 5 * sharedDays.length;
           }
         }
       }
@@ -270,16 +337,17 @@ export function calculateFitness(
 
 export async function generateRandomSchedule(
   courseIds: string[],
-  Preferences: SchedulePreferences,
-  mainSectionMap: Map<string, MainSection[]>,
-  subSectionMap: Map<string, SubSection[]>,
-): Promise<(MainSection | SubSection)[]> {
-  const schedule: (MainSection | SubSection)[] = [];
+  preferences: SchedulePreferences,
+  mainSectionByCourseIdMap: Map<string, MainSection[]>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
+): Promise<Schedule> {
+  const classes: (MainSection | SubSection)[] = [];
+  const exams: Exam[] = [];
   const timeGrid = Array.from({ length: 7 }, () =>
     Array(TIME_SLOTS).fill(false),
   ); // Track occupied time slots
-
-  const excludedTimeSlots = Preferences.excludedTimeSlots;
+  const excludedTimeSlots = preferences.excludedTimeSlots;
   for (const slot of excludedTimeSlots) {
     const days = convertDaysToNumbers(slot.days);
     for (const day of days) {
@@ -293,16 +361,28 @@ export async function generateRandomSchedule(
 
   for (const courseId of courseIds) {
     // console.log(courseId);
-    const mainSections = mainSectionMap.get(courseId) || [];
+    const mainSections = mainSectionByCourseIdMap.get(courseId) || [];
     // console.log(mainSections);
     const mainSection =
       mainSections[Math.floor(Math.random() * mainSections.length)];
     // console.log(mainSection);
-    if (!isValidTimegrid(mainSection, timeGrid)) return [];
+    if (
+      !isValidTimegrid(
+        mainSection,
+        timeGrid,
+        mainSectionByIdMap,
+        preferences,
+      ) ||
+      !isValidExam(exams, mainSection.exams)
+    )
+      return { classes: [], exams: [], fitness: NaN };
 
-    schedule.push(mainSection);
+    classes.push(mainSection);
 
-    const subSections = subSectionMap.get(mainSection.id) || [];
+    for (const exam of mainSection.exams) {
+      exams.push(exam);
+    }
+    const subSections = subSectionByMainSectionIdMap.get(mainSection.id) || [];
     if (subSections.length !== 0) {
       const requiredSections = subSections.filter((s) => s.isRequired);
       const optionalSections = subSections.filter((s) => !s.isRequired);
@@ -312,27 +392,44 @@ export async function generateRandomSchedule(
         : null;
 
       for (const requiredSection of requiredSections) {
-        if (requiredSection && isValidTimegrid(requiredSection, timeGrid)) {
-          schedule.push(requiredSection);
+        if (
+          requiredSection &&
+          isValidTimegrid(
+            requiredSection,
+            timeGrid,
+            mainSectionByIdMap,
+            preferences,
+          )
+        ) {
+          classes.push(requiredSection);
         } else {
-          return [];
+          return { classes: [], exams: [], fitness: NaN };
         }
       }
-      if (optionalSection && isValidTimegrid(optionalSection, timeGrid)) {
-        schedule.push(optionalSection);
+      if (
+        optionalSection &&
+        isValidTimegrid(
+          optionalSection,
+          timeGrid,
+          mainSectionByIdMap,
+          preferences,
+        )
+      ) {
+        classes.push(optionalSection);
       } else {
-        return [];
+        return { classes: [], exams: [], fitness: NaN };
       }
     }
   }
-  return schedule;
+  return { classes: classes, exams: exams, fitness: NaN };
 }
 export async function generateSchedules(
   quantity: number,
   courseId: string[],
   preferences: SchedulePreferences,
-  mainSectionMap: Map<string, MainSection[]>,
-  subSectionmap: Map<string, SubSection[]>,
+  mainSectionByCourseIdMap: Map<string, MainSection[]>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
 ): Promise<Schedule[]> {
   const schedules: Schedule[] = [];
   let validSchedules = 0;
@@ -342,16 +439,15 @@ export async function generateSchedules(
     const newSchedule = await generateRandomSchedule(
       courseId,
       preferences,
-      mainSectionMap,
-      subSectionmap,
+      mainSectionByCourseIdMap,
+      subSectionByMainSectionIdMap,
+      mainSectionByIdMap,
     );
-    if (newSchedule.length != 0) {
-      console.log(newSchedule);
-      console.log(preferences);
-      console.log(calculateFitness(newSchedule, preferences));
+    if (newSchedule.classes.length != 0) {
       schedules.push({
-        classes: newSchedule,
-        fitness: calculateFitness(newSchedule, preferences),
+        classes: newSchedule.classes,
+        exams: newSchedule.exams,
+        fitness: calculateFitness(newSchedule.classes, preferences),
       });
       validSchedules++;
     }
@@ -372,9 +468,11 @@ function mutateSubSection(
   selectedEntry: SubSection,
   preferences: SchedulePreferences,
   randomIndex: number,
-  subSectionMap: Map<string, SubSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
   maxRetries = 5,
 ) {
+  // console.log("Mutating subSection...");
   // Check if the selected entry is a required subSection
   if (selectedEntry.isRequired) {
     // console.log(
@@ -387,7 +485,7 @@ function mutateSubSection(
 
   // Get available optional subSections for the correct mainSection
   const availableSubSections = (
-    subSectionMap.get(selectedEntry.mainSectionId) || []
+    subSectionByMainSectionIdMap.get(selectedEntry.mainSectionId) || []
   ).filter(
     (subSection) =>
       !subSection.isRequired && // Only allow non-required subSections
@@ -416,7 +514,7 @@ function mutateSubSection(
       if (
         newSection &&
         selectedEntry.mainSectionId === newSection.mainSectionId &&
-        isValidEntry(schedule, preferences, newSection)
+        isValidEntry(schedule, preferences, mainSectionByIdMap, newSection)
       ) {
         schedule[randomIndex] = newSection;
         // console.log(
@@ -448,14 +546,17 @@ function mutateSubSection(
 
 function mutateMainSection(
   schedule: (MainSection | SubSection)[],
+  exams: Exam[],
   selectedEntry: MainSection,
   preferences: SchedulePreferences,
   randomIndex: number,
-  mainSectionMap: Map<string, MainSection[]>,
-  subSectionMap: Map<string, SubSection[]>,
+  mainSectionByCourseIdMap: Map<string, MainSection[]>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
 ): boolean {
+  // console.log("Mutating mainSection...");
   const availableMainSections =
-    mainSectionMap.get(selectedEntry.courseId) || [];
+    mainSectionByCourseIdMap.get(selectedEntry.courseId) || [];
   if (availableMainSections.length > 1) {
     const newMainSection =
       availableMainSections[
@@ -463,9 +564,16 @@ function mutateMainSection(
       ];
 
     //  Check if the new mainSection is valid and has no conflicts
-    if (isValidEntry(schedule, preferences, newMainSection)) {
+    if (
+      isValidEntry(schedule, preferences, mainSectionByIdMap, newMainSection) &&
+      isValidExam(exams, newMainSection.exams)
+    ) {
       //  Replace mainSection if valid
       schedule[randomIndex] = newMainSection;
+      exams = exams.filter((exam) => exam.mainSectionId !== newMainSection.id);
+      for (const newExam of newMainSection.exams) {
+        exams.push(newExam);
+      }
 
       // Remove any subSections tied to the old mainSection
       const updatedSchedule = schedule.filter(
@@ -474,16 +582,23 @@ function mutateMainSection(
       );
 
       const requiredSubSections = (
-        subSectionMap.get(newMainSection.id) || []
+        subSectionByMainSectionIdMap.get(newMainSection.id) || []
       ).filter((subSection) => subSection.isRequired);
       // Add a new optional subSection for the new mainSection if available
       const availableSubSections = (
-        subSectionMap.get(newMainSection.id) || []
+        subSectionByMainSectionIdMap.get(newMainSection.id) || []
       ).filter((subSection) => !subSection.isRequired);
 
       if (requiredSubSections.length > 0) {
         for (const requiredSubSection of requiredSubSections) {
-          if (isValidEntry(updatedSchedule, preferences, requiredSubSection)) {
+          if (
+            isValidEntry(
+              updatedSchedule,
+              preferences,
+              mainSectionByIdMap,
+              requiredSubSection,
+            )
+          ) {
             updatedSchedule.push(requiredSubSection);
           } else {
             return false;
@@ -496,7 +611,14 @@ function mutateMainSection(
             ];
 
           // Check if the new subSection is valid before adding it
-          if (isValidEntry(updatedSchedule, preferences, newSection)) {
+          if (
+            isValidEntry(
+              updatedSchedule,
+              preferences,
+              mainSectionByIdMap,
+              newSection,
+            )
+          ) {
             updatedSchedule.push(newSection);
             //   console.log(
             //     `🔄 MainSection Mutation: Replaced ${JSON.stringify(
@@ -525,62 +647,77 @@ export function mutate(
   preferences: SchedulePreferences,
   cache: Map<string, number>,
   temperature: number,
-  mainSectionMap: Map<string, MainSection[]>,
-  subSectionMap: Map<string, SubSection[]>,
-) {
+  mainSectionByCourseIdMap: Map<string, MainSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
+): Schedule {
   const originalFitness = calculateFitness(schedule.classes, preferences);
-  let newSchedule = [...schedule.classes];
+  let newClasses = [...schedule.classes];
+  let newExams = [...schedule.exams];
   let newFitness = originalFitness;
   let iterations = 0;
 
   // Attempt mutation for 100 iterations or until fitness improves
   while (iterations < 100) {
     iterations++;
-    const mutatedSchedule = [...newSchedule];
-    const randomIndex = Math.floor(Math.random() * mutatedSchedule.length);
-    const selectedEntry = mutatedSchedule[randomIndex];
+    const mutatedClasses = [...newClasses];
+    const mutatedExams = [...newExams];
+    const randomIndex = Math.floor(Math.random() * mutatedClasses.length);
+    const selectedEntry = mutatedClasses[randomIndex];
     let success = false;
+    let change = "None";
     // Mutate SubSection or MainSection
-    if ("main_section_id" in selectedEntry) {
+    if ("mainSectionId" in selectedEntry) {
       success = mutateSubSection(
-        mutatedSchedule,
+        mutatedClasses,
         selectedEntry as SubSection,
         preferences,
         randomIndex,
-        subSectionMap,
+        mainSectionByIdMap,
+        subSectionByMainSectionIdMap,
       );
+      change = "sub_section";
     } else {
       success = mutateMainSection(
-        mutatedSchedule,
+        mutatedClasses,
+        mutatedExams,
         selectedEntry as MainSection,
         preferences,
         randomIndex,
-        mainSectionMap,
-        subSectionMap,
+        mainSectionByCourseIdMap,
+        subSectionByMainSectionIdMap,
+        mainSectionByIdMap,
       );
+      change = "main_section";
     }
-
     if (!success) {
       continue;
     }
-    const hash = hashSchedule({ classes: mutatedSchedule, fitness: 0 });
+    const hash = hashSchedule({
+      classes: mutatedClasses,
+      exams: schedule.exams,
+      fitness: 0,
+    });
     if (cache.has(hash)) {
       newFitness = cache.get(hash)!;
     } else {
-      newFitness = calculateFitness(mutatedSchedule, preferences);
+      newFitness = calculateFitness(mutatedClasses, preferences);
       cache.set(hash, newFitness);
     }
 
     const fitnessDifference = newFitness - originalFitness;
 
     if (
-      newFitness >= originalFitness || // Flat acceptance
+      newFitness > originalFitness || // Flat acceptance
       Math.random() < Math.exp(fitnessDifference / temperature) // Monte Carlo acceptance
     ) {
       console.log(
         `Accepted Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
       );
-      newSchedule = mutatedSchedule;
+      newClasses = mutatedClasses;
+      if (change === "main_section") {
+        newExams = mutatedExams;
+      }
       break;
     } else {
       console.log(
@@ -589,7 +726,8 @@ export function mutate(
     }
   }
   return {
-    classes: newSchedule,
+    classes: newClasses,
+    exams: newExams,
     fitness: newFitness,
   };
 }
@@ -597,34 +735,39 @@ export function mutate(
 export default async function generateOptimalSchedule(
   courseId: string[],
   preferences: SchedulePreferences,
-  mainSectionMap: Map<string, MainSection[]>,
-  subSectionMap: Map<string, SubSection[]>,
+  mainSectionByCourseIdMap: Map<string, MainSection[]>,
+  subSectionByMainSectionIdMap: Map<string, SubSection[]>,
+  mainSectionByIdMap: Map<string, MainSection>,
 ): Promise<Schedule[]> {
-  console.log(mainSectionMap);
-  console.log(subSectionMap);
+  console.log("Main Section Map:", mainSectionByCourseIdMap);
+  console.log("Sub Section Map:", subSectionByMainSectionIdMap);
+
   let scheduleList = await generateSchedules(
-    5,
+    100,
     courseId,
     preferences,
-    mainSectionMap,
-    subSectionMap,
+    mainSectionByCourseIdMap,
+    subSectionByMainSectionIdMap,
+    mainSectionByIdMap,
   );
+
   const cache = new Map<string, number>();
 
-  for (let i = 0; i < 1000; i++) {
-    // for (const schedule of scheduleList) {
-    //   console.log(schedule.classes);
-    //   console.log(schedule.fitness);
-    // }
+  for (let i = 0; i < 10; i++) {
     const parents = selectParents(scheduleList);
     const children = parents.map((parent) =>
-      mutate(parent, preferences, cache, 10, mainSectionMap, subSectionMap),
+      mutate(
+        parent,
+        preferences,
+        cache,
+        10,
+        mainSectionByCourseIdMap,
+        mainSectionByIdMap,
+        subSectionByMainSectionIdMap,
+      ),
     );
+
     scheduleList = [...parents, ...children];
-
-    //const children = mutate(scheduleList[0], preferences, cache);
-    //scheduleList = [children];
   }
-
   return scheduleList;
 }

@@ -26,7 +26,7 @@ const Preferences = () => {
     (state) => state.schedulePreferences,
   );
   const updateSchedulPreferences = usePreferenceStore(
-    (state) => state.updateSchedulPreferences,
+    (state) => state.updateSchedulePreferences,
   );
 
   return (
