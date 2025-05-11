@@ -4,7 +4,7 @@ import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
 import {
   createMainSectionByCourseIdLookup,
   createMainSectionByIdLookup,
-  // createSubSectionByIdLookup,
+  createSubSectionByIdLookup,
   createSubSectionByMainSectionIdLookup,
   parseAvailableCourses,
   quarterNameToString,
@@ -162,6 +162,7 @@ export default function Home() {
           await createSubSectionByMainSectionIdLookup(subSections);
         const mainSectionByIdMap =
           await createMainSectionByIdLookup(mainSections);
+        const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
         //const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
         const schedules: Schedule[] = await generateOptimalSchedule(
           courseIds,
@@ -169,6 +170,7 @@ export default function Home() {
           mainSectionByCourseIdMap,
           subSectionByMainSectionIdMap,
           mainSectionByIdMap,
+          subSectionByIdMap,
         );
         setAlgorithmRan(true);
 
@@ -177,7 +179,7 @@ export default function Home() {
           console.log("No valid schedules found");
           return;
         }
-
+        console.log(schedules);
         for (const schedule of schedules) {
           console.log(schedule.classes);
           console.log(schedule.exams);
@@ -205,11 +207,7 @@ export default function Home() {
                   (mainSection) => mainSection.id === entry.mainSectionId,
                 );
 
-            const title = `${course?.subject || "?"} ${course?.code || "?"} | ${
-              isMain
-                ? `Lecture: ${mainSection?.letter}`
-                : `Section: ${entry.section} | Lecture: ${mainSection?.letter || "?"}`
-            }`;
+            const title = `${course?.subject || "?"} ${course?.code}`;
 
             return {
               id: (i + 1).toString(),
@@ -218,11 +216,11 @@ export default function Home() {
               endTime: entry.endTime,
               daysOfWeek: convertDaysToNumbers(entry.days),
               extendedProps: {
-                instructor: mainSection?.instructor || "TBA",
-                location: isMain
-                  ? mainSection?.location
-                  : entry?.location || "TBD",
-                meeting_type: isMain ? "Lecture" : "Section",
+                lecture: isMain ? entry.letter : mainSection?.letter,
+                section: isMain ? "00" : entry.section,
+                instructor: isMain ? entry.instructor : mainSection?.instructor,
+                location: entry.location || "TBD",
+                meeting_type: entry.type,
               },
             };
           }),
