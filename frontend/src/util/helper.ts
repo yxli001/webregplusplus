@@ -98,9 +98,9 @@ export async function createSubSectionByMainSectionIdLookup(
   return sectionMap;
 }
 
-export function createMainSectionByIdLookup(
+export async function createMainSectionByIdLookup(
   mainSections: MainSection[],
-): Map<string, MainSection> {
+): Promise<Map<string, MainSection>> {
   const map = new Map<string, MainSection>();
   mainSections.forEach((ms) => {
     map.set(ms.id, ms);
@@ -108,9 +108,9 @@ export function createMainSectionByIdLookup(
   return map;
 }
 
-export function createSubSectionByIdLookup(
+export async function createSubSectionByIdLookup(
   subSections: SubSection[],
-): Map<string, SubSection> {
+): Promise<Map<string, SubSection>> {
   const map = new Map<string, SubSection>();
   subSections.forEach((sub) => {
     map.set(sub.id, sub);
@@ -179,19 +179,46 @@ export async function parseAvailableCourses(
 }
 
 export function hashSchedule(schedule: Schedule): string {
-  let hash = 0;
   const str = schedule.classes
     .map(
-      (currClass) => `${currClass.id}:${"lecture_id" in currClass ? "L" : "S"}`,
+      (currClass) =>
+        `${currClass.id}:${"mainSectionId" in currClass ? "S" : "L"}`,
     )
     .join("|");
-
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) % 1_000_000_007;
-  }
-  return hash.toString();
+  return str;
 }
 
+export function parseScheduleEntry(
+  entry: [string, number],
+  mainSectionByIdMap: Map<string, MainSection>,
+  subSectionByIdMap: Map<string, SubSection>,
+): Schedule {
+  const [key, fitness] = entry;
+  const schedule: Schedule = { classes: [], exams: [], fitness };
+
+  const parts = key.split("|");
+
+  for (const part of parts) {
+    const [id, type] = part.split(":");
+
+    if (type === "L") {
+      const main = mainSectionByIdMap.get(id);
+      if (main) {
+        schedule.classes.push(main);
+        if (main.exams && main.exams.length > 0) {
+          schedule.exams.push(...main.exams);
+        }
+      }
+    } else if (type === "S") {
+      const sub = subSectionByIdMap.get(id);
+      if (sub) {
+        schedule.classes.push(sub);
+      }
+    }
+  }
+
+  return schedule;
+}
 // FA24 -> Fall 2024
 export function quarterNameToString(quarter: string) {
   const quarterMap: Record<string, string> = {

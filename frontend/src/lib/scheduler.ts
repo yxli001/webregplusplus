@@ -7,6 +7,7 @@ import {
   isTimeTBA,
 } from "../util/helper";
 import { SchedulePreferences } from "@/store/preferenceStore";
+import { parseScheduleEntry } from "../util/helper";
 
 const START_TIME = 8 * 60;
 const TIME_INTERVAL = 10;
@@ -425,6 +426,7 @@ export async function generateRandomSchedule(
 }
 export async function generateSchedules(
   quantity: number,
+  cache: Map<string, number>,
   courseId: string[],
   preferences: SchedulePreferences,
   mainSectionByCourseIdMap: Map<string, MainSection[]>,
@@ -450,6 +452,14 @@ export async function generateSchedules(
         fitness: calculateFitness(newSchedule.classes, preferences),
       });
       validSchedules++;
+      const hash = hashSchedule(newSchedule);
+      let fitness = 0;
+      if (cache.has(hash)) {
+        fitness = cache.get(hash)!;
+      } else {
+        fitness = calculateFitness(newSchedule.classes, preferences);
+        cache.set(hash, fitness);
+      }
     }
   }
   return schedules;
@@ -711,18 +721,18 @@ export function mutate(
       newFitness > originalFitness || // Flat acceptance
       Math.random() < Math.exp(fitnessDifference / temperature) // Monte Carlo acceptance
     ) {
-      console.log(
-        `Accepted Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
-      );
+      //   console.log(
+      //     `Accepted Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
+      //   );
       newClasses = mutatedClasses;
       if (change === "main_section") {
         newExams = mutatedExams;
       }
       break;
     } else {
-      console.log(
-        `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
-      );
+      //   console.log(
+      //     `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
+      //   );
     }
   }
   return {
@@ -738,20 +748,22 @@ export default async function generateOptimalSchedule(
   mainSectionByCourseIdMap: Map<string, MainSection[]>,
   subSectionByMainSectionIdMap: Map<string, SubSection[]>,
   mainSectionByIdMap: Map<string, MainSection>,
+  subSectionByIdMap: Map<string, SubSection>,
 ): Promise<Schedule[]> {
-  console.log("Main Section Map:", mainSectionByCourseIdMap);
-  console.log("Sub Section Map:", subSectionByMainSectionIdMap);
+  console.log("Main Section Map:", mainSectionByIdMap);
+  console.log("Sub Section Map:", subSectionByIdMap);
+
+  const cache = new Map<string, number>();
 
   let scheduleList = await generateSchedules(
     100,
+    cache,
     courseId,
     preferences,
     mainSectionByCourseIdMap,
     subSectionByMainSectionIdMap,
     mainSectionByIdMap,
   );
-
-  const cache = new Map<string, number>();
 
   for (let i = 0; i < 10; i++) {
     const parents = selectParents(scheduleList);
@@ -769,5 +781,17 @@ export default async function generateOptimalSchedule(
 
     scheduleList = [...parents, ...children];
   }
-  return scheduleList;
+  console.log(cache);
+
+  const sortedCache = [...cache.entries()].sort((a, b) => b[1] - a[1]);
+  const loops = sortedCache.length > 10 ? 10 : sortedCache.length;
+  const optimalSchedules = Array(loops);
+  for (let i = 0; i < loops; i++) {
+    optimalSchedules[i] = parseScheduleEntry(
+      sortedCache[i],
+      mainSectionByIdMap,
+      subSectionByIdMap,
+    );
+  }
+  return optimalSchedules;
 }
