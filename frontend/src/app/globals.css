@@ -49,47 +49,6 @@
   }
 }
 
-/* --- Custom Event Colors & Rounded Corners --- */
-.fc-event {
-  background-color: #1976d2 !important; /* similar to UCSD blue */
-  border: none !important;
-  border-radius: 6px !important;
-  padding: 4px !important;
-  cursor: pointer;
-}
-
-/* --- Custom Column Headers (Days) --- */
-.fc-col-header-cell {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 8px 0;
-}
-
-/* --- Time Labels (7 AM to 10 PM) --- */
-.fc-timegrid-slot-label {
-  font-size: 0.75rem;
-  color: #666;
-}
-
-/* --- Hide borders to clean up look --- */
-.fc-scrollgrid,
-.fc-scrollgrid-section,
-.fc-scrollgrid-sync-table,
-.fc-timegrid-slot,
-.fc-timegrid-col {
-  border: none !important;
-}
-
-/* --- Make it compact like WebReg --- */
-.fc .fc-timegrid-slot {
-  height: 2.2em;
-}
-
-.fc-now-indicator-line,
-.fc-now-indicator-arrow {
-  display: none !important;
-}
 /*
 @media (prefers-color-scheme: dark) {
   :root {
@@ -103,3 +62,71 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 } */
+
+.fc {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: white;
+  border: 1px solid #d9e2ec;
+}
+
+/* Target only 30-minute (or minor) grid lines */
+.fc-timegrid-slot-label.fc-timegrid-slot-minor,
+.fc-timegrid-slot-lane.fc-timegrid-slot-minor {
+  border-top: none !important;
+}
+
+.fc-view-harness {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+}
+
+.fc-col-header-cell {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.fc-timegrid-slot-label {
+  font-size: 0.7rem;
+  color: #334e68;
+}
+.fc-event {
+  background-color: transparent !important;
+  border: none !important;
+  margin: 2px !important;
+}
+
+.fc-event-main {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.fc-day-today {
+  background-color: transparent !important;
+}
+
+.fc,
+.fc-view-harness,
+.fc-view,
+.fc-scrollgrid,
+.fc-timegrid {
+  background-color: white !important;
+}
+
+.event-box {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  overflow-x: hidden;
+  padding: 4px 6px;
+  font-size: 0.5rem;
+  background-color: var(--event-bg, #e3f8ff);
+  color: var(--event-color, #1992d4);
+}
