@@ -47,7 +47,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         .map((option) => option.value.trim());
     });
 
-    serverLogger.info(`Found quarters: ${quarters.join(", ")}`);
+    serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
     const quartersCourses: Quarter[] = [];
     for (const quarter of quarters) {
@@ -112,8 +112,6 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         );
       });
       serverLogger.info(`Total pages: ${numPages}`);
-
-      const courses: Course[] = [];
 
       for (
         let batchStart = 0;
@@ -336,41 +334,43 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
           ),
         );
 
-        pageCoursesArray.forEach((pageCourses) => {
-          if (!pageCourses || pageCourses.length === 0) {
-            serverLogger.info("No courses found.");
-            return;
-          }
-
-          // Check if there are overlapping courses and merge them
-          if (
-            courses.length > 0 &&
-            pageCourses[0].name === courses[courses.length - 1].name &&
-            pageCourses[0].code === courses[courses.length - 1].code
-          ) {
-            courses[courses.length - 1].mainSections.push(
-              ...pageCourses[0].mainSections,
-            );
-            pageCourses.shift();
-          }
-
-          currQuarter.courses.push(...pageCourses);
-        });
-
-        serverLogger.debug(
-          `Found ${currQuarter.courses.length} courses for ${currQuarter.name}\n`,
-        );
+        currQuarter.courses.push(...pageCoursesArray.flat());
 
         // Close the pages after processing
         await Promise.all(pages.map((page) => page.close()));
       }
+
+      // Remove duplicate courses
+      currQuarter.courses = currQuarter.courses.reduce(
+        (acc: Course[], course: Course) => {
+          const existingCourse = acc.find(
+            (c) => c.code === course.code && c.subject === course.subject,
+          );
+
+          if (!existingCourse) {
+            acc.push(course);
+          } else {
+            // Merge main sections
+            existingCourse.mainSections = existingCourse.mainSections.concat(
+              course.mainSections,
+            );
+          }
+
+          return acc;
+        },
+        [],
+      );
+
+      serverLogger.info(
+        `Found ${currQuarter.courses.length} courses for ${currQuarter.name}\n`,
+      );
 
       serverLogger.info("Navigating back to the search page...");
       await page.goto(SCHEDULE_OF_CLASSES_URL, {
         waitUntil: "domcontentloaded",
       });
 
-      serverLogger.info("Waiting for quarter selector to load...");
+      serverLogger.info("Waiting for quarter selector to load...\n");
       await page.waitForSelector("#selectedTerm");
 
       quartersCourses.push(currQuarter);

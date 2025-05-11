@@ -5,7 +5,6 @@ import {
   createMainSectionByCourseIdLookup,
   createMainSectionByIdLookup,
   createSubSectionByIdLookup,
-  // createSubSectionByIdLookup,
   createSubSectionByMainSectionIdLookup,
   parseAvailableCourses,
   quarterNameToString,

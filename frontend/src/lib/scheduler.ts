@@ -730,9 +730,9 @@ export function mutate(
       }
       break;
     } else {
-      //   console.log(
-      //     `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
-      //   );
+      console.log(
+        `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
+      );
     }
   }
   return {

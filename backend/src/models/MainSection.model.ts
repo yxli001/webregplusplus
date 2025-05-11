@@ -12,8 +12,8 @@ import {
   Default,
   UpdatedAt,
   BelongsTo,
-  Scopes,
   HasMany,
+  DefaultScope,
 } from "sequelize-typescript";
 import Course from "./Course.model";
 import SubSection from "./SubSection.model";
@@ -46,14 +46,15 @@ type MainSectionCreationAttributes = Optional<MainSectionAttributes, "id">;
 @Table({
   tableName: "main_section",
 })
-@Scopes(() => ({
-  default: {
-    include: [
-      {
-        model: SubSection,
-      },
-    ],
-  },
+@DefaultScope(() => ({
+  include: [
+    {
+      model: SubSection,
+    },
+    {
+      model: Exam,
+    },
+  ],
 }))
 class MainSection extends Model<
   MainSectionAttributes,
