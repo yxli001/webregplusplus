@@ -721,18 +721,18 @@ export function mutate(
       newFitness > originalFitness || // Flat acceptance
       Math.random() < Math.exp(fitnessDifference / temperature) // Monte Carlo acceptance
     ) {
-      //   console.log(
-      //     `Accepted Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
-      //   );
+      console.log(
+        `Accepted Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
+      );
       newClasses = mutatedClasses;
       if (change === "main_section") {
         newExams = mutatedExams;
       }
       break;
     } else {
-      //   console.log(
-      //     `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
-      //   );
+         console.log(
+           `Rejected Mutation: Original Fitness: ${originalFitness}, New Fitness: ${newFitness}`,
+         );
     }
   }
   return {
