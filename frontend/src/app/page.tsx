@@ -58,7 +58,10 @@ export default function Home() {
 
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [algorithmRan, setAlgorithmRan] = useState(false);
+
+  // Generated schedules
   const [events, setEvents] = useState<Event[][]>([]);
+  const [currEvents, setCurrEvents] = useState<Event[][]>([]);
 
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setSelectedCourses = usePreferenceStore(
@@ -218,6 +221,7 @@ export default function Home() {
         );
 
         setEvents(formattedEvents);
+        setCurrEvents(formattedEvents.slice(0, 1));
       }
 
       fetchSchedule();
@@ -289,10 +293,23 @@ export default function Home() {
           {/* Schedule Display */}
           {algorithmRan && (
             <Section title="Possible Schedules" className="flex flex-col gap-4">
-              <div className="flex rounded-md border border-border w-full">
-                asdfasdf
+              <div className="flex flex-wrap rounded-md border border-border w-full p-2 gap-4">
+                {events.map((curr, i) => (
+                  <Button
+                    key={i}
+                    label={`Option ${i + 1}`}
+                    className={`px-3 py-2 ${
+                      currEvents[0] == curr
+                        ? "bg-[#E3F8FF] text-[#1992D4]"
+                        : "bg-[#F6F6F6] !text-text-light"
+                    }`}
+                    onClick={() => {
+                      setCurrEvents([events[i]]);
+                    }}
+                  />
+                ))}
               </div>
-              <ScheduleDisplay events={events} />
+              <ScheduleDisplay events={currEvents[0]} />
             </Section>
           )}
         </>

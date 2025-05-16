@@ -6,7 +6,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import { Event } from "@/types/calendar";
 
 interface ScheduleDisplayProps {
-  events: Event[][];
+  events: Event[];
 }
 
 export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
@@ -22,7 +22,7 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
         dayHeaderFormat={{ weekday: "long" }} // Only show "Mon", "Tue", etc.
         hiddenDays={[0, 6]}
         headerToolbar={false}
-        events={events[0]}
+        events={events}
         slotMinTime="08:00:00"
         slotMaxTime="22:00:00"
         slotDuration="00:30:00"
