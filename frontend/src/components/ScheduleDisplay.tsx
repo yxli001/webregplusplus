@@ -3,21 +3,7 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid";
-
-interface Event {
-  id: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  daysOfWeek?: number[];
-  extendedProps?: {
-    lecture?: string;
-    section?: string;
-    meetingType?: string;
-    instructor?: string;
-    location?: string;
-  };
-}
+import { Event } from "@/types/calendar";
 
 interface ScheduleDisplayProps {
   events: Event[][];

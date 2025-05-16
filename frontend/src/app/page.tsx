@@ -31,32 +31,23 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import DropdownSelect from "@/components/DropdownSelect";
+import { Event } from "@/types/calendar";
 
 interface SectionProps {
   title: string;
   children?: React.ReactNode;
+  className?: string;
 }
 
-interface Event {
-  id: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  daysOfWeek?: number[];
-  extendedProps?: {
-    instructor?: string;
-    location?: string;
-    meeting_type?: string;
-  };
-}
-
-const Section = ({ title, children }: SectionProps) => {
+const Section = ({ title, children, className }: SectionProps) => {
   return (
-    <div className="bg-foreground flex flex-col border border-border rounded-md">
+    <div
+      className={`bg-foreground flex flex-col border border-border rounded-md`}
+    >
       <h1 className="text-lg font-bold text-text-dark border-b border-border px-5 py-3">
         {title}
       </h1>
-      <div className="w-full p-8">{children}</div>
+      <div className={`w-full p-8 ${className}`}>{children}</div>
     </div>
   );
 };
@@ -186,7 +177,7 @@ export default function Home() {
           console.log(schedule.fitness);
         }
 
-        const formattedEvents = schedules.map((schedule: Schedule) =>
+        const formattedEvents: Event[][] = schedules.map((schedule: Schedule) =>
           schedule.classes.map((entry: MainSection | SubSection, i) => {
             const isMain = "letter" in entry;
 
@@ -220,9 +211,9 @@ export default function Home() {
                 section: isMain ? "00" : entry.section,
                 instructor: isMain ? entry.instructor : mainSection?.instructor,
                 location: entry.location || "TBD",
-                meeting_type: entry.type,
+                meetingType: entry.type,
               },
-            };
+            } as Event;
           }),
         );
 
@@ -297,7 +288,10 @@ export default function Home() {
 
           {/* Schedule Display */}
           {algorithmRan && (
-            <Section title="Possible Schedules">
+            <Section title="Possible Schedules" className="flex flex-col gap-4">
+              <div className="flex rounded-md border border-border w-full">
+                asdfasdf
+              </div>
               <ScheduleDisplay events={events} />
             </Section>
           )}
