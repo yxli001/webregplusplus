@@ -49,25 +49,9 @@
   }
 }
 
-/*
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-} */
-
 .fc {
-  border-radius: 12px;
   overflow: hidden;
   background-color: white;
-  border: 1px solid #d9e2ec;
 }
 
 /* Target only 30-minute (or minor) grid lines */
@@ -77,10 +61,8 @@ body {
 }
 
 .fc-view-harness {
-  border-radius: 12px;
   overflow: hidden;
-  background-color: white;
-  border: 1px solid #e0e0e0;
+  background-color: transparent !important;
 }
 
 .fc-col-header-cell {
@@ -105,7 +87,6 @@ body {
   height: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: inherit;
 }
 
 .fc-day-today {
@@ -117,16 +98,9 @@ body {
 .fc-view,
 .fc-scrollgrid,
 .fc-timegrid {
-  background-color: white !important;
+  background-color: transparent !important;
 }
 
-.event-box {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  overflow-x: hidden;
-  padding: 4px 6px;
-  font-size: 0.5rem;
-  background-color: var(--event-bg, #e3f8ff);
-  color: var(--event-color, #1992d4);
+.fc-scrollgrid-section {
+  border-width: 0 !important;
 }

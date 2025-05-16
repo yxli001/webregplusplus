@@ -163,7 +163,7 @@ export default function Home() {
         const mainSectionByIdMap =
           await createMainSectionByIdLookup(mainSections);
         const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
-        //const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
+
         const schedules: Schedule[] = await generateOptimalSchedule(
           courseIds,
           schedulePreferences,
@@ -296,7 +296,11 @@ export default function Home() {
           )}
 
           {/* Schedule Display */}
-          {algorithmRan && <ScheduleDisplay events={events} />}
+          {algorithmRan && (
+            <Section title="Possible Schedules">
+              <ScheduleDisplay events={events} />
+            </Section>
+          )}
         </>
       )}
     </div>

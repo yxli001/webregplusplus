@@ -25,18 +25,16 @@ interface ScheduleDisplayProps {
 
 export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
   return (
-    <div
-      style={{
-        width: "100%", // take full width or set a max if desired
-        maxWidth: "1000px", // optional for nice centering
-        margin: "0 auto", // center horizontally
-      }}
-    >
+    <div className="w-full mx-auto">
       <FullCalendar
+        viewClassNames="w-full"
+        dayHeaderClassNames="!py-[0.3rem]"
+        slotLabelClassNames="uppercase !px-[0.5rem]"
         plugins={[timeGridPlugin, dayGridPlugin]}
         initialView="timeGridWeek"
         firstDay={1} // 0 = Sunday, 1 = Monday
         dayHeaderFormat={{ weekday: "long" }} // Only show "Mon", "Tue", etc.
+        hiddenDays={[0, 6]}
         headerToolbar={false}
         events={events[0]}
         slotMinTime="08:00:00"
@@ -49,24 +47,17 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
         eventContent={(eventInfo) => {
           const { title, extendedProps, backgroundColor } = eventInfo.event;
           return (
-            <div className="event-box">
+            <div className="flex items-center h-full overflow-x-hidden px-[4px] py-[6px] text-[0.5rem] bg-[#e3f8ff] text-[#1992d4]">
               {/* Colored left bar */}
               <div
-                style={{
-                  width: "2.5px",
-                  flexShrink: "0" /* prevents flex from compressing it */,
-                  height: "80%",
-                  borderRadius: "4px",
-                  backgroundColor: backgroundColor || "#1992D4",
-                  marginRight: "6px",
-                }}
+                className={`h-full w-[2.5px] flex-shrink-0 rounded-md ${backgroundColor ? `bg-[${backgroundColor}]` : "bg-[#1992D4]"} mr-[6px]`}
               ></div>
 
               {/* Text content */}
-              <div style={{ lineHeight: 1.2 }}>
-                <div style={{ fontWeight: 600, fontSize: "0.6rem" }}>
+              <div className="leading-[1.2]">
+                <div className="font-semibold text-[0.6rem]">
                   {title} |{" "}
-                  <span style={{ fontWeight: 600 }}>
+                  <span className="font-semibold">
                     {extendedProps.lecture}
                     {extendedProps.section} / {extendedProps.meetingType}
                   </span>
