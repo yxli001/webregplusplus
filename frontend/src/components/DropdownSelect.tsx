@@ -10,6 +10,7 @@ interface BaseDropdownProps {
   placeholder?: string;
   className?: string;
   closeOnSelect?: boolean; // Add the new prop here
+  disabled?: boolean;
 }
 
 interface SingleSelectDropdownProps extends BaseDropdownProps {
@@ -34,6 +35,7 @@ const DropdownSelect = ({
   placeholder = "Select an option",
   className = "",
   multiple = false,
+  disabled = false,
   closeOnSelect = false, // Default to true
   ...props
 }: DropdownSelectProps) => {
@@ -67,6 +69,8 @@ const DropdownSelect = ({
   };
 
   const toggleDropdown = () => {
+    if (disabled) return;
+
     setIsOpen((prev) => !prev);
   };
 
@@ -110,7 +114,7 @@ const DropdownSelect = ({
   return (
     <div ref={dropdownRef} className={`relative w-full ${className}`}>
       <div
-        className="flex items-center justify-between bg-white border border-text-light rounded-md p-2 sm:p-3 cursor-pointer hover:bg-gray-50"
+        className={`flex items-center justify-between bg-white border border-text-light rounded-md p-2 sm:p-3 ${!disabled ? "hover:bg-gray-50 hover:cursor-pointer" : ""}`}
         onClick={toggleDropdown}
       >
         <span className="truncate text-sm sm:text-base">{getLabel()}</span>

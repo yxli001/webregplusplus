@@ -170,7 +170,9 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
   }, [course.mainSections, pref.selectedInstructors]);
 
   return (
-    <div className="w-full flex flex-col rounded-md border border-text-light px-4 sm:px-6 py-4 gap-4">
+    <div
+      className={`w-full flex flex-col rounded-md border border-text-light px-4 sm:px-6 py-4 gap-4 ${!pref.included ? "opacity-50" : ""}`}
+    >
       <div
         className="flex gap-4 items-center hover:cursor-pointer"
         onClick={toggleIncluded}
@@ -193,6 +195,7 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
           value={pref.selectedInstructors}
           onChange={handleInstructorChange}
           placeholder="Select Instructor"
+          disabled={!pref.included}
           multiple
         />
       </div>
@@ -204,6 +207,7 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
           value={pref.selectedSubSections}
           onChange={handleSubSectionChange}
           placeholder="Select Sections"
+          disabled={!pref.included}
           multiple
         />
       </div>
