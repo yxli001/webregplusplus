@@ -50,33 +50,28 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
   try {
     await Promise.all([
       SubSection.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       Exam.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       MainSection.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       Course.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       QuarterModel.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
     ]);
