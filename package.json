@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "build": "pnpm --filter frontend run build",
+    "cron": "pnpm --filter backend run cron"
+  }
+}

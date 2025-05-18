@@ -30,7 +30,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
 
     await saveQuarters(sequelize, quarters);
   } catch (error) {
-    serverLogger.error("Error updating schedules:", (error as Error).stack);
+    serverLogger.error("Error updating schedules:" + (error as Error).stack);
 
     serverLogger.info(
       `Retrying schedule update in ${RETRY_DELAY / 1000} seconds...`,
@@ -170,8 +170,7 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
     await t.rollback();
 
     serverLogger.error(
-      "Schedule update failed, rolled back:",
-      (error as Error).stack,
+      "Schedule update failed, rolled back:" + (error as Error).stack,
     );
 
     throw new Error("Database update failed");

@@ -35,7 +35,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
     await page.waitForSelector("#selectedTerm");
 
     serverLogger.info("Extracting available terms...");
-    const quarters = await page.evaluate(() => {
+    let quarters = await page.evaluate(() => {
       const options = Array.from(
         document.querySelectorAll("#selectedTerm option"),
       ) as HTMLOptionElement[];
@@ -46,6 +46,8 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         .filter((option) => acceptableTermsRegex.test(option.value.trim()))
         .map((option) => option.value.trim());
     });
+
+    quarters = quarters.slice(0, 1); // Only scrape the first quarter
 
     serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
