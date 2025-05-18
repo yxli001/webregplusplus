@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install chrome browser
+        run: pnpm dlx puppeteer browsers install chrome
+
       - name: Run cron script
         run: pnpm run cron
         env:
@@ -51,6 +54,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install chrome browser
+        run: pnpm dlx puppeteer browsers install chrome
 
       - name: Run cron script
         run: pnpm run cron
