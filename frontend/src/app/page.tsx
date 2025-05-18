@@ -335,8 +335,6 @@ export default function Home() {
       res = [...res, ...currEvents];
     }
 
-    console.log(res);
-
     return res;
   }, [schedules, currSchedule]);
 
