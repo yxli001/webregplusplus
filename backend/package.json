@@ -50,7 +50,7 @@
     "express-async-handler": "^1.2.0",
     "express-validator": "^7.2.1",
     "http-errors": "^2.0.0",
-    "pg": "^8.13.3",
+    "pg": "^8.16.0",
     "puppeteer": "^24.2.0",
     "sequelize": "^6.37.5",
     "sequelize-typescript": "^2.1.6",
