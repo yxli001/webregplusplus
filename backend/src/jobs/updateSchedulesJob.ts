@@ -10,7 +10,7 @@ import { Quarter } from "../types";
 
 const RETRY_DELAY = 1000 * 60 * 2; // 2 minutes
 
-const updateSchedules = async (sequelize: Sequelize) => {
+const updateSchedules = async (sequelize: Sequelize, retryOnFail: boolean) => {
   try {
     serverLogger.info("Verifying database connection...");
 
@@ -32,15 +32,14 @@ const updateSchedules = async (sequelize: Sequelize) => {
   } catch (error) {
     serverLogger.error("Error updating schedules:" + (error as Error).stack);
 
-    serverLogger.info(
-      `Retrying schedule update in ${RETRY_DELAY / 1000} seconds...`,
-    );
-
-    setTimeout(async () => {
-      serverLogger.info("Retrying schedule update...");
-
-      await updateSchedules(sequelize);
-    }, RETRY_DELAY);
+    if (retryOnFail) {
+      serverLogger.info(`Retrying in ${RETRY_DELAY / 1000}s…`);
+      setTimeout(() => {
+        void updateSchedules(sequelize, true);
+      }, RETRY_DELAY);
+    } else {
+      throw error;
+    }
   }
 };
 
