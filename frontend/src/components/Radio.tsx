@@ -8,22 +8,22 @@ interface RadioProps {
 const Radio = ({ checked, onChange, ...props }: RadioProps) => {
   return (
     <div
-      className="relative w-4 h-4 flex items-center justify-center cursor-pointer"
+      className="relative flex h-4 w-4 cursor-pointer items-center justify-center"
       onClick={() => !props.disabled && onChange(!checked)}
     >
       <div
-        className={`w-4 h-4 rounded-full border transition-colors ${
+        className={`h-4 w-4 rounded-full border transition-colors ${
           checked ? "border-primary-light" : "border-text-light"
         } ${props.disabled ? "opacity-50" : ""}`}
       />
       {checked && (
         <div
-          className={`absolute w-2 h-2 rounded-full bg-primary-light ${props.disabled ? "opacity-50" : ""}`}
+          className={`absolute h-2 w-2 rounded-full bg-primary-light ${props.disabled ? "opacity-50" : ""}`}
         />
       )}
       <input
         type="radio"
-        className="absolute opacity-0 w-full h-full cursor-pointer"
+        className="absolute h-full w-full cursor-pointer opacity-0"
         checked={checked}
         onChange={(e) => !props.disabled && onChange(e.target.checked)}
         {...props}

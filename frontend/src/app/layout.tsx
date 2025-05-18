@@ -26,7 +26,7 @@ export default function RootLayout({
       <body>
         <PrimeReactProvider value={{ unstyled: true }}>
           <Navbar />
-          <div className="w-[80%] mx-auto py-10 flex flex-col items-center">
+          <div className="mx-auto flex w-[80%] flex-col items-center py-10">
             {children}
           </div>
         </PrimeReactProvider>

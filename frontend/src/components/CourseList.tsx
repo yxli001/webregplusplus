@@ -171,19 +171,19 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
 
   return (
     <div
-      className={`w-full flex flex-col rounded-md border border-text-light px-4 sm:px-6 py-4 gap-4 ${!pref.included ? "opacity-50" : ""}`}
+      className={`flex w-full flex-col gap-4 rounded-md border border-text-light px-4 py-4 sm:px-6 ${!pref.included ? "opacity-50" : ""}`}
     >
       <div
-        className="flex gap-4 items-center hover:cursor-pointer"
+        className="flex items-center gap-4 hover:cursor-pointer"
         onClick={toggleIncluded}
       >
         <Checkbox
           checked={pref.included}
           variant="light"
-          className="w-5 h-5 p-1"
+          className="h-5 w-5 p-1"
           onChange={toggleIncluded}
         />
-        <h1 className="text-xl sm:text-2xl font-medium text-text-dark uppercase">
+        <h1 className="text-xl font-medium uppercase text-text-dark sm:text-2xl">
           {course.subject} {course.code}
         </h1>
       </div>
@@ -221,7 +221,7 @@ const CourseList = memo(() => {
   const courseDetails = usePreferenceStore((state) => state.courseDetails);
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
       {courseDetails.map((course) => (
         <CourseCard key={course.id} course={course} />
       ))}

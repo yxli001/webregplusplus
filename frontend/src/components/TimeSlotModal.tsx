@@ -64,49 +64,49 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
     <Modal
       open={isOpen}
       onClose={handleClose}
-      className="max-w-md rounded-lg p-6 flex flex-col gap-2"
+      className="flex max-w-md flex-col gap-2 rounded-lg p-6"
     >
-      <h2 className="text-xl font-semibold mb-4 text-text-dark">
+      <h2 className="mb-4 text-xl font-semibold text-text-dark">
         Edit Time Slot
       </h2>
 
       {/* Days Selection */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-text-dark mb-2">
+        <label className="mb-2 block text-sm font-medium text-text-dark">
           Days
         </label>
         <DaysSelect value={selectedDays} onChange={setSelectedDays} />
       </div>
 
       {/* Time Selection */}
-      <div className="grid grid-cols-2 gap-4 mb-2">
+      <div className="mb-2 grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-text-dark mb-2">
+          <label className="mb-2 block text-sm font-medium text-text-dark">
             Start Time
           </label>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="w-full border border-text-light rounded-md px-3 py-2"
+            className="w-full rounded-md border border-text-light px-3 py-2"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-text-dark mb-2">
+          <label className="mb-2 block text-sm font-medium text-text-dark">
             End Time
           </label>
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="w-full border border-text-light rounded-md px-3 py-2"
+            className="w-full rounded-md border border-text-light px-3 py-2"
           />
         </div>
       </div>
 
       {/* Time Validation Message */}
       {startTime && endTime && !isValidTimeRange && (
-        <p className="text-red-500 text-sm mb-4">
+        <p className="mb-4 text-sm text-red-500">
           End time must be after start time
         </p>
       )}
@@ -115,7 +115,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
       <div className="flex justify-end gap-2">
         <button
           onClick={handleClose}
-          className="px-4 py-2 text-text-dark hover:text-text-darker"
+          className="hover:text-text-darker px-4 py-2 text-text-dark"
         >
           Cancel
         </button>
@@ -127,7 +127,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
             !endTime ||
             !isValidTimeRange
           }
-          className="px-4 py-2 bg-primary-light text-white rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-primary-light px-4 py-2 text-white hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           Save
         </button>

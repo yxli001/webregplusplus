@@ -1,4 +1,11 @@
-export interface Event {
+export interface CalSchedule {
+  id: number;
+  pinned: boolean;
+  events: CalEvent[];
+  backgroundColor: string;
+  textColor: string;
+}
+export interface CalEvent {
   id: string;
   title: string;
   startTime: string;
@@ -11,4 +18,6 @@ export interface Event {
     instructor?: string;
     location?: string;
   };
+  backgroundColor?: string;
+  textColor?: string;
 }

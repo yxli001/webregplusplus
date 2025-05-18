@@ -48,7 +48,7 @@ const Control = ({
 }: ControlProps<{ label: string; value: Course }, true>) => {
   return (
     <components.Control {...props}>
-      <div className="w-full bg-foreground flex flex-row items-center justify-between gap-4 px-3 py-2 border border-text-light rounded-lg hover:cursor-pointer">
+      <div className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-text-light bg-foreground px-3 py-2 hover:cursor-pointer">
         <Search size={18} />
         {children}
       </div>

@@ -65,9 +65,9 @@ const TimeSlotEditor = ({
         {value.map((slot) => (
           <div
             key={slot.id}
-            className="flex items-center justify-between px-2 py-1 border border-border rounded-lg"
+            className="flex items-center justify-between rounded-lg border border-border px-2 py-1"
           >
-            <div className="flex items-center gap-4 text-md">
+            <div className="text-md flex items-center gap-4">
               <span>{slot.days}</span>
               <span>
                 {slot.startTime} - {slot.endTime}
