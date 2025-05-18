@@ -189,7 +189,13 @@ export default function Home() {
         setAlgorithmRan(true);
 
         if (schedules.length === 0) {
-          console.log("No valid schedules found");
+          toast.current?.show({
+            severity: "warn",
+            summary: "Warning",
+            detail:
+              "No valid schedules found. Please try again with different preferences.",
+            life: 2000,
+          });
           return;
         }
 
