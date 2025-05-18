@@ -7,11 +7,13 @@ on:
       - staging
       - main
   schedule:
+    # scheduled runs only run on the main branch
     # midnight America/Los_Angeles:
     - cron: "0 7 * * *" # PDT (UTC–7)
 
 jobs:
   staging-cron:
+    # only run on staging branch
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
     environment: Preview
@@ -41,6 +43,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
   prod-cron:
+    # only run on main branch
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: Production
