@@ -28,12 +28,13 @@ import {
   Quarter,
   SubSection,
 } from "@/types/course";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import DropdownSelect from "@/components/DropdownSelect";
 import { CalEvent, CalSchedule } from "@/types/calendar";
 import Pin from "@/icons/Pin";
 import PinFill from "@/icons/PinFill";
+import { Toast } from "primereact/toast";
 
 interface SectionProps {
   title: string;
@@ -73,6 +74,8 @@ const COLORS: {
 ];
 
 export default function Home() {
+  const toast = useRef<Toast>(null);
+
   const [allQuarters, setAllQuarters] = useState<Quarter[]>([]);
   const [selectedQuarter, setSelectedQuarter] = useState<string>("");
 
@@ -186,7 +189,6 @@ export default function Home() {
         setAlgorithmRan(true);
 
         if (schedules.length === 0) {
-          alert("No valid schedules found. Please adjust your preferences.");
           console.log("No valid schedules found");
           return;
         }
@@ -460,9 +462,14 @@ export default function Home() {
                         );
 
                         if (pinned.length === COLORS.length) {
-                          alert(
-                            "You can only pin up to 2 schedules. Please unpin one before pinning another.",
-                          );
+                          toast.current?.show({
+                            severity: "info",
+                            summary: "Info",
+                            detail:
+                              "You can only pin up to 2 schedules. Please unpin one before pinning another.",
+                            life: 2000,
+                          });
+
                           return;
                         }
 
@@ -510,6 +517,17 @@ export default function Home() {
               <ScheduleDisplay events={getEvents()} />
             </Section>
           )}
+          <Toast
+            ref={toast}
+            pt={{
+              content: {
+                className: "flex p-3 gap-4",
+              },
+              icon: {
+                className: "mt-1",
+              },
+            }}
+          />
         </>
       )}
     </div>

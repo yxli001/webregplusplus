@@ -67,6 +67,7 @@ const TimeRangeSlider = ({
       </div>
       <div className="w-full">
         <Slider
+          unstyled
           value={[startMinutes, endMinutes]}
           onChange={(e: SliderChangeEvent) => handleChange(e.value as number[])}
           min={minMinutes}
