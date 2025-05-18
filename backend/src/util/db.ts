@@ -1,3 +1,4 @@
+import pg from "pg";
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { dbLogger, serverLogger } from "../util/logger";
 import { envType } from "./envConfig";
@@ -14,6 +15,7 @@ export const connectDB = async (): Promise<Sequelize> => {
       database: env.POSTGRES_DB,
       username: env.POSTGRES_USER,
       password: env.POSTGRES_PASSWORD,
+      dialectModule: pg,
       logging: (sql) => {
         dbLogger.debug(sql); // Log SQL queries to the database log file
       },
