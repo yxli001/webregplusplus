@@ -1,4 +1,4 @@
-import { MainSectionType } from "@/types";
+import { MainSectionType } from "../types";
 import { Optional } from "sequelize";
 import {
   Table,

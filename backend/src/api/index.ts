@@ -1,4 +1,9 @@
-import serverless from "serverless-http";
 import app from "../app";
+import env from "../util/validateEnv";
+import { serverLogger } from "../util/logger";
 
-export default serverless(app);
+app.listen(env.PORT, () => {
+  serverLogger.info(`Server listening on port ${env.PORT}`);
+});
+
+export default app;

@@ -8,9 +8,7 @@ import path from "path";
 const isServerless = Boolean(process.env.VERCEL);
 
 // pick a base dir that exists & is writable
-const baseLogDir = isServerless
-  ? path.join(os.tmpdir(), "logs")
-  : path.join(process.cwd(), "logs");
+const baseLogDir = isServerless ? path.join(os.tmpdir(), "logs") : "logs";
 
 // ensure the directory exists
 if (!fs.existsSync(baseLogDir)) {
@@ -32,7 +30,7 @@ const serverLogger = createLogger({
 
     // file-rotate into /tmp/logs on Vercel, or ./logs locally
     new transports.DailyRotateFile({
-      filename: path.join(baseLogDir, "server-%DATE%.log"),
+      filename: baseLogDir + "/server-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",
@@ -53,7 +51,7 @@ const dbLogger = createLogger({
   ),
   transports: [
     new transports.DailyRotateFile({
-      filename: path.join(baseLogDir, "db-%DATE%.log"),
+      filename: baseLogDir + "/db-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",

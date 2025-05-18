@@ -1,7 +1,6 @@
-import "tsconfig-paths/register";
-import { serverLogger } from "./util/logger";
 import { connectDB } from "./util/db";
 import env from "./util/validateEnv";
+import { serverLogger } from "./util/logger";
 import app from "./app";
 
 const startServer = async () => {

@@ -27,6 +27,8 @@ courseRouter.get(
   "/",
   getCoursesValidator,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    console.log("GET /api/course");
+
     try {
       const results = validationResult(req);
 

@@ -13,7 +13,7 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import MainSection from "./MainSection.model";
-import { ExamType } from "@/types";
+import { ExamType } from "../types";
 
 // All attributes
 type ExamAttributes = {
