@@ -10,6 +10,8 @@ import {
   Quarter,
 } from "@/types";
 
+const isCI = !!process.env.CI;
+
 export async function scrapeSchedule(): Promise<Quarter[]> {
   const SCHEDULE_OF_CLASSES_URL =
     "https://act.ucsd.edu/scheduleOfClasses/scheduleOfClassesStudent.htm";
@@ -24,7 +26,16 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
 
   try {
     serverLogger.info("Starting Puppeteer browser...");
-    browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
+    browser = await puppeteer.launch({
+      headless: true,
+      browser: "chrome",
+      args: [
+        // disable sandbox when running in GH Actions
+        ...(isCI ? ["--no-sandbox", "--disable-setuid-sandbox"] : []),
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
+    });
 
     const page = await browser.newPage();
 
@@ -35,7 +46,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
     await page.waitForSelector("#selectedTerm");
 
     serverLogger.info("Extracting available terms...");
-    let quarters = await page.evaluate(() => {
+    const quarters = await page.evaluate(() => {
       const options = Array.from(
         document.querySelectorAll("#selectedTerm option"),
       ) as HTMLOptionElement[];
@@ -46,8 +57,6 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         .filter((option) => acceptableTermsRegex.test(option.value.trim()))
         .map((option) => option.value.trim());
     });
-
-    quarters = quarters.slice(0, 1); // Only scrape the first quarter
 
     serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
