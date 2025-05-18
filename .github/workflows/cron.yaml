@@ -11,6 +11,10 @@ on:
     # midnight America/Los_Angeles:
     - cron: "0 7 * * *" # PDT (UTC–7)
 
+concurrency:
+  group: cron-${{ github.ref_name }} # e.g. "cron-staging"
+  cancel-in-progress: true # cancels any in-flight run in that group
+
 jobs:
   staging-cron:
     # only run on staging branch
