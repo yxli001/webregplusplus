@@ -226,7 +226,7 @@ export default function Home() {
                 const title = `${course?.subject || "?"} ${course?.code}`;
 
                 return {
-                  id: ((index + 1) * (i + 1)).toString(),
+                  id: `${index}-${i}`,
                   title,
                   startTime: entry.startTime,
                   endTime: entry.endTime,
@@ -300,7 +300,7 @@ export default function Home() {
 
       return schedulesToUpdate;
     },
-    [],
+    [currSchedule],
   );
 
   const getEvents = useCallback(() => {
@@ -401,9 +401,9 @@ export default function Home() {
           {algorithmRan && schedules.length > 0 && (
             <Section title="Possible Schedules" className="flex flex-col gap-4">
               <div className="flex w-full flex-wrap gap-4 rounded-md border border-border p-2">
-                {schedules.map((curr, i) => (
+                {schedules.map((curr) => (
                   <div
-                    key={i}
+                    key={curr.id}
                     className="flex items-center rounded-md text-[16px] font-semibold hover:cursor-pointer"
                     style={{
                       backgroundColor: curr.pinned
