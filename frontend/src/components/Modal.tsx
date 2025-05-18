@@ -88,20 +88,20 @@ const Modal = (props: ModalProps): React.JSX.Element => {
   return (
     // backdrop
     <div
-      className={`absolute left-0 top-0 w-[100vw] h-[100vh] flex justify-center items-center ${
+      className={`absolute left-0 top-0 flex h-[100vh] w-[100vw] items-center justify-center ${
         !disableClose && "hover:cursor-pointer"
-      } transition z-50`}
+      } z-50 transition`}
       style={{ backgroundColor: useOverlay ? "#000000" + backdropOpacity : "" }}
       ref={backdropRef}
     >
       {/* modal container */}
       <div
         {...restProps}
-        className={`relative bg-white mx-auto w-[50%] p-2 hover:cursor-default ${className}`}
+        className={`relative mx-auto w-[50%] bg-white p-2 hover:cursor-default ${className}`}
       >
         {!disableClose && (
           <Cross
-            className="absolute top-2 right-2 hover:text-primary hover:cursor-pointer transition"
+            className="hover:text-primary absolute right-2 top-2 transition hover:cursor-pointer"
             size={20}
             onClick={() => props.onClose()}
           />

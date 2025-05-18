@@ -33,7 +33,7 @@ const TimeSlider = ({
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
-      <div className="relative w-full h-1 bg-gray-200 rounded-full">
+      <div className="relative h-1 w-full rounded-full bg-gray-200">
         <input
           type="range"
           min={min}
@@ -41,16 +41,16 @@ const TimeSlider = ({
           step={10}
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
-          className="absolute w-full h-full opacity-0 cursor-pointer z-30"
+          className="absolute z-30 h-full w-full cursor-pointer opacity-0"
         />
         <div
-          className="absolute h-full bg-primary-light rounded-full"
+          className="absolute h-full rounded-full bg-primary-light"
           style={{
             width: `${((value - min) / (max - min)) * 100}%`,
           }}
         />
         <div
-          className="absolute w-4 h-4 bg-primary-light rounded-full -translate-y-1.5"
+          className="absolute h-4 w-4 -translate-y-1.5 rounded-full bg-primary-light"
           style={{
             left: `calc(${((value - min) / (max - min)) * 100}% - 0.5rem)`,
           }}

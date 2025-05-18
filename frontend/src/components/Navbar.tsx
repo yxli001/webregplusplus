@@ -1,5 +1,5 @@
 const Navbar = () => {
-  return <div className="w-full h-16 bg-text-light"></div>;
+  return <div className="h-16 w-full bg-text-light"></div>;
 };
 
 export default Navbar;

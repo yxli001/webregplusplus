@@ -3,6 +3,7 @@ import { PrimeReactProvider } from "primereact/api";
 
 import "./globals.css";
 import "primereact/resources/primereact.min.css";
+import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
@@ -65,9 +66,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <PrimeReactProvider value={{ unstyled: true }}>
+        <PrimeReactProvider>
           <Navbar />
-          <div className="w-[80%] mx-auto py-10 flex flex-col items-center">
+          <div className="mx-auto flex w-[80%] flex-col items-center py-10">
             {children}
           </div>
         </PrimeReactProvider>

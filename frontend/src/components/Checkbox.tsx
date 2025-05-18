@@ -15,9 +15,9 @@ const Checkbox = ({
 }: CheckboxProps) => {
   return (
     <div
-      className={`w-4 h-4 p-0.5 flex items-center justify-center ${
+      className={`flex h-4 w-4 items-center justify-center p-0.5 ${
         variant === "dark" ? "border-text-dark" : "border-text-light"
-      } rounded cursor-pointer ${
+      } cursor-pointer rounded ${
         checked
           ? variant === "dark"
             ? "bg-primary-dark"

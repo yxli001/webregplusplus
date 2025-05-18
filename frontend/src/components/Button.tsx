@@ -14,7 +14,7 @@ const Button = ({
   return (
     <button
       onClick={onClick}
-      className={`bg-primary-dark text-text-lighter font-semibold p-3 rounded-md hover:cursor-pointer flex items-center gap-2 ${className}`}
+      className={`flex items-center gap-2 rounded-md bg-primary-dark p-3 font-semibold text-text-lighter hover:cursor-pointer ${className}`}
     >
       {icon && icon}
       {label}

@@ -61,12 +61,13 @@ const TimeRangeSlider = ({
 
   return (
     <div className={`flex flex-col py-4 ${className}`}>
-      <div className="flex justify-between mb-4 text-sm text-text-light">
+      <div className="mb-4 flex justify-between text-sm text-text-light">
         <span>{formatTimeDisplay(startTime)}</span>
         <span>{formatTimeDisplay(endTime)}</span>
       </div>
       <div className="w-full">
         <Slider
+          unstyled
           value={[startMinutes, endMinutes]}
           onChange={(e: SliderChangeEvent) => handleChange(e.value as number[])}
           min={minMinutes}

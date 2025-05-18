@@ -31,11 +31,11 @@ const Preferences = () => {
 
   return (
     <div className="flex flex-col gap-6 md:flex-row md:gap-20">
-      <div className="md:w-[40%] flex flex-col gap-6">
+      <div className="flex flex-col gap-6 md:w-[40%]">
         {/* Spread Preference */}
         <div className="flex flex-col gap-2">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer items-center gap-3"
             onClick={() => setShowSpacing(!showSpacing)}
           >
             <Checkbox
@@ -63,7 +63,7 @@ const Preferences = () => {
         {/* Preferred Days */}
         <div className="flex flex-col gap-2">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer items-center gap-3"
             onClick={() => {
               const newState = !showPreferredDays;
               setShowPreferredDays(newState);
@@ -99,7 +99,7 @@ const Preferences = () => {
         {/* Preferred Time Range */}
         <div className="flex flex-col gap-2">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer items-center gap-3"
             onClick={() => {
               setShowPreferredTimeRange(!showPreferredTimeRange);
             }}
@@ -127,7 +127,7 @@ const Preferences = () => {
 
         {/* Avoid Back-to-Back Option */}
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex cursor-pointer items-center gap-3"
           onClick={() =>
             updateSchedulPreferences({
               avoidBackToBack: !schedulePreferences.avoidBackToBack,
@@ -146,11 +146,11 @@ const Preferences = () => {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-1 flex-col">
         {/* Excluded Time Slots Option */}
         <div className="flex flex-col gap-2">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer items-center gap-3"
             onClick={() => setShowExcludedTimes(!showExcludedTimes)}
           >
             <Checkbox

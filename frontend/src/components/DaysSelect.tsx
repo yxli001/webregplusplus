@@ -19,7 +19,7 @@ const DaysSelect = ({ value, onChange, className = "" }: DaysSelectProps) => {
                 : [...value, day],
             );
           }}
-          className={`px-3 py-1 rounded ${
+          className={`rounded px-3 py-1 ${
             value.includes(day)
               ? "bg-primary-light text-white"
               : "bg-gray-100 text-text-dark"
