@@ -1,7 +1,7 @@
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
-import { dbLogger, serverLogger } from "@/util/logger";
+import { dbLogger, serverLogger } from "../util/logger";
 import { envType } from "./envConfig";
-import env from "@/util/validateEnv";
+import env from "../util/validateEnv";
 import path from "path";
 
 export const connectDB = async (): Promise<Sequelize> => {
@@ -42,7 +42,7 @@ export const connectDB = async (): Promise<Sequelize> => {
 
     return sequelize;
   } catch (error) {
-    serverLogger.error("Database connection error:", error);
+    serverLogger.error("Database connection error:" + (error as Error).stack);
     process.exit(1);
   }
 };

@@ -1,6 +1,6 @@
-import "@/util/envConfig";
+import "../util/envConfig";
 
-import { updateSchedules } from "@/jobs/updateSchedulesJob";
+import { updateSchedules } from "./jobs/updateSchedulesJob";
 import { connectDB } from "./util/db";
 
 async function main() {

@@ -1,5 +1,5 @@
 import puppeteer, { Browser } from "puppeteer";
-import { serverLogger } from "@/util/logger";
+import { serverLogger } from "../util/logger";
 import {
   Course,
   MainSection,
@@ -8,7 +8,7 @@ import {
   SubSectionType,
   ExamType,
   Quarter,
-} from "@/types";
+} from "../types";
 
 const isCI = !!process.env.CI;
 

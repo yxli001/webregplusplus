@@ -1,10 +1,10 @@
-import Course from "@/models/Course.model";
-import Quarter from "@/models/Quarter.model";
-import validationErrorParser from "@/util/validationErrorParser";
+import Course from "../models/Course.model";
+import Quarter from "../models/Quarter.model";
+import validationErrorParser from "../util/validationErrorParser";
 import {
   getCourseDetailsValidator,
   getCoursesValidator,
-} from "@/validators/course.validator";
+} from "../validators/course.validator";
 import { NextFunction, Request, Response, Router } from "express";
 import asyncHandler from "express-async-handler";
 import { matchedData, validationResult } from "express-validator";

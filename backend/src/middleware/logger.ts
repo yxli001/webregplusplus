@@ -1,4 +1,4 @@
-import { serverLogger } from "@/util/logger";
+import { serverLogger } from "../util/logger";
 import { RequestHandler } from "express";
 
 export const log: RequestHandler = (req, res, next) => {
