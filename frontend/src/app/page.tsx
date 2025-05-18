@@ -226,7 +226,7 @@ export default function Home() {
                 const title = `${course?.subject || "?"} ${course?.code}`;
 
                 return {
-                  id: (index * (i + 1)).toString(),
+                  id: ((index + 1) * (i + 1)).toString(),
                   title,
                   startTime: entry.startTime,
                   endTime: entry.endTime,
