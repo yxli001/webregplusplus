@@ -1,24 +1,24 @@
-export interface QuarterJSON {
+export type QuarterJSON = {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface CourseJSON {
+export type CourseJSON = {
   id: string;
   subject: string;
   code: string;
   quarterId: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface CourseWithSectionsJSON extends CourseJSON {
+export type CourseWithSectionsJSON = {
   mainSections: MainSectionJSON[];
-}
+} & CourseJSON;
 
-export interface MainSectionJSON {
+export type MainSectionJSON = {
   id: string;
   type: string;
   letter: string;
@@ -32,9 +32,9 @@ export interface MainSectionJSON {
   createdAt: string;
   updatedAt: string;
   courseId: string;
-}
+};
 
-export interface SubSectionJSON {
+export type SubSectionJSON = {
   id: string;
   type: string;
   section: string;
@@ -46,9 +46,9 @@ export interface SubSectionJSON {
   createdAt: string;
   updatedAt: string;
   mainSectionId: string;
-}
+};
 
-export interface ExamJSON {
+export type ExamJSON = {
   id: string;
   type: string;
   date: string;
@@ -58,27 +58,27 @@ export interface ExamJSON {
   createdAt: string;
   updatedAt: string;
   mainSectionId: string;
-}
+};
 
-export interface Quarter {
+export type Quarter = {
   id: string;
   name: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-export interface Course {
+export type Course = {
   id: string;
   subject: string;
   code: string;
   quarterId: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-export interface CourseWithSections extends Course {
+export type CourseWithSections = {
   mainSections: MainSection[];
-}
+} & Course;
 
 export type MainSection = {
   id: string;

@@ -1,6 +1,7 @@
-import Quarter from "../models/Quarter.model";
 import { NextFunction, Request, Response, Router } from "express";
 import asyncHandler from "express-async-handler";
+
+import Quarter from "../models/Quarter.model";
 
 const quarterRouter = Router();
 

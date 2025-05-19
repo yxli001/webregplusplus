@@ -1,14 +1,15 @@
 import puppeteer, { Browser } from "puppeteer";
-import { serverLogger } from "../util/logger";
+
 import {
   Course,
-  MainSection,
-  SubSection,
-  MainSectionType,
-  SubSectionType,
   ExamType,
+  MainSection,
+  MainSectionType,
   Quarter,
+  SubSection,
+  SubSectionType,
 } from "../types";
+import { serverLogger } from "../util/logger";
 
 const isCI = !!process.env.CI;
 
@@ -147,9 +148,9 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         );
 
         const pageCoursesArray = await Promise.all(
-          pages.map((page) =>
-            page.evaluate(
-              (MainSectionType, SubSectionType) => {
+          pages.map((currPage) =>
+            currPage.evaluate(
+              (MSType, SSType) => {
                 const unacceptableSections = ["IT"];
 
                 const scrapedCourses: Course[] = [];
@@ -175,9 +176,10 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   const cells = Array.from(row.querySelectorAll("td"));
 
                   // Title cell
-                  if (cells.length == 1) {
+                  if (cells.length === 1) {
                     // No subject acronym
-                    if (cells[0].querySelectorAll("span").length == 1) continue;
+                    if (cells[0].querySelectorAll("span").length === 1)
+                      continue;
 
                     // Push the previous course if it exists
                     if (course.code !== "") {
@@ -203,7 +205,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   }
 
                   // Course header cell
-                  if (cells.length == 4) {
+                  if (cells.length === 4) {
                     const courseCode = (cells[1].textContent || "").trim();
                     const courseName = cells[2]
                       .querySelector("a > span.boldtxt")
@@ -236,7 +238,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                     if (unacceptableSections.includes(sectionType)) continue;
 
                     // Times are TBA
-                    if (cells.length == 10) {
+                    if (cells.length === 10) {
                       days = "TBA";
                       startTime = "TBA";
                       endTime = "TBA";
@@ -264,7 +266,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
 
                     // Main section
                     if (
-                      Object.values(MainSectionType).includes(
+                      Object.values(MSType).includes(
                         sectionType as MainSectionType,
                       ) &&
                       sectionCode.substring(1) === "00"
@@ -284,7 +286,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                     }
                     // Subsection
                     else if (
-                      Object.values(SubSectionType).includes(
+                      Object.values(SSType).includes(
                         sectionType as SubSectionType,
                       )
                     ) {
@@ -308,7 +310,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   }
 
                   // Exam
-                  if (row.className === "nonenrtxt" && cells.length == 10) {
+                  if (row.className === "nonenrtxt" && cells.length === 10) {
                     const examType = cells[2].textContent?.trim() || "";
                     const examDate = cells[3].textContent?.trim() || "";
                     const examTime = cells[5].textContent?.trim() || "";
@@ -348,7 +350,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         currQuarter.courses.push(...pageCoursesArray.flat());
 
         // Close the pages after processing
-        await Promise.all(pages.map((page) => page.close()));
+        await Promise.all(pages.map((p) => p.close()));
       }
 
       // Remove duplicate courses

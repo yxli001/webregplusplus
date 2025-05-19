@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
+
 import Cross from "@/icons/Cross";
 
-interface BaseModalProps extends React.HTMLAttributes<HTMLDivElement> {
+type BaseModalProps = {
   open: boolean;
   disableClose?: boolean;
   useOverlay?: boolean;
@@ -10,16 +11,16 @@ interface BaseModalProps extends React.HTMLAttributes<HTMLDivElement> {
 
   // passed to the modal container within the backdrop
   className?: string;
-}
+} & React.HTMLAttributes<HTMLDivElement>;
 
-interface EnableCloseModalProps extends BaseModalProps {
+type EnableCloseModalProps = {
   disableClose?: false;
   onClose: () => void;
-}
+} & BaseModalProps;
 
-interface DisableCloseModalProps extends BaseModalProps {
+type DisableCloseModalProps = {
   disableClose: true;
-}
+} & BaseModalProps;
 
 type ModalProps = EnableCloseModalProps | DisableCloseModalProps;
 
@@ -91,7 +92,11 @@ const Modal = (props: ModalProps): React.JSX.Element => {
       className={`absolute left-0 top-0 flex h-[100vh] w-[100vw] items-center justify-center ${
         !disableClose && "hover:cursor-pointer"
       } z-50 transition`}
-      style={{ backgroundColor: useOverlay ? "#000000" + backdropOpacity : "" }}
+      style={{
+        backgroundColor: useOverlay
+          ? "#000000" + backdropOpacity.toString()
+          : "",
+      }}
       ref={backdropRef}
     >
       {/* modal container */}
@@ -103,7 +108,9 @@ const Modal = (props: ModalProps): React.JSX.Element => {
           <Cross
             className="hover:text-primary absolute right-2 top-2 transition hover:cursor-pointer"
             size={20}
-            onClick={() => props.onClose()}
+            onClick={() => {
+              props.onClose();
+            }}
           />
         )}
 

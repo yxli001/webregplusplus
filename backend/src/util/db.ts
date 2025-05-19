@@ -1,9 +1,12 @@
+import path from "path";
+
 import pg from "pg";
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
+
 import { dbLogger, serverLogger } from "../util/logger";
-import { envType } from "./envConfig";
 import env from "../util/validateEnv";
-import path from "path";
+
+import { envType } from "./envConfig";
 
 export const connectDB = async (): Promise<Sequelize> => {
   try {

@@ -1,19 +1,21 @@
 import { Optional } from "sequelize";
 import {
-  Table,
+  AllowNull,
+  BelongsTo,
   Column,
+  CreatedAt,
+  DataType,
+  Default,
+  ForeignKey,
   Model,
   PrimaryKey,
-  ForeignKey,
-  DataType,
-  CreatedAt,
-  AllowNull,
-  Default,
+  Table,
   UpdatedAt,
-  BelongsTo,
 } from "sequelize-typescript";
-import MainSection from "./MainSection.model";
+
 import { ExamType } from "../types";
+
+import MainSection from "./MainSection.model";
 
 // All attributes
 type ExamAttributes = {

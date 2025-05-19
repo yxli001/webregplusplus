@@ -1,19 +1,20 @@
 import { Optional } from "sequelize";
 import {
-  Table,
+  AllowNull,
+  BelongsTo,
   Column,
+  CreatedAt,
+  DataType,
+  Default,
+  ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
-  DataType,
-  CreatedAt,
-  HasMany,
   Scopes,
-  AllowNull,
-  Default,
+  Table,
   UpdatedAt,
-  BelongsTo,
-  ForeignKey,
 } from "sequelize-typescript";
+
 import MainSection from "./MainSection.model";
 import Quarter from "./Quarter.model";
 

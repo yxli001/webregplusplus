@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
 import { PrimeReactProvider } from "primereact/api";
+
+import type { Metadata } from "next";
 
 import "./globals.css";
 import "primereact/resources/primereact.min.css";

@@ -1,15 +1,15 @@
 import { Optional } from "sequelize";
 import {
-  Table,
+  AllowNull,
   Column,
+  CreatedAt,
+  DataType,
+  Default,
   Model,
   PrimaryKey,
-  DataType,
-  CreatedAt,
-  AllowNull,
-  Default,
-  UpdatedAt,
+  Table,
   Unique,
+  UpdatedAt,
 } from "sequelize-typescript";
 
 // All attributes

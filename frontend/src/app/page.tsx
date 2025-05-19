@@ -1,6 +1,33 @@
 "use client";
 
+import { Toast } from "primereact/toast";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
+import Button from "@/components/Button";
+import CourseDropdown from "@/components/CourseDropdown";
+import CourseList from "@/components/CourseList";
+import DropdownSelect from "@/components/DropdownSelect";
+import PreferencesComponent from "@/components/Preferences";
+import ScheduleDisplay from "@/components/ScheduleDisplay";
+import Calendar from "@/icons/Calendar";
+import Pin from "@/icons/Pin";
+import PinFill from "@/icons/PinFill";
+import generateOptimalSchedule from "@/lib/scheduler";
+import {
+  CoursePreferences,
+  SchedulePreferences,
+  usePreferenceStore,
+} from "@/store/preferenceStore";
+import { CalEvent, CalSchedule } from "@/types/calendar";
+import {
+  Course,
+  CourseWithSections,
+  MainSection,
+  Quarter,
+  SubSection,
+} from "@/types/course";
+import { convertDaysToNumbers } from "@/util/helper";
 import {
   createMainSectionByCourseIdLookup,
   createMainSectionByIdLookup,
@@ -9,38 +36,12 @@ import {
   parseAvailableCourses,
   quarterNameToString,
 } from "@/util/helper";
-import generateOptimalSchedule from "@/lib/scheduler";
-import { convertDaysToNumbers } from "@/util/helper";
-import Button from "@/components/Button";
-import CourseDropdown from "@/components/CourseDropdown";
-import CourseList from "@/components/CourseList";
-import PreferencesComponent from "@/components/Preferences";
-import Calendar from "@/icons/Calendar";
-import {
-  CoursePreferences,
-  SchedulePreferences,
-  usePreferenceStore,
-} from "@/store/preferenceStore";
-import {
-  Course,
-  CourseWithSections,
-  MainSection,
-  Quarter,
-  SubSection,
-} from "@/types/course";
-import { useCallback, useEffect, useRef, useState } from "react";
-import ScheduleDisplay from "@/components/ScheduleDisplay";
-import DropdownSelect from "@/components/DropdownSelect";
-import { CalEvent, CalSchedule } from "@/types/calendar";
-import Pin from "@/icons/Pin";
-import PinFill from "@/icons/PinFill";
-import { Toast } from "primereact/toast";
 
-interface SectionProps {
+type SectionProps = {
   title: string;
   children?: React.ReactNode;
   className?: string;
-}
+};
 
 const Section = ({ title, children, className }: SectionProps) => {
   return (
@@ -118,7 +119,7 @@ export default function Home() {
       }
     };
 
-    fetchDetails();
+    void fetchDetails();
   };
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function Home() {
       }
     };
 
-    fetchQuarters();
+    void fetchQuarters();
   }, []);
 
   useEffect(() => {
@@ -149,37 +150,33 @@ export default function Home() {
       }
     };
 
-    fetchCourses();
+    void fetchCourses();
   }, [selectedQuarter]);
 
   const handleAutoScheduler = useCallback(
     (
-      courseDetails: CourseWithSections[],
-      coursePreferences: CoursePreferences[],
-      schedulePreferences: SchedulePreferences,
+      cDetails: CourseWithSections[],
+      cPreferences: CoursePreferences[],
+      sPreferences: SchedulePreferences,
     ) => {
-      async function fetchSchedule() {
-        const availableCourses = await parseAvailableCourses(
-          courseDetails,
-          coursePreferences,
-        );
+      const fetchSchedule = () => {
+        const availableCourses = parseAvailableCourses(cDetails, cPreferences);
 
         const courses = availableCourses.courses;
-        const courseIds: string[] = courses.map((course) => course.id!);
+        const courseIds: string[] = courses.map((course) => course.id);
         const mainSections = availableCourses.mainSection;
         const subSections = availableCourses.subSection;
 
         const mainSectionByCourseIdMap =
-          await createMainSectionByCourseIdLookup(mainSections);
+          createMainSectionByCourseIdLookup(mainSections);
         const subSectionByMainSectionIdMap =
-          await createSubSectionByMainSectionIdLookup(subSections);
-        const mainSectionByIdMap =
-          await createMainSectionByIdLookup(mainSections);
-        const subSectionByIdMap = await createSubSectionByIdLookup(subSections);
+          createSubSectionByMainSectionIdLookup(subSections);
+        const mainSectionByIdMap = createMainSectionByIdLookup(mainSections);
+        const subSectionByIdMap = createSubSectionByIdLookup(subSections);
 
-        const schedules = await generateOptimalSchedule(
+        const scheds = generateOptimalSchedule(
           courseIds,
-          schedulePreferences,
+          sPreferences,
           mainSectionByCourseIdMap,
           subSectionByMainSectionIdMap,
           mainSectionByIdMap,
@@ -188,7 +185,7 @@ export default function Home() {
 
         setAlgorithmRan(true);
 
-        if (schedules.length === 0) {
+        if (scheds.length === 0) {
           toast.current?.show({
             severity: "warn",
             summary: "Warning",
@@ -199,66 +196,61 @@ export default function Home() {
           return;
         }
 
-        const formattedEvents: CalSchedule[] = schedules.map(
-          (schedule, index) => {
-            const events = schedule.classes.map(
-              (entry: MainSection | SubSection, i) => {
-                const isMain = "letter" in entry;
+        const formattedEvents: CalSchedule[] = scheds.map((schedule, index) => {
+          const events = schedule.classes.map(
+            (entry: MainSection | SubSection, i) => {
+              const isMain = "letter" in entry;
 
-                // If it's a MainSection, grab course directly
-                const course = isMain
-                  ? courses.find((course) => course.id === entry.courseId)
-                  : courses.find(
-                      (course) =>
-                        course.id ===
-                        mainSections.find(
-                          (mainSection) =>
-                            mainSection.id === entry.mainSectionId,
-                        )?.courseId,
-                    );
+              // If it's a MainSection, grab course directly
+              const course = isMain
+                ? courses.find((c) => c.id === entry.courseId)
+                : courses.find(
+                    (c) =>
+                      c.id ===
+                      mainSections.find(
+                        (mainSection) => mainSection.id === entry.mainSectionId,
+                      )?.courseId,
+                  );
 
-                const mainSection = isMain
-                  ? (entry as MainSection)
-                  : mainSections.find(
-                      (mainSection) => mainSection.id === entry.mainSectionId,
-                    );
+              const mainSection = isMain
+                ? entry
+                : mainSections.find((ms) => ms.id === entry.mainSectionId);
 
-                const title = `${course?.subject || "?"} ${course?.code}`;
+              const title = `${course?.subject ?? "?"} ${course?.code}`;
 
-                return {
-                  id: `${index}-${i}`,
-                  title,
-                  startTime: entry.startTime,
-                  endTime: entry.endTime,
-                  daysOfWeek: convertDaysToNumbers(entry.days),
-                  extendedProps: {
-                    lecture: isMain ? entry.letter : mainSection?.letter,
-                    section: isMain ? "00" : entry.section,
-                    instructor: isMain
-                      ? entry.instructor
-                      : mainSection?.instructor,
-                    location: entry.location || "TBD",
-                    meetingType: entry.type,
-                  },
-                } as CalEvent;
-              },
-            );
+              return {
+                id: `${index}-${i}`,
+                title,
+                startTime: entry.startTime,
+                endTime: entry.endTime,
+                daysOfWeek: convertDaysToNumbers(entry.days),
+                extendedProps: {
+                  lecture: isMain ? entry.letter : mainSection?.letter,
+                  section: isMain ? "00" : entry.section,
+                  instructor: isMain
+                    ? entry.instructor
+                    : mainSection?.instructor,
+                  location: entry.location || "TBD",
+                  meetingType: entry.type,
+                },
+              } as CalEvent;
+            },
+          );
 
-            return {
-              id: index + 1,
-              pinned: false,
-              events,
-              backgroundColor: COLORS[0].backgroundColor,
-              textColor: COLORS[0].textColor,
-            } as CalSchedule;
-          },
-        );
+          return {
+            id: index + 1,
+            pinned: false,
+            events,
+            backgroundColor: COLORS[0].backgroundColor,
+            textColor: COLORS[0].textColor,
+          } as CalSchedule;
+        });
 
         // Apply colors to the schedules before setting them
         const coloredSchedules = updateScheduleColors(formattedEvents);
         setSchedules(coloredSchedules);
         setCurrSchedule(coloredSchedules[0]);
-      }
+      };
 
       fetchSchedule();
     },
@@ -284,7 +276,7 @@ export default function Home() {
           .filter((schedule) => !schedule.pinned)
           .sort((a, b) => a.id - b.id)
           .map((schedule) => {
-            if (currSchedule && currSchedule.id == schedule.id) {
+            if (currSchedule && currSchedule.id === schedule.id) {
               return {
                 ...schedule,
                 backgroundColor: currSchedule.backgroundColor,
@@ -381,7 +373,7 @@ export default function Home() {
                 icon={<Calendar />}
                 label="Update Schedule"
                 className="self-end"
-                onClick={() =>
+                onClick={() => {
                   handleAutoScheduler(courseDetails, coursePreferences, {
                     ...schedulePreferences,
                     allowedConflicts: new Set([
@@ -389,8 +381,8 @@ export default function Home() {
                       "1a5bf273-1eee-4168-b9d5-418641029fb8",
                       "481a6a23-b0db-4ec0-b7b3-1d41f9082298",
                     ]),
-                  })
-                }
+                  });
+                }}
               />
             </>
           )}
@@ -406,14 +398,14 @@ export default function Home() {
                     style={{
                       backgroundColor: curr.pinned
                         ? curr.backgroundColor
-                        : currSchedule && currSchedule.id == curr.id
+                        : currSchedule && currSchedule.id === curr.id
                           ? currSchedule.backgroundColor
                             ? currSchedule.backgroundColor
                             : "#E3F8FF"
                           : "#F6F6F6",
                       color: curr.pinned
                         ? curr.textColor
-                        : currSchedule && currSchedule.id == curr.id
+                        : currSchedule && currSchedule.id === curr.id
                           ? currSchedule.textColor
                             ? currSchedule.textColor
                             : "#1992D4"
@@ -492,7 +484,7 @@ export default function Home() {
                           color={
                             curr.pinned
                               ? curr.textColor
-                              : currSchedule && currSchedule.id == curr.id
+                              : currSchedule && currSchedule.id === curr.id
                                 ? currSchedule.textColor
                                   ? currSchedule.textColor
                                   : "#1992D4"
@@ -506,7 +498,7 @@ export default function Home() {
                           color={
                             curr.pinned
                               ? curr.textColor
-                              : currSchedule && currSchedule.id == curr.id
+                              : currSchedule && currSchedule.id === curr.id
                                 ? currSchedule.textColor
                                   ? currSchedule.textColor
                                   : "#1992D4"

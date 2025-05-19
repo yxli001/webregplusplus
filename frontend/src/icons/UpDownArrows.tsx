@@ -1,8 +1,8 @@
 import { SVGProps } from "react";
 
-interface UpDownArrowsProps extends SVGProps<SVGSVGElement> {
+type UpDownArrowsProps = {
   size?: number; // Add a size prop
-}
+} & SVGProps<SVGSVGElement>;
 
 const UpDownArrows = ({ color, size = 16, ...props }: UpDownArrowsProps) => (
   <svg
@@ -14,7 +14,7 @@ const UpDownArrows = ({ color, size = 16, ...props }: UpDownArrowsProps) => (
     {...props}
   >
     <path
-      stroke={color ? color : "#627D98"}
+      stroke={color ?? "#627D98"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

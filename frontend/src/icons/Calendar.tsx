@@ -1,8 +1,8 @@
 import { SVGProps } from "react";
 
-interface CalendarProps extends SVGProps<SVGSVGElement> {
+type CalendarProps = {
   size?: number;
-}
+} & SVGProps<SVGSVGElement>;
 
 const Calendar = ({ color, size = 16, ...props }: CalendarProps) => (
   <svg
@@ -14,7 +14,7 @@ const Calendar = ({ color, size = 16, ...props }: CalendarProps) => (
     {...props}
   >
     <path
-      stroke={color ? color : "#fff"}
+      stroke={color ?? "#fff"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

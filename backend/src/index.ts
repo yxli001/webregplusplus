@@ -1,7 +1,7 @@
-import { connectDB } from "./util/db";
-import env from "./util/validateEnv";
-import { serverLogger } from "./util/logger";
 import app from "./app";
+import { connectDB } from "./util/db";
+import { serverLogger } from "./util/logger";
+import env from "./util/validateEnv";
 
 const startServer = async () => {
   await connectDB();

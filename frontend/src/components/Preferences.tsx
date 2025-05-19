@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { usePreferenceStore } from "@/store/preferenceStore";
-import TimeSlotEditor from "./TimeSlotEditor";
+
 import Checkbox from "./Checkbox";
-import SelectDropdown from "./DropdownSelect";
 import DaysSelect from "./DaysSelect";
+import SelectDropdown from "./DropdownSelect";
 import TimeRangeSlider from "./TimeRangeSlider";
+import TimeSlotEditor from "./TimeSlotEditor";
+
+import { usePreferenceStore } from "@/store/preferenceStore";
 import { SpreadPreference } from "@/types/preferences";
 
 const spreadOptions = [
@@ -36,11 +38,15 @@ const Preferences = () => {
         <div className="flex flex-col gap-2">
           <div
             className="flex cursor-pointer items-center gap-3"
-            onClick={() => setShowSpacing(!showSpacing)}
+            onClick={() => {
+              setShowSpacing(!showSpacing);
+            }}
           >
             <Checkbox
               checked={showSpacing}
-              onChange={() => setShowSpacing(!showSpacing)}
+              onChange={() => {
+                setShowSpacing(!showSpacing);
+              }}
             />
             <span className="text-text-light">Schedule Spacing</span>
           </div>
@@ -49,11 +55,11 @@ const Preferences = () => {
               <SelectDropdown
                 options={spreadOptions}
                 value={schedulePreferences.spread}
-                onChange={(value) =>
+                onChange={(value) => {
                   updateSchedulPreferences({
                     spread: value as SpreadPreference,
-                  })
-                }
+                  });
+                }}
                 placeholder="Select spacing preference"
               />
             </div>
@@ -88,9 +94,9 @@ const Preferences = () => {
             <div className="pl-6">
               <DaysSelect
                 value={schedulePreferences.preferredDays}
-                onChange={(days) =>
-                  updateSchedulPreferences({ preferredDays: days })
-                }
+                onChange={(days) => {
+                  updateSchedulPreferences({ preferredDays: days });
+                }}
               />
             </div>
           )}
@@ -104,7 +110,7 @@ const Preferences = () => {
               setShowPreferredTimeRange(!showPreferredTimeRange);
             }}
           >
-            <Checkbox checked={showPreferredTimeRange} onChange={() => {}} />
+            <Checkbox checked={showPreferredTimeRange} />
             <span className="text-text-light">Preferred Time Range</span>
           </div>
 
@@ -128,19 +134,19 @@ const Preferences = () => {
         {/* Avoid Back-to-Back Option */}
         <div
           className="flex cursor-pointer items-center gap-3"
-          onClick={() =>
+          onClick={() => {
             updateSchedulPreferences({
               avoidBackToBack: !schedulePreferences.avoidBackToBack,
-            })
-          }
+            });
+          }}
         >
           <Checkbox
             checked={schedulePreferences.avoidBackToBack}
-            onChange={() =>
+            onChange={() => {
               updateSchedulPreferences({
                 avoidBackToBack: !schedulePreferences.avoidBackToBack,
-              })
-            }
+              });
+            }}
           />
           <span>Avoid back-to-back classes</span>
         </div>
@@ -151,11 +157,15 @@ const Preferences = () => {
         <div className="flex flex-col gap-2">
           <div
             className="flex cursor-pointer items-center gap-3"
-            onClick={() => setShowExcludedTimes(!showExcludedTimes)}
+            onClick={() => {
+              setShowExcludedTimes(!showExcludedTimes);
+            }}
           >
             <Checkbox
               checked={showExcludedTimes}
-              onChange={() => setShowExcludedTimes(!showExcludedTimes)}
+              onChange={() => {
+                setShowExcludedTimes(!showExcludedTimes);
+              }}
             />
             <span>Exclude sections that meet on</span>
           </div>
