@@ -1,7 +1,8 @@
-import { Course, CourseWithSections } from "@/types/course";
-import { SpreadPreference } from "@/types/preferences";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+
+import { Course, CourseWithSections } from "@/types/course";
+import { SpreadPreference } from "@/types/preferences";
 
 type TimeSlot = {
   id: string;
@@ -63,10 +64,11 @@ export const usePreferenceStore = create(
       allowedConflicts: new Set([]),
     },
 
-    setSelectedCourses: (courses) =>
+    setSelectedCourses: (courses) => {
       set(() => ({
         selectedCourses: courses,
-      })),
+      }));
+    },
 
     setCourseDetails: (details) => {
       set(() => ({
@@ -97,7 +99,7 @@ export const usePreferenceStore = create(
       }));
     },
 
-    removeCourse: (id) =>
+    removeCourse: (id) => {
       set((state) => ({
         selectedCourses: state.selectedCourses.filter(
           (course) => course.id !== id,
@@ -106,17 +108,19 @@ export const usePreferenceStore = create(
         coursePreferences: state.coursePreferences.filter(
           (pref) => pref.courseId !== id,
         ),
-      })),
+      }));
+    },
 
-    updateCoursePreferences: (id, update) =>
+    updateCoursePreferences: (id, update) => {
       set((state) => ({
         coursePreferences: state.coursePreferences.map((pref) =>
           pref.courseId === id ? { ...pref, ...update } : pref,
         ),
-      })),
+      }));
+    },
 
     // Schedule Preferences Actions
-    updateSchedulePreferences: (update) =>
+    updateSchedulePreferences: (update) => {
       set((state) => ({
         schedulePreferences: {
           ...state.schedulePreferences,
@@ -128,7 +132,8 @@ export const usePreferenceStore = create(
               }))
             : state.schedulePreferences.excludedTimeSlots,
         },
-      })),
+      }));
+    },
   })),
 );
 

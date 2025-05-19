@@ -1,3 +1,8 @@
 packages:
   - frontend
   - backend
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+onlyBuiltDependencies:
+  - puppeteer

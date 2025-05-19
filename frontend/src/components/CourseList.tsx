@@ -1,10 +1,12 @@
-import Checkbox from "./Checkbox";
-import {
-  usePreferenceStore,
-  useCoursePreference,
-} from "@/store/preferenceStore";
-import SelectDropdown from "@/components/DropdownSelect";
 import { memo, useCallback, useEffect, useMemo } from "react";
+
+import Checkbox from "./Checkbox";
+
+import SelectDropdown from "@/components/DropdownSelect";
+import {
+  useCoursePreference,
+  usePreferenceStore,
+} from "@/store/preferenceStore";
 import { CourseWithSections } from "@/types/course";
 
 const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
@@ -43,7 +45,6 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course.id]); // Only run once when the component mounts
 
   const toggleIncluded = useCallback(() => {

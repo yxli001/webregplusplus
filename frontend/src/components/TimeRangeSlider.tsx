@@ -1,13 +1,13 @@
 import { Slider, SliderChangeEvent } from "primereact/slider";
 
-interface TimeRangeSliderProps {
+type TimeRangeSliderProps = {
   startTime: string; // 24-hour format HH:mm
   endTime: string; // 24-hour format HH:mm
   onChange: (startTime: string, endTime: string) => void;
   className?: string;
   min?: string; // 24-hour format HH:mm
   max?: string; // 24-hour format HH:mm
-}
+};
 
 const TimeRangeSlider = ({
   startTime,
@@ -69,7 +69,9 @@ const TimeRangeSlider = ({
         <Slider
           unstyled
           value={[startMinutes, endMinutes]}
-          onChange={(e: SliderChangeEvent) => handleChange(e.value as number[])}
+          onChange={(e: SliderChangeEvent) => {
+            handleChange(e.value as number[]);
+          }}
           min={minMinutes}
           max={maxMinutes}
           range

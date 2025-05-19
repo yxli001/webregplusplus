@@ -1,30 +1,31 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import UpDownArrows from "@/icons/UpDownArrows";
+import { useEffect, useRef, useState } from "react";
+
 import Checkbox from "@/components/Checkbox";
 import Radio from "@/components/Radio";
+import UpDownArrows from "@/icons/UpDownArrows";
 
-interface BaseDropdownProps {
+type BaseDropdownProps = {
   options: { label: string; value: string }[];
   placeholder?: string;
   className?: string;
   closeOnSelect?: boolean; // Add the new prop here
   disabled?: boolean;
-}
+};
 
-interface SingleSelectDropdownProps extends BaseDropdownProps {
+type SingleSelectDropdownProps = {
   multiple?: false;
   value: string;
   onChange: (value: string) => void;
-}
+} & BaseDropdownProps;
 
-interface MultiSelectDropdownProps extends BaseDropdownProps {
+type MultiSelectDropdownProps = {
   multiple: true;
   value: string[];
   onChange: (value: string[]) => void;
   minSelected?: number;
-}
+} & BaseDropdownProps;
 
 type DropdownSelectProps = SingleSelectDropdownProps | MultiSelectDropdownProps;
 
@@ -128,17 +129,15 @@ const DropdownSelect = ({
               <div
                 key={option.value}
                 className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
-                onClick={() => handleOptionClick(option.value)}
+                onClick={() => {
+                  handleOptionClick(option.value);
+                }}
               >
                 {multiple ? (
-                  <Checkbox
-                    checked={values.includes(option.value)}
-                    onChange={() => {}}
-                  />
+                  <Checkbox checked={values.includes(option.value)} />
                 ) : (
                   <Radio
                     checked={value === option.value}
-                    onChange={() => {}}
                     name="dropdown-option"
                   />
                 )}

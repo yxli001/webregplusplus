@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 
-interface TimeSliderProps {
+type TimeSliderProps = {
   value: number;
   onChange: (minutes: number) => void;
   min?: number;
   max?: number;
   className?: string;
-}
+};
 
 const TimeSlider = ({
   value,
@@ -40,7 +40,9 @@ const TimeSlider = ({
           max={max}
           step={10}
           value={value}
-          onChange={(e) => onChange(parseInt(e.target.value))}
+          onChange={(e) => {
+            onChange(parseInt(e.target.value));
+          }}
           className="absolute z-30 h-full w-full cursor-pointer opacity-0"
         />
         <div

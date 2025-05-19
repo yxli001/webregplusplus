@@ -1,11 +1,11 @@
-export interface CalSchedule {
+export type CalSchedule = {
   id: number;
   pinned: boolean;
   events: CalEvent[];
   backgroundColor: string;
   textColor: string;
-}
-export interface CalEvent {
+};
+export type CalEvent = {
   id: string;
   title: string;
   startTime: string;
@@ -20,4 +20,4 @@ export interface CalEvent {
   };
   backgroundColor?: string;
   textColor?: string;
-}
+};

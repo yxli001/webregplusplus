@@ -1,8 +1,8 @@
 import { SVGProps } from "react";
 
-interface CrossProps extends SVGProps<SVGSVGElement> {
+type CrossProps = {
   size?: number; // Add a size prop
-}
+} & SVGProps<SVGSVGElement>;
 
 const Cross = ({ color, size = 16, ...props }: CrossProps) => (
   <svg
@@ -15,7 +15,7 @@ const Cross = ({ color, size = 16, ...props }: CrossProps) => (
   >
     <path
       d="M1 13L13 1M1 1L13 13"
-      stroke={color ? color : "#627D98"}
+      stroke={color ?? "#627D98"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

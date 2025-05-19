@@ -1,12 +1,13 @@
-import { useState, useMemo } from "react";
-import Modal from "./Modal";
-import DaysSelect from "./DaysSelect";
+import { useMemo, useState } from "react";
 
-interface TimeSlotModalProps {
+import DaysSelect from "./DaysSelect";
+import Modal from "./Modal";
+
+type TimeSlotModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSave: (days: string, startTime: string, endTime: string) => void;
-}
+};
 
 const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
@@ -87,7 +88,9 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
           <input
             type="time"
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            onChange={(e) => {
+              setStartTime(e.target.value);
+            }}
             className="w-full rounded-md border border-text-light px-3 py-2"
           />
         </div>
@@ -98,7 +101,9 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
           <input
             type="time"
             value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
+            onChange={(e) => {
+              setEndTime(e.target.value);
+            }}
             className="w-full rounded-md border border-text-light px-3 py-2"
           />
         </div>

@@ -1,8 +1,8 @@
-interface DaysSelectProps {
+type DaysSelectProps = {
   value: string[];
   onChange: (days: string[]) => void;
   className?: string;
-}
+};
 
 const DAYS = ["M", "Tu", "W", "Th", "F"];
 
