@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 // Types used for the scraper
 
 export enum MainSectionType {

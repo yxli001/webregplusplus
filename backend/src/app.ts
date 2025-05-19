@@ -1,10 +1,11 @@
-import express from "express";
 import cors from "cors";
-import { log } from "./middleware/logger";
-import env from "./util/validateEnv";
+import express from "express";
+
 import errorHandler from "./middleware/errorHandler";
+import { log } from "./middleware/logger";
 import courseRouter from "./routes/course.routes";
 import quarterRouter from "./routes/quarter.routes";
+import env from "./util/validateEnv";
 
 const app = express();
 

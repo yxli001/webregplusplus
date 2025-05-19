@@ -1,18 +1,20 @@
-import { SubSectionType } from "../types";
 import { Optional } from "sequelize";
 import {
-  Table,
+  AllowNull,
+  BelongsTo,
   Column,
+  CreatedAt,
+  DataType,
+  Default,
+  ForeignKey,
   Model,
   PrimaryKey,
-  ForeignKey,
-  DataType,
-  CreatedAt,
-  AllowNull,
-  Default,
+  Table,
   UpdatedAt,
-  BelongsTo,
 } from "sequelize-typescript";
+
+import { SubSectionType } from "../types";
+
 import MainSection from "./MainSection.model";
 
 // All attributes

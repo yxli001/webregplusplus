@@ -1,12 +1,13 @@
-import { scrapeSchedule } from "../util/scraper";
-import SubSection from "../models/SubSection.model";
+import { Sequelize } from "sequelize";
+
+import Course from "../models/Course.model";
 import Exam from "../models/Exam.model";
 import MainSection from "../models/MainSection.model";
-import Course from "../models/Course.model";
 import QuarterModel from "../models/Quarter.model";
-import { serverLogger } from "../util/logger";
-import { Sequelize } from "sequelize";
+import SubSection from "../models/SubSection.model";
 import { Quarter } from "../types";
+import { serverLogger } from "../util/logger";
+import { scrapeSchedule } from "../util/scraper";
 
 const updateSchedules = async (sequelize: Sequelize) => {
   try {

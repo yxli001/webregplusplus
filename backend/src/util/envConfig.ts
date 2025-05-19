@@ -1,5 +1,6 @@
-import { config } from "dotenv";
 import path from "path";
+
+import { config } from "dotenv";
 
 type EnvTypes = "development" | "staging" | "production";
 
