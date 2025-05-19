@@ -22,7 +22,14 @@ export default [
     },
     rules: {
       // Built-in rules
-      "no-unused-vars": "error",
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
       "no-undef": "off",
       "prefer-const": "error",
 
