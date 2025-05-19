@@ -8,9 +8,7 @@ import { serverLogger } from "../util/logger";
 import { Sequelize } from "sequelize";
 import { Quarter } from "../types";
 
-const RETRY_DELAY = 1000 * 60 * 2; // 2 minutes
-
-const updateSchedules = async (sequelize: Sequelize, retryOnFail: boolean) => {
+const updateSchedules = async (sequelize: Sequelize) => {
   try {
     serverLogger.info("Verifying database connection...");
 
@@ -29,17 +27,14 @@ const updateSchedules = async (sequelize: Sequelize, retryOnFail: boolean) => {
     );
 
     await saveQuarters(sequelize, quarters);
+
+    // Log success
+    serverLogger.info("Update schedules job completed successfully");
   } catch (error) {
     serverLogger.error("Error updating schedules:" + (error as Error).stack);
 
-    if (retryOnFail) {
-      serverLogger.info(`Retrying in ${RETRY_DELAY / 1000}s…`);
-      setTimeout(() => {
-        void updateSchedules(sequelize, true);
-      }, RETRY_DELAY);
-    } else {
-      throw error;
-    }
+    // Rethrow the error so the caller (cron.js) can catch it and handle retries
+    throw error;
   }
 };
 
