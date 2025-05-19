@@ -110,7 +110,7 @@ export default function Home() {
     const fetchDetails = async () => {
       const res = await getCourseDetails(
         selectedQuarter,
-        selectedCourses.map((course) => `${course.subject} ${course.code}`),
+        selectedCourses.map((course) => `${course.subject}+${course.code}`),
       );
 
       if (res.success) {

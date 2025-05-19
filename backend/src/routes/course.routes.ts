@@ -1,3 +1,4 @@
+import { serverLogger } from "../util/logger";
 import Course from "../models/Course.model";
 import Quarter from "../models/Quarter.model";
 import validationErrorParser from "../util/validationErrorParser";
@@ -27,8 +28,6 @@ courseRouter.get(
   "/",
   getCoursesValidator,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    console.log("GET /api/course");
-
     try {
       const results = validationResult(req);
 
@@ -103,10 +102,12 @@ courseRouter.get(
 
       const resCourses = [];
       for (const course of coursesList) {
+        serverLogger.debug(`Searching for course ${course}`);
+
         const foundCourse = await Course.scope("details").findOne({
           where: {
-            subject: course.split(" ")[0],
-            code: course.split(" ")[1],
+            subject: course.split("+")[0],
+            code: course.split("+")[1],
             quarterId: foundQuarter.id,
           },
         });

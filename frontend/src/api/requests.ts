@@ -13,8 +13,7 @@ type Method = "GET" | "POST" | "PATCH" | "DELETE";
  * every request. This means in the rest of our code, we can write "/api/foo"
  * instead of "http://localhost:3001/api/foo".
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_HOST || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_HOST || "";
 
 /**
  * A wrapper around the built-in `fetch()` function that abstracts away some of
