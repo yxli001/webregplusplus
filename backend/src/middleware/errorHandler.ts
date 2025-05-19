@@ -1,9 +1,14 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
 import { serverLogger } from "../util/logger";
 
-const errorHandler = (error: unknown, req: Request, res: Response) => {
+const errorHandler = (
+  error: unknown,
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   // 500 is the "internal server error" error code, this will be our fallback
   let statusCode = 500;
   let errorMessage = "An error has occurred.";
