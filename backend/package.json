@@ -56,7 +56,6 @@
     "puppeteer": "^24.2.0",
     "sequelize": "^6.37.5",
     "sequelize-typescript": "^2.1.6",
-    "tsconfig-paths": "^4.2.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.24.2"
