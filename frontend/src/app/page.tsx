@@ -8,6 +8,7 @@ import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
 import CourseList from "@/components/CourseList";
 import DropdownSelect from "@/components/DropdownSelect";
+import PageLoading from "@/components/PageLoading";
 import PreferencesComponent from "@/components/Preferences";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import Calendar from "@/icons/Calendar";
@@ -77,6 +78,10 @@ const COLORS: {
 export default function Home() {
   const toast = useRef<Toast>(null);
 
+  const [loadingQuarters, setLoadingQuarters] = useState(false);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [loadingCourseDetails, setLoadingCourseDetails] = useState(false);
+
   const [allQuarters, setAllQuarters] = useState<Quarter[]>([]);
   const [selectedQuarter, setSelectedQuarter] = useState<string>("");
 
@@ -109,6 +114,8 @@ export default function Home() {
     }
 
     const fetchDetails = async () => {
+      setLoadingCourseDetails(true);
+
       const res = await getCourseDetails(
         selectedQuarter,
         selectedCourses.map((course) => `${course.subject}+${course.code}`),
@@ -116,7 +123,16 @@ export default function Home() {
 
       if (res.success) {
         setCourseDetails(res.data);
+      } else {
+        toast.current?.show({
+          severity: "error",
+          summary: "Error fetching course details",
+          detail: res.error,
+          life: 2000,
+        });
       }
+
+      setLoadingCourseDetails(false);
     };
 
     void fetchDetails();
@@ -124,11 +140,22 @@ export default function Home() {
 
   useEffect(() => {
     const fetchQuarters = async () => {
+      setLoadingQuarters(true);
+
       const res = await getQuarters();
 
       if (res.success) {
         setAllQuarters(res.data);
+      } else {
+        toast.current?.show({
+          severity: "error",
+          summary: "Error fetching courses",
+          detail: res.error,
+          life: 2000,
+        });
       }
+
+      setLoadingQuarters(false);
     };
 
     void fetchQuarters();
@@ -141,12 +168,23 @@ export default function Home() {
     setAlgorithmRan(false);
 
     const fetchCourses = async () => {
+      setLoadingCourses(true);
+
       if (selectedQuarter) {
         const res = await getCourses(selectedQuarter);
 
         if (res.success) {
           setAllCourses(res.data);
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error fetching courses",
+            detail: res.error,
+            life: 2000,
+          });
         }
+
+        setLoadingCourses(false);
       }
     };
 
@@ -335,6 +373,7 @@ export default function Home() {
       {/* Quarter Selection */}
       <Section title="Select a quarter">
         <DropdownSelect
+          loading={loadingQuarters}
           options={allQuarters.map((quarter) => ({
             label: quarterNameToString(quarter.name),
             value: quarter.name,
@@ -352,7 +391,11 @@ export default function Home() {
           {/* Course Selection */}
           <Section title="Select Your Courses">
             <div className="flex w-full items-center justify-center gap-4">
-              <CourseDropdown className="max-w-[30rem]" courses={allCourses} />
+              <CourseDropdown
+                className="max-w-[30rem]"
+                courses={allCourses}
+                loading={loadingCourses}
+              />
               <Button label="Search" onClick={handleFetchCourseDetails} />
             </div>
           </Section>
@@ -526,6 +569,7 @@ export default function Home() {
           />
         </>
       )}
+      <PageLoading loading={loadingCourseDetails} />
     </div>
   );
 }

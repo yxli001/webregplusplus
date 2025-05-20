@@ -104,3 +104,8 @@
 .fc-scrollgrid-section {
   border-width: 0 !important;
 }
+
+/* PrimeReact progress spinner stroke color */
+.p-progress-spinner-circle {
+  stroke: var(--primary-light) !important;
+}

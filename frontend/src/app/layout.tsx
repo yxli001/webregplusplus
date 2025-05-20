@@ -65,6 +65,7 @@ export default function RootLayout({
           name="emotion-insertion-point"
           content="emotion-insertion-point"
         />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
         <PrimeReactProvider>
