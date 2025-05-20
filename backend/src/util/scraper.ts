@@ -13,15 +13,18 @@ import { serverLogger } from "../util/logger";
 
 const isCI = !!process.env.CI;
 
+// Maximum number of quarters to scrape
+const MAX_QUARTERS = 4;
+
+// Number of pages to scrape at the same time
+const BATCH_SIZE = 30;
+
 export async function scrapeSchedule(): Promise<Quarter[]> {
   const SCHEDULE_OF_CLASSES_URL =
     "https://act.ucsd.edu/scheduleOfClasses/scheduleOfClassesStudent.htm";
 
   const SCHEDULE_OF_CLASSES_RESULT_URL =
     "https://act.ucsd.edu/scheduleOfClasses/scheduleOfClassesStudentResult.htm";
-
-  // Number of pages to scrape at the same time
-  const BATCH_SIZE = 30;
 
   let browser: Browser | null = null;
 
@@ -47,17 +50,19 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
     await page.waitForSelector("#selectedTerm");
 
     serverLogger.info("Extracting available terms...");
-    const quarters = await page.evaluate(() => {
-      const options = Array.from(
-        document.querySelectorAll("#selectedTerm option"),
-      ) as HTMLOptionElement[];
+    const quarters = (
+      await page.evaluate(() => {
+        const options = Array.from(
+          document.querySelectorAll("#selectedTerm option"),
+        ) as HTMLOptionElement[];
 
-      const acceptableTermsRegex = /^(FA|WI|SP)\d{2}$/;
+        const acceptableTermsRegex = /^(FA|WI|SP)\d{2}$/;
 
-      return options
-        .filter((option) => acceptableTermsRegex.test(option.value.trim()))
-        .map((option) => option.value.trim());
-    });
+        return options
+          .filter((option) => acceptableTermsRegex.test(option.value.trim()))
+          .map((option) => option.value.trim());
+      })
+    ).slice(0, MAX_QUARTERS);
 
     serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
