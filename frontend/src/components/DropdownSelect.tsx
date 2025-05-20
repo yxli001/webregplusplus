@@ -1,5 +1,6 @@
 "use client";
 
+import { ProgressSpinner } from "primereact/progressspinner";
 import { useEffect, useRef, useState } from "react";
 
 import Checkbox from "@/components/Checkbox";
@@ -12,6 +13,7 @@ type BaseDropdownProps = {
   className?: string;
   closeOnSelect?: boolean; // Add the new prop here
   disabled?: boolean;
+  loading?: boolean;
 };
 
 type SingleSelectDropdownProps = {
@@ -38,6 +40,7 @@ const DropdownSelect = ({
   multiple = false,
   disabled = false,
   closeOnSelect = false, // Default to true
+  loading = false,
   ...props
 }: DropdownSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -112,6 +115,39 @@ const DropdownSelect = ({
     };
   }, []);
 
+  const dropDownContent = loading ? (
+    <div className="flex h-full w-full items-center justify-center p-5">
+      <ProgressSpinner
+        className="h-10 w-10"
+        strokeWidth="5"
+        animationDuration="2s"
+      />
+    </div>
+  ) : options.length > 0 ? (
+    options.map((option) => (
+      <div
+        key={option.value}
+        className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
+        onClick={() => {
+          handleOptionClick(option.value);
+        }}
+      >
+        {multiple ? (
+          <Checkbox checked={values.includes(option.value)} />
+        ) : (
+          <Radio checked={value === option.value} name="dropdown-option" />
+        )}
+        <span className="flex-1 truncate text-sm sm:text-base">
+          {option.label}
+        </span>
+      </div>
+    ))
+  ) : (
+    <div className="p-2 text-sm italic text-gray-500 sm:text-base">
+      No options available
+    </div>
+  );
+
   return (
     <div ref={dropdownRef} className={`relative w-full ${className}`}>
       <div
@@ -124,33 +160,7 @@ const DropdownSelect = ({
 
       {isOpen && (
         <div className="absolute z-[100] mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
-          {options.length > 0 ? (
-            options.map((option) => (
-              <div
-                key={option.value}
-                className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
-                onClick={() => {
-                  handleOptionClick(option.value);
-                }}
-              >
-                {multiple ? (
-                  <Checkbox checked={values.includes(option.value)} />
-                ) : (
-                  <Radio
-                    checked={value === option.value}
-                    name="dropdown-option"
-                  />
-                )}
-                <span className="flex-1 truncate text-sm sm:text-base">
-                  {option.label}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="p-2 text-sm italic text-gray-500 sm:text-base">
-              No options available
-            </div>
-          )}
+          {dropDownContent}
         </div>
       )}
     </div>
