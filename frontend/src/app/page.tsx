@@ -36,6 +36,7 @@ import {
   parseAvailableCourses,
   quarterNameToString,
 } from "@/util/helper";
+import PageLoading from "@/components/PageLoading";
 
 type SectionProps = {
   title: string;
@@ -79,6 +80,7 @@ export default function Home() {
 
   const [loadingQuarters, setLoadingQuarters] = useState(false);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [loadingCourseDetails, setLoadingCourseDetails] = useState(false);
 
   const [allQuarters, setAllQuarters] = useState<Quarter[]>([]);
   const [selectedQuarter, setSelectedQuarter] = useState<string>("");
@@ -112,6 +114,8 @@ export default function Home() {
     }
 
     const fetchDetails = async () => {
+      setLoadingCourseDetails(true);
+
       const res = await getCourseDetails(
         selectedQuarter,
         selectedCourses.map((course) => `${course.subject}+${course.code}`),
@@ -122,11 +126,13 @@ export default function Home() {
       } else {
         toast.current?.show({
           severity: "error",
-          summary: "Error fetching courses",
+          summary: "Error fetching course details",
           detail: res.error,
           life: 2000,
         });
       }
+
+      setLoadingCourseDetails(false);
     };
 
     void fetchDetails();
@@ -143,7 +149,7 @@ export default function Home() {
       } else {
         toast.current?.show({
           severity: "error",
-          summary: "Error fetching course details",
+          summary: "Error fetching courses",
           detail: res.error,
           life: 2000,
         });
@@ -563,6 +569,7 @@ export default function Home() {
           />
         </>
       )}
+      <PageLoading loading={loadingCourseDetails} />
     </div>
   );
 }
