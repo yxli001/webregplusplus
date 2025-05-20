@@ -8,6 +8,7 @@ import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
 import CourseList from "@/components/CourseList";
 import DropdownSelect from "@/components/DropdownSelect";
+import PageLoading from "@/components/PageLoading";
 import PreferencesComponent from "@/components/Preferences";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import Calendar from "@/icons/Calendar";
@@ -36,7 +37,6 @@ import {
   parseAvailableCourses,
   quarterNameToString,
 } from "@/util/helper";
-import PageLoading from "@/components/PageLoading";
 
 type SectionProps = {
   title: string;
