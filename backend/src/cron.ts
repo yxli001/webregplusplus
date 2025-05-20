@@ -17,6 +17,7 @@ const main = async () => {
           resolve(); // If successful, resolve the promise
         } catch (error) {
           console.error("Error in job execution:", error);
+          console.log(`Retrying in ${RETRY_DELAY / 6000} minutes`);
 
           // Instead of exiting, set a timeout to retry
           setTimeout(runWithRetryHandling, RETRY_DELAY);
