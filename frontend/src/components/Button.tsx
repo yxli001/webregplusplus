@@ -1,16 +1,11 @@
-interface ButtonProps {
+type ButtonProps = {
   label: string;
   onClick?: () => void;
   className?: string;
   icon?: React.ReactNode;
-}
+};
 
-const Button = ({
-  label,
-  onClick = () => {},
-  className = "",
-  icon,
-}: ButtonProps) => {
+const Button = ({ label, onClick, className = "", icon }: ButtonProps) => {
   return (
     <button
       onClick={onClick}

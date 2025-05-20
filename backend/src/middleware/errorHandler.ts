@@ -1,13 +1,13 @@
-import { serverLogger } from "@/util/logger";
 import { NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
+
+import { serverLogger } from "../util/logger";
 
 const errorHandler = (
   error: unknown,
   req: Request,
   res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   // 500 is the "internal server error" error code, this will be our fallback
   let statusCode = 500;

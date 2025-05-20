@@ -163,3 +163,4 @@ dist
 .idea
 frontend/src/app/lib/dummy_courses.ts
 /frontend/src/app/sched
+.env*.local

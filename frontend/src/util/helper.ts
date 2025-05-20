@@ -12,30 +12,17 @@ export function timeToIndex(
 }
 
 export function convertTo24Hr(time: string): string {
-  const match = time.match(/(\d+):(\d+)([ap])/i);
+  const match = /(\d+):(\d+)([ap])/i.exec(time);
   if (!match) return time;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, h, m, period] = match;
   let hour = parseInt(h);
   if (period.toLowerCase() === "p" && hour !== 12) hour += 12;
   if (period.toLowerCase() === "a" && hour === 12) hour = 0;
   return `${hour.toString().padStart(2, "0")}:${m}`;
 }
-// export function convertDaysToNumbers(days: string[]): number[] {
-//   const mapping: { [key: string]: number } = {
-//     Su: 0,
-//     M: 1,
-//     Tu: 2,
-//     W: 3,
-//     Th: 4,
-//     F: 5,
-//     Sa: 6,
-//   };
-//   return days.map((day) => mapping[day]).filter((num) => num !== undefined);
-// }
 
 export function computePreferredDays(selectedDays: string[]): number[] {
-  const scores = new Array(7).fill(0);
+  const scores = new Array<number>(7).fill(0);
   for (const day of selectedDays) {
     const dayScoreMap: Record<string, { index: number; score: number }> = {
       Su: { index: 0, score: 0 },
@@ -51,11 +38,12 @@ export function computePreferredDays(selectedDays: string[]): number[] {
       scores[mapping.index] = mapping.score;
     }
   }
+
   return scores;
 }
 
 export function convertDaysToNumbers(days: string): number[] {
-  const mapping: { [key: string]: number } = {
+  const mapping: Record<string, number> = {
     Su: 0,
     M: 1,
     Tu: 2,
@@ -66,41 +54,41 @@ export function convertDaysToNumbers(days: string): number[] {
   };
 
   const pattern = /Su|Tu|Th|Sa|M|W|F/g;
-  const matches = days.match(pattern) || [];
+  const matches = days.match(pattern) ?? [];
 
   return matches.map((day) => mapping[day]);
 }
-export async function createMainSectionByCourseIdLookup(
+export function createMainSectionByCourseIdLookup(
   mainSections: MainSection[],
-): Promise<Map<string, MainSection[]>> {
+): Map<string, MainSection[]> {
   const mainSectionMap = new Map<string, MainSection[]>();
   mainSections.forEach((mainSection) => {
     if (!mainSectionMap.has(mainSection.courseId)) {
       mainSectionMap.set(mainSection.courseId, []);
     }
-    mainSectionMap.get(mainSection.courseId)!.push(mainSection);
+    mainSectionMap.get(mainSection.courseId)?.push(mainSection);
   });
 
   return mainSectionMap;
 }
 
-export async function createSubSectionByMainSectionIdLookup(
+export function createSubSectionByMainSectionIdLookup(
   subSections: SubSection[],
-): Promise<Map<string, SubSection[]>> {
+): Map<string, SubSection[]> {
   const sectionMap = new Map<string, SubSection[]>();
   subSections.forEach((subSection) => {
     if (!sectionMap.has(subSection.mainSectionId)) {
       sectionMap.set(subSection.mainSectionId, []);
     }
-    sectionMap.get(subSection.mainSectionId)!.push(subSection);
+    sectionMap.get(subSection.mainSectionId)?.push(subSection);
   });
 
   return sectionMap;
 }
 
-export async function createMainSectionByIdLookup(
+export function createMainSectionByIdLookup(
   mainSections: MainSection[],
-): Promise<Map<string, MainSection>> {
+): Map<string, MainSection> {
   const map = new Map<string, MainSection>();
   mainSections.forEach((ms) => {
     map.set(ms.id, ms);
@@ -108,9 +96,9 @@ export async function createMainSectionByIdLookup(
   return map;
 }
 
-export async function createSubSectionByIdLookup(
+export function createSubSectionByIdLookup(
   subSections: SubSection[],
-): Promise<Map<string, SubSection>> {
+): Map<string, SubSection> {
   const map = new Map<string, SubSection>();
   subSections.forEach((sub) => {
     map.set(sub.id, sub);
@@ -118,7 +106,7 @@ export async function createSubSectionByIdLookup(
   return map;
 }
 
-export async function parseAvailableCourses(
+export function parseAvailableCourses(
   coursesResponse: CourseWithSections[],
   coursePreferences: CoursePreferences[],
 ) {

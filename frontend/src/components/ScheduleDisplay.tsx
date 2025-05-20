@@ -1,13 +1,14 @@
 "use client"; // Ensure it's a client component
 
+import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import dayGridPlugin from "@fullcalendar/daygrid";
+
 import { CalEvent } from "@/types/calendar";
 
-interface ScheduleDisplayProps {
+type ScheduleDisplayProps = {
   events: CalEvent[];
-}
+};
 
 export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
   return (

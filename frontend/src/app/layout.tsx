@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
 import { PrimeReactProvider } from "primereact/api";
+
+import type { Metadata } from "next";
 
 import "./globals.css";
 import "primereact/resources/primereact.min.css";
@@ -64,6 +65,7 @@ export default function RootLayout({
           name="emotion-insertion-point"
           content="emotion-insertion-point"
         />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
         <PrimeReactProvider>

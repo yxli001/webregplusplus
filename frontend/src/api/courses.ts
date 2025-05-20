@@ -1,3 +1,5 @@
+import { APIResult, get, handleAPIError } from "./requests";
+
 import {
   Course,
   CourseJSON,
@@ -9,7 +11,6 @@ import {
   QuarterJSON,
   SubSectionType,
 } from "@/types/course";
-import { APIResult, get, handleAPIError } from "./requests";
 
 /**
  * Parses a QuarterJSON object into a Quarter object.

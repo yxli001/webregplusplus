@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev": "vercel dev --local-config vercel.dev.json",
+    "build": "pnpm --filter frontend run build",
+    "cron": "pnpm --filter backend run cron",
+    "lint-check": "pnpm --filter backend run lint-check && pnpm --filter frontend run lint-check",
+    "lint-fix": "pnpm --filter backend run lint-fix && pnpm --filter frontend run lint-fix"
+  }
+}

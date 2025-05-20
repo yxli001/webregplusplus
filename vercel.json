@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "devCommand": "pnpm --filter frontend run dev",
+  "builds": [
+    { "src": "frontend/package.json", "use": "@vercel/next" },
+    { "src": "backend/src/api/index.ts", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/backend/src/api/index.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
+  ]
+}

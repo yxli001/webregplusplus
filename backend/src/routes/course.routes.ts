@@ -1,14 +1,16 @@
-import Course from "@/models/Course.model";
-import Quarter from "@/models/Quarter.model";
-import validationErrorParser from "@/util/validationErrorParser";
-import {
-  getCourseDetailsValidator,
-  getCoursesValidator,
-} from "@/validators/course.validator";
 import { NextFunction, Request, Response, Router } from "express";
 import asyncHandler from "express-async-handler";
 import { matchedData, validationResult } from "express-validator";
 import createHttpError from "http-errors";
+
+import Course from "../models/Course.model";
+import Quarter from "../models/Quarter.model";
+import { serverLogger } from "../util/logger";
+import validationErrorParser from "../util/validationErrorParser";
+import {
+  getCourseDetailsValidator,
+  getCoursesValidator,
+} from "../validators/course.validator";
 
 const courseRouter = Router();
 
@@ -101,10 +103,12 @@ courseRouter.get(
 
       const resCourses = [];
       for (const course of coursesList) {
+        serverLogger.debug(`Searching for course ${course}`);
+
         const foundCourse = await Course.scope("details").findOne({
           where: {
-            subject: course.split(" ")[0],
-            code: course.split(" ")[1],
+            subject: course.split("+")[0],
+            code: course.split("+")[1],
             quarterId: foundQuarter.id,
           },
         });

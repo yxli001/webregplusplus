@@ -1,0 +1,77 @@
+name: Update schedules scraper cron job
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - staging
+      - main
+  schedule:
+    # scheduled runs only run on the main branch
+    # midnight America/Los_Angeles:
+    - cron: "0 7 * * *" # PDT (UTC–7)
+
+concurrency:
+  group: cron-${{ github.ref_name }} # e.g. "cron-staging"
+  cancel-in-progress: true # cancels any in-flight run in that group
+
+jobs:
+  staging-cron:
+    # only run on staging branch
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    environment: Preview
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install chrome browser
+        run: pnpm dlx puppeteer browsers install chrome
+
+      - name: Run cron script
+        run: pnpm run cron
+        env:
+          PORT: ${{ secrets.PORT }}
+          FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+
+  prod-cron:
+    # only run on main branch
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install chrome browser
+        run: pnpm dlx puppeteer browsers install chrome
+
+      - name: Run cron script
+        run: pnpm run cron
+        env:
+          PORT: ${{ secrets.PORT }}
+          FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}

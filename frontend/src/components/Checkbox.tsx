@@ -1,11 +1,11 @@
 import Check from "@/icons/Check";
 
-interface CheckboxProps {
+type CheckboxProps = {
   checked: boolean;
-  onChange: () => void;
+  onChange?: () => void;
   className?: string;
   variant?: "dark" | "light";
-}
+};
 
 const Checkbox = ({
   checked,

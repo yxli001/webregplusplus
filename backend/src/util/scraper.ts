@@ -1,14 +1,23 @@
 import puppeteer, { Browser } from "puppeteer";
-import { serverLogger } from "@/util/logger";
+
 import {
   Course,
-  MainSection,
-  SubSection,
-  MainSectionType,
-  SubSectionType,
   ExamType,
+  MainSection,
+  MainSectionType,
   Quarter,
-} from "@/types";
+  SubSection,
+  SubSectionType,
+} from "../types";
+import { serverLogger } from "../util/logger";
+
+const isCI = !!process.env.CI;
+
+// Maximum number of quarters to scrape
+const MAX_QUARTERS = 4;
+
+// Number of pages to scrape at the same time
+const BATCH_SIZE = 30;
 
 export async function scrapeSchedule(): Promise<Quarter[]> {
   const SCHEDULE_OF_CLASSES_URL =
@@ -17,14 +26,20 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
   const SCHEDULE_OF_CLASSES_RESULT_URL =
     "https://act.ucsd.edu/scheduleOfClasses/scheduleOfClassesStudentResult.htm";
 
-  // Number of pages to scrape at the same time
-  const BATCH_SIZE = 30;
-
   let browser: Browser | null = null;
 
   try {
     serverLogger.info("Starting Puppeteer browser...");
-    browser = await puppeteer.launch({ headless: true, browser: "chrome" }); // Set to false if debugging
+    browser = await puppeteer.launch({
+      headless: true,
+      browser: "chrome",
+      args: [
+        // disable sandbox when running in GH Actions
+        ...(isCI ? ["--no-sandbox", "--disable-setuid-sandbox"] : []),
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
+    });
 
     const page = await browser.newPage();
 
@@ -35,17 +50,19 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
     await page.waitForSelector("#selectedTerm");
 
     serverLogger.info("Extracting available terms...");
-    const quarters = await page.evaluate(() => {
-      const options = Array.from(
-        document.querySelectorAll("#selectedTerm option"),
-      ) as HTMLOptionElement[];
+    const quarters = (
+      await page.evaluate(() => {
+        const options = Array.from(
+          document.querySelectorAll("#selectedTerm option"),
+        ) as HTMLOptionElement[];
 
-      const acceptableTermsRegex = /^(FA|WI|SP)\d{2}$/;
+        const acceptableTermsRegex = /^(FA|WI|SP)\d{2}$/;
 
-      return options
-        .filter((option) => acceptableTermsRegex.test(option.value.trim()))
-        .map((option) => option.value.trim());
-    });
+        return options
+          .filter((option) => acceptableTermsRegex.test(option.value.trim()))
+          .map((option) => option.value.trim());
+      })
+    ).slice(0, MAX_QUARTERS);
 
     serverLogger.info(`Found quarters: ${quarters.join(", ")}\n`);
 
@@ -136,9 +153,9 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         );
 
         const pageCoursesArray = await Promise.all(
-          pages.map((page) =>
-            page.evaluate(
-              (MainSectionType, SubSectionType) => {
+          pages.map((currPage) =>
+            currPage.evaluate(
+              (MSType, SSType) => {
                 const unacceptableSections = ["IT"];
 
                 const scrapedCourses: Course[] = [];
@@ -164,9 +181,10 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   const cells = Array.from(row.querySelectorAll("td"));
 
                   // Title cell
-                  if (cells.length == 1) {
+                  if (cells.length === 1) {
                     // No subject acronym
-                    if (cells[0].querySelectorAll("span").length == 1) continue;
+                    if (cells[0].querySelectorAll("span").length === 1)
+                      continue;
 
                     // Push the previous course if it exists
                     if (course.code !== "") {
@@ -192,7 +210,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   }
 
                   // Course header cell
-                  if (cells.length == 4) {
+                  if (cells.length === 4) {
                     const courseCode = (cells[1].textContent || "").trim();
                     const courseName = cells[2]
                       .querySelector("a > span.boldtxt")
@@ -225,7 +243,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                     if (unacceptableSections.includes(sectionType)) continue;
 
                     // Times are TBA
-                    if (cells.length == 10) {
+                    if (cells.length === 10) {
                       days = "TBA";
                       startTime = "TBA";
                       endTime = "TBA";
@@ -253,7 +271,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
 
                     // Main section
                     if (
-                      Object.values(MainSectionType).includes(
+                      Object.values(MSType).includes(
                         sectionType as MainSectionType,
                       ) &&
                       sectionCode.substring(1) === "00"
@@ -273,7 +291,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                     }
                     // Subsection
                     else if (
-                      Object.values(SubSectionType).includes(
+                      Object.values(SSType).includes(
                         sectionType as SubSectionType,
                       )
                     ) {
@@ -297,7 +315,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                   }
 
                   // Exam
-                  if (row.className === "nonenrtxt" && cells.length == 10) {
+                  if (row.className === "nonenrtxt" && cells.length === 10) {
                     const examType = cells[2].textContent?.trim() || "";
                     const examDate = cells[3].textContent?.trim() || "";
                     const examTime = cells[5].textContent?.trim() || "";
@@ -337,7 +355,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         currQuarter.courses.push(...pageCoursesArray.flat());
 
         // Close the pages after processing
-        await Promise.all(pages.map((page) => page.close()));
+        await Promise.all(pages.map((p) => p.close()));
       }
 
       // Remove duplicate courses

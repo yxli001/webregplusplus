@@ -20,15 +20,15 @@ Try it live: [https://webregplusplus.tech](https://webregplusplus.tech)
 
 ## Project Structure
 
-webregplusplus/ 
+webregplusplus/
 
-├── frontend/ # Next.js frontend 
+├── frontend/ # Next.js frontend
 
-├── backend/ # Express + TypeScript backend 
+├── backend/ # Express + TypeScript backend
 
-├── .husky/ # Git hooks 
+├── .husky/ # Git hooks
 
-├── .secret-scan/ # Secret scan rules 
+├── .secret-scan/ # Secret scan rules
 
 └── README.md
 
@@ -36,58 +36,67 @@ webregplusplus/
 
 ### Clone the repository
 
-git clone https://github.com/yxli001/webregplusplus.git 
+git clone https://github.com/yxli001/webregplusplus.git
 
-cd webregplusplus
+`cd webregplusplus`
 
 ### Install dependencies
 
-**Frontend**
+_Run in root directory_
+`pnpm install`
 
-cd frontend pnpm install
+### Environment variables
 
 **Backend**
 
-cd ../backend pnpm install
+Configure a local PostgreSQL instance and put the following fields in the backend `.env` file:
+
+- `PORT`
+- `FRONTEND_ORIGIN`
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DB`
 
 ### Run the app locally
 
+**Populate DB**
+
+- From the root directory, run `pnpm run cron`, this should run the scraper (~20 minutes) and populate your local PostgreSQL database.
+
 **Backend**
 
-- In `index.ts`, uncomment the call to `updateSchedules()` on line 138
-- Start the server with `pnpm run dev`, it will now scrape schedule of classes and populate your local database
-- THIS SHOULD ONLY BE DONE ONCE (it may run multiple instances, be wary of this and make sure to end the program or it may populate your tables multiple times)
-- Comment out line 138 again
 - `pnpm run dev` will now give you access to the API Endpoints below
 
+**Frontend**
 
-API Endpoints:
-- GET `/api/course`
-    - No params
-    - Returns list of all courses, only containing the course subject and code 
-    - Intended to be used to generate the course dropdown list
-- GET `/api/course/details?courses=[courses]`
-    - Returns course full detail for the list of courses specified in the `courses` param
-    - `courses` param should be a string of comma separate course full names, e.g. `"CSE 100,CSE101,MATH183"`
-      
-Steps to test:
-- First configure a local PostgreSQL instance and put the following fields in the backend `.env` file
-    - `PORT`
-    - `FRONTEND_ORIGIN`
-    - `POSTGRES_HOST`
-    - `POSTGRES_PORT`
-    - `POSTGRES_USER`
-    - `POSTGRES_PASSWORD`
-    - `POSTGRES_DB`
- 
-  
-
-**Frontend (in a separate terminal)**
-`cd ../frontend pnpm run dev`
+- `pnpm run dev`
 
 The app should now be running on `http://localhost:3000`.
 
 Note: The frontend application runs slowly in dev mode. For a more optimized program, use pnpm run build followed by pnpm start
+
+### API Endpoints:
+
+- GET `/api/course`
+  - No params
+  - Returns list of all courses, only containing the course subject and code
+  - Intended to be used to generate the course dropdown list
+- GET `/api/course/details?courses=[courses]`
+  - Returns course full detail for the list of courses specified in the `courses` param
+  - `courses` param should be a string of comma separated course full names joined by a `+`, e.g. `"CSE+100,CSE+101,MATH+183"`
+
+Steps to test:
+
+- First configure a local PostgreSQL instance and put the following fields in the backend `.env.development` file
+  - `PORT`
+  - `FRONTEND_ORIGIN`
+  - `POSTGRES_HOST`
+  - `POSTGRES_PORT`
+  - `POSTGRES_USER`
+  - `POSTGRES_PASSWORD`
+  - `POSTGRES_DB`
 
 ## Algorithm Overview
 
@@ -100,9 +109,6 @@ The scheduling logic in `scheduler.ts` works by:
 - Caching evaluated schedules to avoid recomputation
 
 This results in an optimized schedule that balances user preferences and constraints.
-
-## Issues
-If you select a class which has a location, time, instructor listed as TBA, it will not show in the scheduler and hence create a schedule with missing values.
 
 ## Screenshots
 

@@ -13,8 +13,7 @@ type Method = "GET" | "POST" | "PATCH" | "DELETE";
  * every request. This means in the rest of our code, we can write "/api/foo"
  * instead of "http://localhost:3001/api/foo".
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_HOST || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_HOST ?? "";
 
 /**
  * A wrapper around the built-in `fetch()` function that abstracts away some of
@@ -103,14 +102,14 @@ export async function get(
 ): Promise<Response> {
   // Construct the query string
   const queryString = new URLSearchParams(
-    Object.entries(queries).reduce(
+    Object.entries(queries).reduce<Record<string, string>>(
       (acc, [key, value]) => {
         if (value !== undefined && value !== null) {
           acc[key] = String(value);
         }
         return acc;
       },
-      {} as Record<string, string>,
+      {},
     ),
   ).toString();
 
@@ -121,7 +120,7 @@ export async function get(
 
   // Make the request
   const response = await fetchRequest("GET", fullUrl, undefined, headers);
-  void (await assertOk(response));
+  await assertOk(response);
   return response;
 }
 
@@ -144,7 +143,7 @@ export async function post(
     body,
     headers,
   );
-  void (await assertOk(response));
+  await assertOk(response);
   return response;
 }
 
@@ -167,7 +166,7 @@ export async function patch(
     body,
     headers,
   );
-  void (await assertOk(response));
+  await assertOk(response);
   return response;
 }
 
@@ -189,7 +188,7 @@ export async function del(
     undefined,
     headers,
   );
-  void (await assertOk(response));
+  await assertOk(response);
   return response;
 }
 

@@ -1,8 +1,8 @@
 import { SVGProps } from "react";
 
-interface CheckProps extends SVGProps<SVGSVGElement> {
+type CheckProps = {
   size?: number; // Add a size prop
-}
+} & SVGProps<SVGSVGElement>;
 
 const Check = ({ color, size = 16, ...props }: CheckProps) => (
   <svg
@@ -15,7 +15,7 @@ const Check = ({ color, size = 16, ...props }: CheckProps) => (
   >
     <path
       d="M1 7L5 11L15 1"
-      stroke={color ? color : "#627D98"}
+      stroke={color ?? "#627D98"}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

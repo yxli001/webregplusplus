@@ -1,8 +1,23 @@
-import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
+import fs from "fs";
+import os from "os";
+import path from "path";
+
+import { createLogger, format, transports } from "winston";
+
+// detect if we’re running in Vercel (or any serverless)
+const isServerless = Boolean(process.env.VERCEL);
+
+// pick a base dir that exists & is writable
+const baseLogDir = isServerless ? path.join(os.tmpdir(), "logs") : "logs";
+
+// ensure the directory exists
+if (!fs.existsSync(baseLogDir)) {
+  fs.mkdirSync(baseLogDir, { recursive: true });
+}
 
 const serverLogger = createLogger({
-  level: "debug", // Allow overriding via environment variable
+  level: "debug",
   format: format.combine(
     format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     format.printf(
@@ -11,19 +26,21 @@ const serverLogger = createLogger({
     ),
   ),
   transports: [
-    new transports.Console({ level: "debug" }), // Console logs everything from debug and above
+    // always log to console
+    new transports.Console({ level: "debug" }),
+
+    // file-rotate into /tmp/logs on Vercel, or ./logs locally
     new transports.DailyRotateFile({
-      filename: "logs/server-%DATE%.log",
+      filename: baseLogDir + "/server-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",
       zippedArchive: true,
-      level: "debug", // Only store debug-level logs and above in files
+      level: "debug",
     }),
   ],
 });
 
-// Add a separate transport for database logs
 const dbLogger = createLogger({
   level: "debug",
   format: format.combine(
@@ -35,12 +52,12 @@ const dbLogger = createLogger({
   ),
   transports: [
     new transports.DailyRotateFile({
-      filename: "logs/db-%DATE%.log",
+      filename: baseLogDir + "/db-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",
       zippedArchive: true,
-      level: "debug", // Only store debug-level logs and above in files
+      level: "debug",
     }),
   ],
 });

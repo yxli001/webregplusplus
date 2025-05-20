@@ -1,18 +1,19 @@
 import { useState } from "react";
+
 import TimeSlotModal from "./TimeSlotModal";
 
-interface TimeSlot {
+type TimeSlot = {
   id: string;
   days: string;
   startTime: string;
   endTime: string;
-}
+};
 
-interface TimeSlotEditorProps {
+type TimeSlotEditorProps = {
   value: TimeSlot[];
   onChange: (slots: TimeSlot[]) => void;
   className?: string;
-}
+};
 
 const TimeSlotEditor = ({
   value,
@@ -76,13 +77,17 @@ const TimeSlotEditor = ({
             <div className="flex items-center gap-4 text-primary-dark">
               <button
                 className="hover:underline"
-                onClick={() => handleEdit(slot)}
+                onClick={() => {
+                  handleEdit(slot);
+                }}
               >
                 Edit
               </button>
               <button
                 className="hover:underline"
-                onClick={() => handleDelete(slot.id)}
+                onClick={() => {
+                  handleDelete(slot.id);
+                }}
               >
                 Delete
               </button>
@@ -102,7 +107,9 @@ const TimeSlotEditor = ({
       {/* Edit Modal */}
       <TimeSlotModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
         onSave={handleSave}
       />
     </div>

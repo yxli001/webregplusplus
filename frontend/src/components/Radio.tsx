@@ -1,15 +1,17 @@
-interface RadioProps {
+type RadioProps = {
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  onChange?: (checked: boolean) => void;
   disabled?: boolean;
   name?: string;
-}
+};
 
 const Radio = ({ checked, onChange, ...props }: RadioProps) => {
   return (
     <div
       className="relative flex h-4 w-4 cursor-pointer items-center justify-center"
-      onClick={() => !props.disabled && onChange(!checked)}
+      onClick={() => {
+        if (!props.disabled && onChange) onChange(!checked);
+      }}
     >
       <div
         className={`h-4 w-4 rounded-full border transition-colors ${
@@ -25,7 +27,9 @@ const Radio = ({ checked, onChange, ...props }: RadioProps) => {
         type="radio"
         className="absolute h-full w-full cursor-pointer opacity-0"
         checked={checked}
-        onChange={(e) => !props.disabled && onChange(e.target.checked)}
+        onChange={(e) => {
+          if (!props.disabled && onChange) onChange(e.target.checked);
+        }}
         {...props}
       />
     </div>

@@ -1,22 +1,21 @@
 "use client";
 
+import createCache from "@emotion/cache";
+import { CacheProvider } from "@emotion/react";
 import React, { useEffect, useState } from "react";
 import Select, {
   ClearIndicatorProps,
-  components,
   ControlProps,
-  createFilter,
   OptionProps,
+  components,
+  createFilter,
 } from "react-select";
-import createCache from "@emotion/cache";
-import { CacheProvider } from "@emotion/react";
-
-import { Course } from "@/types/course";
 
 import Check from "@/icons/Check";
-import Search from "@/icons/Search";
 import Cross from "@/icons/Cross";
+import Search from "@/icons/Search";
 import { usePreferenceStore } from "@/store/preferenceStore";
+import { Course } from "@/types/course";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
 const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
@@ -30,7 +29,7 @@ const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
       key: "with-tailwind",
       insertionPoint: document.querySelector(
         'meta[name="emotion-insertion-point"]',
-      ) as HTMLElement,
+      ) as HTMLElement | undefined,
     });
     setCache(emotionCache);
   }, []);
@@ -94,11 +93,12 @@ const ClearIndicator = ({
   );
 };
 
-interface CourseDropdownProps {
+type CourseDropdownProps = {
   courses: Course[];
   maxCourses?: number;
   className?: string;
-}
+  loading?: boolean;
+};
 
 /**
  * Dropdown to select courses
@@ -112,6 +112,7 @@ const CourseDropdown = ({
   courses,
   maxCourses = 10,
   className = "",
+  loading = false,
 }: CourseDropdownProps) => {
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setSelectedCourses = usePreferenceStore(
@@ -129,7 +130,9 @@ const CourseDropdown = ({
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
           noOptionsMessage: () => "p-4 text-text-light",
+          loadingMessage: () => "p-4 text-text-light",
         }}
+        isLoading={loading}
         name="course"
         value={selectedCourses.map((course) => ({
           label: `${course.subject} ${course.code}`,
@@ -157,9 +160,9 @@ const CourseDropdown = ({
           matchFrom: "any",
         })}
         components={{
-          Option: Option,
-          Control: Control,
-          ClearIndicator: ClearIndicator,
+          Option,
+          Control,
+          ClearIndicator,
           DropdownIndicator: () => null,
         }}
         placeholder="eg. BILD, BILD 3, or CSE 101"

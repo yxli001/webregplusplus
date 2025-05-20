@@ -1,14 +1,13 @@
-import { scrapeSchedule } from "@/util/scraper";
-import SubSection from "@/models/SubSection.model";
-import Exam from "@/models/Exam.model";
-import MainSection from "@/models/MainSection.model";
-import Course from "@/models/Course.model";
-import QuarterModel from "@/models/Quarter.model";
-import { serverLogger } from "@/util/logger";
 import { Sequelize } from "sequelize";
-import { Quarter } from "@/types";
 
-const RETRY_DELAY = 1000 * 60 * 2; // 2 minutes
+import Course from "../models/Course.model";
+import Exam from "../models/Exam.model";
+import MainSection from "../models/MainSection.model";
+import QuarterModel from "../models/Quarter.model";
+import SubSection from "../models/SubSection.model";
+import { Quarter } from "../types";
+import { serverLogger } from "../util/logger";
+import { scrapeSchedule } from "../util/scraper";
 
 const updateSchedules = async (sequelize: Sequelize) => {
   try {
@@ -29,18 +28,14 @@ const updateSchedules = async (sequelize: Sequelize) => {
     );
 
     await saveQuarters(sequelize, quarters);
+
+    // Log success
+    serverLogger.info("Update schedules job completed successfully");
   } catch (error) {
-    serverLogger.error("Error updating schedules:", (error as Error).stack);
+    serverLogger.error("Error updating schedules:" + (error as Error).stack);
 
-    serverLogger.info(
-      `Retrying schedule update in ${RETRY_DELAY / 1000} seconds...`,
-    );
-
-    setTimeout(async () => {
-      serverLogger.info("Retrying schedule update...");
-
-      await updateSchedules(sequelize);
-    }, RETRY_DELAY);
+    // Rethrow the error so the caller (cron.js) can catch it and handle retries
+    throw error;
   }
 };
 
@@ -51,33 +46,28 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
   try {
     await Promise.all([
       SubSection.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       Exam.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       MainSection.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       Course.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
       QuarterModel.destroy({
-        truncate: true,
+        where: {},
         cascade: true,
-        restartIdentity: true,
         transaction: t,
       }),
     ]);
@@ -170,8 +160,7 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
     await t.rollback();
 
     serverLogger.error(
-      "Schedule update failed, rolled back:",
-      (error as Error).stack,
+      "Schedule update failed, rolled back:" + (error as Error).stack,
     );
 
     throw new Error("Database update failed");

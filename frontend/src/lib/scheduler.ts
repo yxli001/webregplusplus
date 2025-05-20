@@ -1,24 +1,25 @@
-import { Exam, MainSection, SubSection } from "@/types/course";
 import {
-  convertDaysToNumbers,
-  timeToIndex,
-  hashSchedule,
   computePreferredDays,
+  convertDaysToNumbers,
+  hashSchedule,
   isTimeTBA,
+  timeToIndex,
 } from "../util/helper";
-import { SchedulePreferences } from "@/store/preferenceStore";
 import { parseScheduleEntry } from "../util/helper";
+
+import { SchedulePreferences } from "@/store/preferenceStore";
+import { Exam, MainSection, SubSection } from "@/types/course";
 
 const START_TIME = 8 * 60;
 const TIME_INTERVAL = 10;
 const TOTAL_MINUTES = (22 - 8) * 60;
 const TIME_SLOTS = TOTAL_MINUTES / TIME_INTERVAL;
 
-export interface Schedule {
+export type Schedule = {
   classes: (MainSection | SubSection)[];
   exams: Exam[];
   fitness: number;
-}
+};
 
 function isValidEntry(
   schedule: (MainSection | SubSection)[],
@@ -84,11 +85,11 @@ function isValidEntry(
     if (newEntry === existingClass) {
       continue; // skip self cuz im gonna be using this in a kinda weird way
     }
-    const course_id =
+    const courseId =
       "courseId" in newEntry
         ? newEntry.courseId
         : mainSectionByIdMap.get(newEntry.mainSectionId)!.courseId;
-    if (preferences.allowedConflicts.has(course_id)) {
+    if (preferences.allowedConflicts.has(courseId)) {
       continue; // Allow conflict
     }
     // Check if they share any common days
@@ -147,7 +148,7 @@ function isValidExam(exams: Exam[], newExams: Exam[]) {
         continue; // skip self cuz im gonna be using this in a kinda weird way
       }
       // Check if they share any common days
-      if (newExam.date == existingExam.date) {
+      if (newExam.date === existingExam.date) {
         // Convert start & end times to comparable indexes
         const existingStartIdx = timeToIndex(
           existingExam.startTime,
@@ -336,17 +337,17 @@ export function calculateFitness(
   return score;
 }
 
-export async function generateRandomSchedule(
+export function generateRandomSchedule(
   courseIds: string[],
   preferences: SchedulePreferences,
   mainSectionByCourseIdMap: Map<string, MainSection[]>,
   subSectionByMainSectionIdMap: Map<string, SubSection[]>,
   mainSectionByIdMap: Map<string, MainSection>,
-): Promise<Schedule> {
+): Schedule {
   const classes: (MainSection | SubSection)[] = [];
   const exams: Exam[] = [];
   const timeGrid = Array.from({ length: 7 }, () =>
-    Array(TIME_SLOTS).fill(false),
+    Array<boolean>(TIME_SLOTS).fill(false),
   ); // Track occupied time slots
   const excludedTimeSlots = preferences.excludedTimeSlots;
   for (const slot of excludedTimeSlots) {
@@ -362,7 +363,7 @@ export async function generateRandomSchedule(
 
   for (const courseId of courseIds) {
     // console.log(courseId);
-    const mainSections = mainSectionByCourseIdMap.get(courseId) || [];
+    const mainSections = mainSectionByCourseIdMap.get(courseId) ?? [];
     // console.log(mainSections);
     const mainSection =
       mainSections[Math.floor(Math.random() * mainSections.length)];
@@ -383,7 +384,7 @@ export async function generateRandomSchedule(
     for (const exam of mainSection.exams) {
       exams.push(exam);
     }
-    const subSections = subSectionByMainSectionIdMap.get(mainSection.id) || [];
+    const subSections = subSectionByMainSectionIdMap.get(mainSection.id) ?? [];
     if (subSections.length !== 0) {
       const requiredSections = subSections.filter((s) => s.isRequired);
       const optionalSections = subSections.filter((s) => !s.isRequired);
@@ -422,9 +423,9 @@ export async function generateRandomSchedule(
       }
     }
   }
-  return { classes: classes, exams: exams, fitness: NaN };
+  return { classes, exams, fitness: NaN };
 }
-export async function generateSchedules(
+export function generateSchedules(
   quantity: number,
   cache: Map<string, number>,
   courseId: string[],
@@ -432,20 +433,20 @@ export async function generateSchedules(
   mainSectionByCourseIdMap: Map<string, MainSection[]>,
   subSectionByMainSectionIdMap: Map<string, SubSection[]>,
   mainSectionByIdMap: Map<string, MainSection>,
-): Promise<Schedule[]> {
+): Schedule[] {
   const schedules: Schedule[] = [];
   let validSchedules = 0;
   let iterations = 0;
   while (validSchedules < quantity && iterations < 1000) {
     iterations++;
-    const newSchedule = await generateRandomSchedule(
+    const newSchedule = generateRandomSchedule(
       courseId,
       preferences,
       mainSectionByCourseIdMap,
       subSectionByMainSectionIdMap,
       mainSectionByIdMap,
     );
-    if (newSchedule.classes.length != 0) {
+    if (newSchedule.classes.length !== 0) {
       schedules.push({
         classes: newSchedule.classes,
         exams: newSchedule.exams,
@@ -495,7 +496,7 @@ function mutateSubSection(
 
   // Get available optional subSections for the correct mainSection
   const availableSubSections = (
-    subSectionByMainSectionIdMap.get(selectedEntry.mainSectionId) || []
+    subSectionByMainSectionIdMap.get(selectedEntry.mainSectionId) ?? []
   ).filter(
     (subSection) =>
       !subSection.isRequired && // Only allow non-required subSections
@@ -566,7 +567,7 @@ function mutateMainSection(
 ): boolean {
   // console.log("Mutating mainSection...");
   const availableMainSections =
-    mainSectionByCourseIdMap.get(selectedEntry.courseId) || [];
+    mainSectionByCourseIdMap.get(selectedEntry.courseId) ?? [];
   if (availableMainSections.length > 1) {
     const newMainSection =
       availableMainSections[
@@ -592,11 +593,11 @@ function mutateMainSection(
       );
 
       const requiredSubSections = (
-        subSectionByMainSectionIdMap.get(newMainSection.id) || []
+        subSectionByMainSectionIdMap.get(newMainSection.id) ?? []
       ).filter((subSection) => subSection.isRequired);
       // Add a new optional subSection for the new mainSection if available
       const availableSubSections = (
-        subSectionByMainSectionIdMap.get(newMainSection.id) || []
+        subSectionByMainSectionIdMap.get(newMainSection.id) ?? []
       ).filter((subSection) => !subSection.isRequired);
 
       if (requiredSubSections.length > 0) {
@@ -680,7 +681,7 @@ export function mutate(
     if ("mainSectionId" in selectedEntry) {
       success = mutateSubSection(
         mutatedClasses,
-        selectedEntry as SubSection,
+        selectedEntry,
         preferences,
         randomIndex,
         mainSectionByIdMap,
@@ -691,7 +692,7 @@ export function mutate(
       success = mutateMainSection(
         mutatedClasses,
         mutatedExams,
-        selectedEntry as MainSection,
+        selectedEntry,
         preferences,
         randomIndex,
         mainSectionByCourseIdMap,
@@ -742,20 +743,20 @@ export function mutate(
   };
 }
 
-export default async function generateOptimalSchedule(
+export default function generateOptimalSchedule(
   courseId: string[],
   preferences: SchedulePreferences,
   mainSectionByCourseIdMap: Map<string, MainSection[]>,
   subSectionByMainSectionIdMap: Map<string, SubSection[]>,
   mainSectionByIdMap: Map<string, MainSection>,
   subSectionByIdMap: Map<string, SubSection>,
-): Promise<Schedule[]> {
+): Schedule[] {
   console.log("Main Section Map:", mainSectionByIdMap);
   console.log("Sub Section Map:", subSectionByIdMap);
 
   const cache = new Map<string, number>();
 
-  let scheduleList = await generateSchedules(
+  let scheduleList = generateSchedules(
     100,
     cache,
     courseId,
@@ -785,7 +786,7 @@ export default async function generateOptimalSchedule(
 
   const sortedCache = [...cache.entries()].sort((a, b) => b[1] - a[1]);
   const loops = sortedCache.length > 10 ? 10 : sortedCache.length;
-  const optimalSchedules = Array(loops);
+  const optimalSchedules = Array<Schedule>(loops);
   for (let i = 0; i < loops; i++) {
     optimalSchedules[i] = parseScheduleEntry(
       sortedCache[i],
