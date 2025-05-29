@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import Select, {
   ClearIndicatorProps,
   ControlProps,
-  InputProps,
   OptionProps,
   components,
   createFilter,
@@ -63,6 +62,12 @@ const Control = ({
     <components.Control
       {...props}
       innerProps={{ ...props.innerProps, onMouseDown: handleMouseDown }}
+      selectProps={{
+        ...props.selectProps,
+        onChange: (c, action) => {
+          props.selectProps.onChange?.(c, action);
+        },
+      }}
     >
       <div className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-text-light bg-foreground px-3 py-2 hover:cursor-pointer">
         <Search size={18} />
@@ -135,31 +140,6 @@ const CourseDropdown = ({
   const setSelectedCourses = usePreferenceStore(
     (state) => state.setSelectedCourses,
   );
-  const [isFocused, setIsFocused] = useState(false);
-
-  // Custom Input component to track focus state
-  const Input = (props: InputProps<{ label: string; value: Course }, true>) => {
-    return (
-      <components.Input
-        {...props}
-        className="react-select__input w-full"
-        onFocus={() => {
-          setIsFocused(true);
-
-          // Open menu when input is focused if input not empty
-          if (props.value?.toString().trim() !== "") {
-            props.selectProps.onMenuOpen?.();
-          }
-        }}
-        onBlur={() => {
-          setIsFocused(false);
-
-          // Close menu when input loses focus
-          props.selectProps.onMenuClose?.();
-        }}
-      />
-    );
-  };
 
   return (
     <EmotionCacheProvider>
@@ -167,7 +147,7 @@ const CourseDropdown = ({
         classNames={{
           container: () => `w-full flex flex-col overflow-visible ${className}`,
           menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
-          input: () => "py-1 react-select__input",
+          control: () => "flex",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
@@ -180,16 +160,17 @@ const CourseDropdown = ({
           label: `${course.subject} ${course.code}`,
           value: course,
         }))}
-        onChange={(e) => {
-          if (!e) {
+        onChange={(cArr) => {
+          // If no courses are selected, clear the selection
+          if (!cArr) {
             setSelectedCourses([]);
             return;
           }
 
           // Limit to maxCourses
-          if (e.length > maxCourses) return;
+          if (cArr.length > maxCourses) return;
 
-          setSelectedCourses(e.map((course) => course.value));
+          setSelectedCourses(cArr.map((course) => course.value));
         }}
         options={courses.map((course) => ({
           label: `${course.subject} ${course.code}`,
@@ -206,9 +187,8 @@ const CourseDropdown = ({
           Control,
           ClearIndicator,
           DropdownIndicator: () => null,
-          Input,
         }}
-        placeholder={isFocused ? "" : "eg. BILD, BILD 3, or CSE 101"}
+        placeholder={"eg. BILD, BILD 3, or CSE 101"}
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
         blurInputOnSelect={false}
