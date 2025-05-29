@@ -4,7 +4,6 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { useEffect, useRef, useState } from "react";
 
 import Checkbox from "@/components/Checkbox";
-import Radio from "@/components/Radio";
 import UpDownArrows from "@/icons/UpDownArrows";
 
 type BaseDropdownProps = {
@@ -127,23 +126,21 @@ const DropdownSelect = ({
     options.map((option) => (
       <div
         key={option.value}
-        className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-100"
+        className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-50"
+        style={{
+          backgroundColor:
+            !multiple && values.includes(option.value) ? "#f0f0f0" : "",
+        }}
         onClick={() => {
           handleOptionClick(option.value);
         }}
       >
-        {multiple ? (
-          <Checkbox checked={values.includes(option.value)} />
-        ) : (
-          <Radio checked={value === option.value} name="dropdown-option" />
-        )}
-        <span className="flex-1 truncate text-sm sm:text-base">
-          {option.label}
-        </span>
+        {multiple && <Checkbox checked={values.includes(option.value)} />}
+        <span className="flex-1 truncate text-base">{option.label}</span>
       </div>
     ))
   ) : (
-    <div className="p-2 text-sm italic text-gray-500 sm:text-base">
+    <div className="p-2 text-base italic text-gray-500">
       No options available
     </div>
   );
@@ -154,7 +151,7 @@ const DropdownSelect = ({
         className={`flex items-center justify-between rounded-md border border-text-light bg-white p-2 sm:p-3 ${!disabled ? "hover:cursor-pointer hover:bg-gray-50" : ""}`}
         onClick={toggleDropdown}
       >
-        <span className="truncate text-sm sm:text-base">{getLabel()}</span>
+        <span className="truncate text-base">{getLabel()}</span>
         <UpDownArrows size={16} className="sm:h-5 sm:w-5" />
       </div>
 
