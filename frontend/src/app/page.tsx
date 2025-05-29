@@ -384,6 +384,7 @@ export default function Home() {
       {/* Quarter Selection */}
       <Section title="Select a quarter">
         <DropdownSelect
+          className="mx-auto lg:max-w-[30rem]"
           loading={loadingQuarters}
           options={allQuarters.map((quarter) => ({
             label: quarterNameToString(quarter.name),
@@ -401,13 +402,17 @@ export default function Home() {
         <>
           {/* Course Selection */}
           <Section title="Select Your Courses">
-            <div className="flex w-full items-center justify-center gap-4">
+            <div className="relative mx-auto flex flex-col items-center justify-center gap-4 lg:w-fit lg:flex-row">
               <CourseDropdown
-                className="max-w-[30rem]"
                 courses={allCourses}
                 loading={loadingCourses}
+                className="lg:w-[30rem]"
               />
-              <Button label="Search" onClick={handleFetchCourseDetails} />
+              <Button
+                label="Search"
+                onClick={handleFetchCourseDetails}
+                className="w-full justify-center lg:absolute lg:-right-[6rem] lg:w-auto"
+              />
             </div>
           </Section>
 

@@ -148,11 +148,13 @@ const CourseDropdown = ({
           container: () => `w-full flex flex-col overflow-visible ${className}`,
           menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
           control: () => "flex",
+          input: () => "sm:py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
           noOptionsMessage: () => "p-4 text-text-light",
           loadingMessage: () => "p-4 text-text-light",
+          placeholder: () => "text-nowrap text-elipsis",
         }}
         isLoading={loading}
         name="course"
