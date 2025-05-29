@@ -1,0 +1,43 @@
+name: Reset Staging Branch
+
+on:
+  push:
+    branches:
+      - main
+
+# Add permissions for the GITHUB_TOKEN
+permissions:
+  contents: write # Needed for pushing to branches
+  pull-requests: write # If you need to interact with PRs
+
+jobs:
+  reset-staging:
+    name: Reset Staging Branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          # Use PAT instead of GITHUB_TOKEN for increased permissions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Git Identity
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Delete and recreate staging branch
+        run: |
+          # Check if staging branch exists
+          if git ls-remote --heads origin staging | grep staging; then
+            echo "Deleting existing staging branch"
+            git push origin --delete staging
+          fi
+
+          echo "Creating new staging branch from main"
+          git checkout main
+          git pull origin main
+          git checkout -b staging
+          git push origin staging
