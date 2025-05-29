@@ -1,7 +1,7 @@
 "use client";
 
 import { Toast } from "primereact/toast";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
 import Button from "@/components/Button";
@@ -44,18 +44,23 @@ type SectionProps = {
   className?: string;
 };
 
-const Section = ({ title, children, className }: SectionProps) => {
-  return (
-    <div
-      className={`flex flex-col rounded-md border border-border bg-foreground`}
-    >
-      <h1 className="border-b border-border px-5 py-3 text-lg font-bold text-text-dark">
-        {title}
-      </h1>
-      <div className={`w-full p-8 ${className}`}>{children}</div>
-    </div>
-  );
-};
+const Section = React.forwardRef<HTMLDivElement, SectionProps>(
+  ({ title, children, className }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={`flex flex-col rounded-md border border-border bg-foreground`}
+      >
+        <h1 className="border-b border-border px-5 py-3 text-lg font-bold text-text-dark">
+          {title}
+        </h1>
+        <div className={`w-full p-8 ${className}`}>{children}</div>
+      </div>
+    );
+  },
+);
+
+Section.displayName = "Section";
 
 const COLORS: {
   backgroundColor: string;
@@ -77,6 +82,7 @@ const COLORS: {
 
 export default function Home() {
   const toast = useRef<Toast>(null);
+  const scheduleRef = useRef<HTMLDivElement>(null);
 
   const [loadingQuarters, setLoadingQuarters] = useState(false);
   const [loadingCourses, setLoadingCourses] = useState(false);
@@ -288,11 +294,16 @@ export default function Home() {
         const coloredSchedules = updateScheduleColors(formattedEvents);
         setSchedules(coloredSchedules);
         setCurrSchedule(coloredSchedules[0]);
+
+        // Scroll to schedule section after a short delay to ensure rendering is complete
+        setTimeout(() => {
+          scheduleRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       };
 
       fetchSchedule();
     },
-    [],
+    [scheduleRef],
   );
 
   // Function to update schedule colors
@@ -373,6 +384,7 @@ export default function Home() {
       {/* Quarter Selection */}
       <Section title="Select a quarter">
         <DropdownSelect
+          className="mx-auto lg:max-w-[30rem]"
           loading={loadingQuarters}
           options={allQuarters.map((quarter) => ({
             label: quarterNameToString(quarter.name),
@@ -390,13 +402,17 @@ export default function Home() {
         <>
           {/* Course Selection */}
           <Section title="Select Your Courses">
-            <div className="flex w-full items-center justify-center gap-4">
+            <div className="relative mx-auto flex flex-col items-center justify-center gap-4 lg:w-fit lg:flex-row">
               <CourseDropdown
-                className="max-w-[30rem]"
                 courses={allCourses}
                 loading={loadingCourses}
+                className="lg:w-[30rem]"
               />
-              <Button label="Search" onClick={handleFetchCourseDetails} />
+              <Button
+                label="Search"
+                onClick={handleFetchCourseDetails}
+                className="w-full justify-center lg:absolute lg:-right-[6rem] lg:w-auto"
+              />
             </div>
           </Section>
 
@@ -432,7 +448,11 @@ export default function Home() {
 
           {/* Schedule Display */}
           {algorithmRan && schedules.length > 0 && (
-            <Section title="Possible Schedules" className="flex flex-col gap-4">
+            <Section
+              title="Possible Schedules"
+              className="flex flex-col gap-4"
+              ref={scheduleRef}
+            >
               <div className="flex w-full flex-wrap gap-4 rounded-md border border-border p-2">
                 {schedules.map((curr) => (
                   <div
@@ -443,15 +463,11 @@ export default function Home() {
                         ? curr.backgroundColor
                         : currSchedule && currSchedule.id === curr.id
                           ? currSchedule.backgroundColor
-                            ? currSchedule.backgroundColor
-                            : "#E3F8FF"
                           : "#F6F6F6",
                       color: curr.pinned
                         ? curr.textColor
                         : currSchedule && currSchedule.id === curr.id
                           ? currSchedule.textColor
-                            ? currSchedule.textColor
-                            : "#1992D4"
                           : "#627D98",
                     }}
                   >
@@ -529,8 +545,6 @@ export default function Home() {
                               ? curr.textColor
                               : currSchedule && currSchedule.id === curr.id
                                 ? currSchedule.textColor
-                                  ? currSchedule.textColor
-                                  : "#1992D4"
                                 : "#627D98"
                           }
                         />
@@ -543,8 +557,6 @@ export default function Home() {
                               ? curr.textColor
                               : currSchedule && currSchedule.id === curr.id
                                 ? currSchedule.textColor
-                                  ? currSchedule.textColor
-                                  : "#1992D4"
                                 : "#627D98"
                           }
                         />

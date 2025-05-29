@@ -45,8 +45,30 @@ const Control = ({
   children,
   ...props
 }: ControlProps<{ label: string; value: Course }, true>) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Call the original onMouseDown if it exists
+    props.innerProps.onMouseDown?.(e);
+
+    // Find and focus the input element
+    setTimeout(() => {
+      const inputElement = document.querySelector(".react-select__input input");
+      if (inputElement instanceof HTMLInputElement) {
+        inputElement.focus();
+      }
+    }, 10);
+  };
+
   return (
-    <components.Control {...props}>
+    <components.Control
+      {...props}
+      innerProps={{ ...props.innerProps, onMouseDown: handleMouseDown }}
+      selectProps={{
+        ...props.selectProps,
+        onChange: (c, action) => {
+          props.selectProps.onChange?.(c, action);
+        },
+      }}
+    >
       <div className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-text-light bg-foreground px-3 py-2 hover:cursor-pointer">
         <Search size={18} />
         {children}
@@ -125,12 +147,14 @@ const CourseDropdown = ({
         classNames={{
           container: () => `w-full flex flex-col overflow-visible ${className}`,
           menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
-          input: () => "py-1",
+          control: () => "flex",
+          input: () => "sm:py-1",
           valueContainer: () => "flex flex-row items-center gap-2",
           multiValue: () =>
             "bg-background text-text-light border border-text-light rounded-3xl px-2",
           noOptionsMessage: () => "p-4 text-text-light",
           loadingMessage: () => "p-4 text-text-light",
+          placeholder: () => "text-nowrap text-elipsis",
         }}
         isLoading={loading}
         name="course"
@@ -138,16 +162,17 @@ const CourseDropdown = ({
           label: `${course.subject} ${course.code}`,
           value: course,
         }))}
-        onChange={(e) => {
-          if (!e) {
+        onChange={(cArr) => {
+          // If no courses are selected, clear the selection
+          if (!cArr) {
             setSelectedCourses([]);
             return;
           }
 
           // Limit to maxCourses
-          if (e.length > maxCourses) return;
+          if (cArr.length > maxCourses) return;
 
-          setSelectedCourses(e.map((course) => course.value));
+          setSelectedCourses(cArr.map((course) => course.value));
         }}
         options={courses.map((course) => ({
           label: `${course.subject} ${course.code}`,
@@ -165,11 +190,13 @@ const CourseDropdown = ({
           ClearIndicator,
           DropdownIndicator: () => null,
         }}
-        placeholder="eg. BILD, BILD 3, or CSE 101"
+        placeholder={"eg. BILD, BILD 3, or CSE 101"}
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
         blurInputOnSelect={false}
         tabSelectsValue={false}
+        openMenuOnFocus={false}
+        openMenuOnClick={false}
         isSearchable
         isClearable
         isMulti
