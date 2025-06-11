@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev": "vercel dev --local-config vercel.dev.json",
     "build": "pnpm --filter frontend run build",

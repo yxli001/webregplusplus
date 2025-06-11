@@ -6,7 +6,7 @@ import SelectDropdown from "@/components/DropdownSelect";
 import {
   useCoursePreference,
   usePreferenceStore,
-} from "@/store/preferenceStore";
+} from "@/hooks/usePreferenceStore";
 import { CourseWithSections } from "@/types/course";
 
 const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
