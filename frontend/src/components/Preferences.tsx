@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import Checkbox from "./Checkbox";
 import DaysSelect from "./DaysSelect";
-import SelectDropdown from "./DropdownSelect";
+import DropdownSelect from "./DropdownSelect";
 import TimeRangeSlider from "./TimeRangeSlider";
 import TimeSlotEditor from "./TimeSlotEditor";
 
@@ -52,7 +52,7 @@ const Preferences = () => {
           </div>
           {showSpacing && (
             <div className="pl-6">
-              <SelectDropdown
+              <DropdownSelect
                 options={spreadOptions}
                 value={schedulePreferences.spread}
                 onChange={(value) => {
@@ -61,6 +61,7 @@ const Preferences = () => {
                   });
                 }}
                 placeholder="Select spacing preference"
+                closeOnSelect
               />
             </div>
           )}
