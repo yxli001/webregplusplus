@@ -6,6 +6,7 @@ import "./globals.css";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Navbar from "@/components/Navbar";
+import { PreferenceStoreProvider } from "@/providers/PreferenceStoreProvider";
 
 export const metadata: Metadata = {
   title: "Webreg++ | Smarter UCSD Class Scheduling",
@@ -68,12 +69,14 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
-        <PrimeReactProvider>
-          <Navbar />
-          <div className="mx-auto flex w-[80%] flex-col items-center py-10">
-            {children}
-          </div>
-        </PrimeReactProvider>
+        <PreferenceStoreProvider>
+          <PrimeReactProvider>
+            <Navbar />
+            <div className="mx-auto flex w-[80%] flex-col items-center py-10">
+              {children}
+            </div>
+          </PrimeReactProvider>
+        </PreferenceStoreProvider>
       </body>
     </html>
   );

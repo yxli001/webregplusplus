@@ -1,5 +1,4 @@
-import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
 
 import { Course, CourseWithSections } from "@/types/course";
 import { SpreadPreference } from "@/types/preferences";
@@ -28,13 +27,14 @@ export type SchedulePreferences = {
   allowedConflicts: Set<string>; // Array of sets of course IDs
 };
 
-type PreferenceState = {
+export type PreferenceState = {
   selectedCourses: Course[];
   courseDetails: CourseWithSections[];
   coursePreferences: CoursePreferences[];
   schedulePreferences: SchedulePreferences;
+};
 
-  // Actions
+export type PreferenceActions = {
   setSelectedCourses: (courses: Course[]) => void;
   setCourseDetails: (details: CourseWithSections[]) => void;
   removeCourse: (id: string) => void;
@@ -42,27 +42,32 @@ type PreferenceState = {
     id: string,
     update: Partial<CoursePreferences>,
   ) => void;
-
-  // Schedule Preferences Actions
   updateSchedulePreferences: (update: Partial<SchedulePreferences>) => void;
 };
 
-export const usePreferenceStore = create(
-  subscribeWithSelector<PreferenceState>((set) => ({
-    selectedCourses: [],
-    courseDetails: [],
-    coursePreferences: [],
+export type PreferenceStore = PreferenceState & PreferenceActions;
 
-    // Schedule Preferences - Initial Values
-    schedulePreferences: {
-      spread: "neutral",
-      avoidBackToBack: false,
-      excludedTimeSlots: [],
-      preferredDays: [],
-      preferredStart: "08:00",
-      preferredEnd: "22:00",
-      allowedConflicts: new Set([]),
-    },
+const initialPreferences: PreferenceState = {
+  selectedCourses: [],
+  courseDetails: [],
+  coursePreferences: [],
+
+  schedulePreferences: {
+    spread: "neutral",
+    avoidBackToBack: false,
+    excludedTimeSlots: [],
+    preferredDays: [],
+    preferredStart: "08:00",
+    preferredEnd: "22:00",
+    allowedConflicts: new Set([]),
+  },
+};
+
+export const createPreferenceStore = (
+  initState: PreferenceState = initialPreferences,
+) => {
+  return createStore<PreferenceStore>((set) => ({
+    ...initState,
 
     setSelectedCourses: (courses) => {
       set(() => ({
@@ -134,10 +139,5 @@ export const usePreferenceStore = create(
         },
       }));
     },
-  })),
-);
-
-export const useCoursePreference = (courseId: string) =>
-  usePreferenceStore((state) =>
-    state.coursePreferences.find((pref) => pref.courseId === courseId),
-  );
+  }));
+};

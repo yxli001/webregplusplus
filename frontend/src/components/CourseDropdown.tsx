@@ -11,10 +11,10 @@ import Select, {
   createFilter,
 } from "react-select";
 
+import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Check from "@/icons/Check";
 import Cross from "@/icons/Cross";
 import Search from "@/icons/Search";
-import { usePreferenceStore } from "@/store/preferenceStore";
 import { Course } from "@/types/course";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles

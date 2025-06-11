@@ -6,7 +6,7 @@ import SelectDropdown from "./DropdownSelect";
 import TimeRangeSlider from "./TimeRangeSlider";
 import TimeSlotEditor from "./TimeSlotEditor";
 
-import { usePreferenceStore } from "@/store/preferenceStore";
+import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import { SpreadPreference } from "@/types/preferences";
 
 const spreadOptions = [
