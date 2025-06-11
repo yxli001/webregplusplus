@@ -11,6 +11,7 @@ import DropdownSelect from "@/components/DropdownSelect";
 import PageLoading from "@/components/PageLoading";
 import PreferencesComponent from "@/components/Preferences";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
+import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Calendar from "@/icons/Calendar";
 import Pin from "@/icons/Pin";
 import PinFill from "@/icons/PinFill";
@@ -18,7 +19,6 @@ import generateOptimalSchedule from "@/lib/scheduler";
 import {
   CoursePreferences,
   SchedulePreferences,
-  usePreferenceStore,
 } from "@/store/preferenceStore";
 import { CalEvent, CalSchedule } from "@/types/calendar";
 import {

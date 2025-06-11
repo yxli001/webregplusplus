@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-node@v3
       - uses: pnpm/action-setup@v4
         with:
-          version: 10.11.0
+          version: 10.12.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/setup-node@v3
       - uses: pnpm/action-setup@v4
         with:
-          version: 10.11.0
+          version: 10.12.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
