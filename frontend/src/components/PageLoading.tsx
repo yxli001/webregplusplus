@@ -10,7 +10,7 @@ const PageLoading: React.FC<PageLoadingProps> = ({ loading }) => {
   }
 
   return (
-    <div className="absolute left-0 top-0 z-40 flex h-screen w-screen items-center justify-center bg-black/30">
+    <div className="absolute top-0 left-0 z-40 flex h-screen w-screen items-center justify-center bg-black/30">
       <ProgressSpinner
         className="z-50 h-20 w-20"
         strokeWidth="5"

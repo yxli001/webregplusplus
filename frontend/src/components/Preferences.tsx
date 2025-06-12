@@ -7,7 +7,7 @@ import TimeRangeSlider from "./TimeRangeSlider";
 import TimeSlotEditor from "./TimeSlotEditor";
 
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
-import { SpreadPreference } from "@/types/preferences";
+import type { SpreadPreference } from "@/types/preferences";
 
 const spreadOptions = [
   { label: "Really Spread Out", value: "really-spread-out" },

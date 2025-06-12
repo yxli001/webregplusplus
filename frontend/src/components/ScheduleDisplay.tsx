@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 
-import { CalEvent } from "@/types/calendar";
+import type { CalEvent } from "@/types/calendar";
 
 type ScheduleDisplayProps = {
   events: CalEvent[];
@@ -52,7 +52,7 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
 
               {/* Text content */}
               <div className="leading-[1.2]">
-                <div className="text-[0.6rem] font-semibold">
+                <div className="font-semibold text-[0.6rem]">
                   {title} |{" "}
                   <span className="font-semibold">
                     {extendedProps.lecture}

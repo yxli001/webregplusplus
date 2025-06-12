@@ -140,7 +140,7 @@ const DropdownSelect = ({
       </div>
     ))
   ) : (
-    <div className="p-2 text-base italic text-gray-500">
+    <div className="p-2 text-base text-gray-500 italic">
       No options available
     </div>
   );

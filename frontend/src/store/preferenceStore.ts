@@ -1,7 +1,7 @@
 import { createStore } from "zustand/vanilla";
 
-import { Course, CourseWithSections } from "@/types/course";
-import { SpreadPreference } from "@/types/preferences";
+import type { Course, CourseWithSections } from "@/types/course";
+import type { SpreadPreference } from "@/types/preferences";
 
 type TimeSlot = {
   id: string;

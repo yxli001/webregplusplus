@@ -67,13 +67,13 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
       onClose={handleClose}
       className="flex max-w-md flex-col gap-2 rounded-lg p-6"
     >
-      <h2 className="mb-4 text-xl font-semibold text-text-dark">
+      <h2 className="mb-4 font-semibold text-text-dark text-xl">
         Edit Time Slot
       </h2>
 
       {/* Days Selection */}
       <div className="mb-4">
-        <label className="mb-2 block text-sm font-medium text-text-dark">
+        <label className="mb-2 block font-medium text-sm text-text-dark">
           Days
         </label>
         <DaysSelect value={selectedDays} onChange={setSelectedDays} />
@@ -82,7 +82,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
       {/* Time Selection */}
       <div className="mb-2 grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-2 block text-sm font-medium text-text-dark">
+          <label className="mb-2 block font-medium text-sm text-text-dark">
             Start Time
           </label>
           <input
@@ -95,7 +95,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-medium text-text-dark">
+          <label className="mb-2 block font-medium text-sm text-text-dark">
             End Time
           </label>
           <input
@@ -111,7 +111,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
 
       {/* Time Validation Message */}
       {startTime && endTime && !isValidTimeRange && (
-        <p className="mb-4 text-sm text-red-500">
+        <p className="mb-4 text-red-500 text-sm">
           End time must be after start time
         </p>
       )}
@@ -120,7 +120,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
       <div className="flex justify-end gap-2">
         <button
           onClick={handleClose}
-          className="hover:text-text-darker px-4 py-2 text-text-dark"
+          className="px-4 py-2 text-text-dark hover:text-text-darker"
         >
           Cancel
         </button>

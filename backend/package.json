@@ -12,8 +12,8 @@
     "cron-dev": "cross-env NODE_ENV=development ts-node src/cron.ts",
     "cron-staging": "cross-env NODE_ENV=staging ts-node src/cron.ts",
     "cron": "cross-env NODE_ENV=production ts-node src/cron.ts",
-    "lint-check": "eslint . && prettier --check .",
-    "lint-fix": "eslint . --fix && prettier --write .",
+    "lint-check": "pnpm biome format ./ && pnpm biome lint ./",
+    "lint-fix": "pnpm biome check --write ./",
     "prepare": "cd .. && husky",
     "check-git-hooks": "cd .. && node .secret-scan/secret-scan.js -- --check-git-hooks"
   },
@@ -21,24 +21,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@eslint/js": "^9.27.0",
+    "@biomejs/biome": "1.9.4",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/http-errors": "^2.0.4",
     "@types/node": "^22.13.0",
     "@types/pg": "^8.15.2",
     "cross-env": "^7.0.3",
-    "eslint": "^9.27.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^5.4.0",
     "globals": "^15.15.0",
     "husky": "^9.1.7",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.32.1"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "cors": "^2.8.5",

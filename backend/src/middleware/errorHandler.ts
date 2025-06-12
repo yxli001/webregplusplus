@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
 import { serverLogger } from "../util/logger";

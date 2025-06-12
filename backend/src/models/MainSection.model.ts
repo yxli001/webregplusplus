@@ -1,4 +1,4 @@
-import { Optional } from "sequelize";
+import type { Optional } from "sequelize";
 import {
   AllowNull,
   BelongsTo,
@@ -15,8 +15,7 @@ import {
   UpdatedAt,
 } from "sequelize-typescript";
 
-import { MainSectionType } from "../types";
-
+import type { MainSectionType } from "../types";
 import Course from "./Course.model";
 import Exam from "./Exam.model";
 import SubSection from "./SubSection.model";

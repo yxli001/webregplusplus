@@ -16,12 +16,12 @@ import Calendar from "@/icons/Calendar";
 import Pin from "@/icons/Pin";
 import PinFill from "@/icons/PinFill";
 import generateOptimalSchedule from "@/lib/scheduler";
-import {
+import type {
   CoursePreferences,
   SchedulePreferences,
 } from "@/store/preferenceStore";
-import { CalEvent, CalSchedule } from "@/types/calendar";
-import {
+import type { CalEvent, CalSchedule } from "@/types/calendar";
+import type {
   Course,
   CourseWithSections,
   MainSection,
@@ -51,7 +51,7 @@ const Section = React.forwardRef<HTMLDivElement, SectionProps>(
         ref={ref}
         className={`flex flex-col rounded-md border border-border bg-foreground`}
       >
-        <h1 className="border-b border-border px-5 py-3 text-lg font-bold text-text-dark">
+        <h1 className="border-border border-b px-5 py-3 font-bold text-lg text-text-dark">
           {title}
         </h1>
         <div className={`w-full p-8 ${className}`}>{children}</div>
@@ -411,7 +411,7 @@ export default function Home() {
               <Button
                 label="Search"
                 onClick={handleFetchCourseDetails}
-                className="w-full justify-center lg:absolute lg:-right-[6rem] lg:w-auto"
+                className="lg:-right-[6rem] w-full justify-center lg:absolute lg:w-auto"
               />
             </div>
           </Section>
@@ -457,7 +457,7 @@ export default function Home() {
                 {schedules.map((curr) => (
                   <div
                     key={curr.id}
-                    className="flex items-center rounded-md text-[16px] font-semibold hover:cursor-pointer"
+                    className="flex items-center rounded-md font-semibold text-[16px] hover:cursor-pointer"
                     style={{
                       backgroundColor: curr.pinned
                         ? curr.backgroundColor
@@ -500,7 +500,7 @@ export default function Home() {
                       }}
                     >{`Option ${curr.id}`}</div>
                     <div
-                      className="py-2 pl-2 pr-3"
+                      className="py-2 pr-3 pl-2"
                       onClick={() => {
                         const newSchedules = schedules.map((schedule) => {
                           if (schedule.id === curr.id) {

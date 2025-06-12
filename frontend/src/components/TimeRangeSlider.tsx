@@ -1,4 +1,4 @@
-import { Slider, SliderChangeEvent } from "primereact/slider";
+import { Slider, type SliderChangeEvent } from "primereact/slider";
 
 type TimeRangeSliderProps = {
   startTime: string; // 24-hour format HH:mm

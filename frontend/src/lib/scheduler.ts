@@ -7,8 +7,8 @@ import {
 } from "../util/helper";
 import { parseScheduleEntry } from "../util/helper";
 
-import { SchedulePreferences } from "@/store/preferenceStore";
-import { Exam, MainSection, SubSection } from "@/types/course";
+import type { SchedulePreferences } from "@/store/preferenceStore";
+import type { Exam, MainSection, SubSection } from "@/types/course";
 
 const START_TIME = 8 * 60;
 const TIME_INTERVAL = 10;

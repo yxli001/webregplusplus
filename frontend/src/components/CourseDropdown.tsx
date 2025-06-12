@@ -2,11 +2,11 @@
 
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Select, {
-  ClearIndicatorProps,
-  ControlProps,
-  OptionProps,
+  type ClearIndicatorProps,
+  type ControlProps,
+  type OptionProps,
   components,
   createFilter,
 } from "react-select";
@@ -15,7 +15,7 @@ import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Check from "@/icons/Check";
 import Cross from "@/icons/Cross";
 import Search from "@/icons/Search";
-import { Course } from "@/types/course";
+import type { Course } from "@/types/course";
 
 // EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
 const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
@@ -81,7 +81,6 @@ const Control = ({
 const Option = ({
   ...props
 }: OptionProps<{ label: string; value: Course }, true>) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { onMouseMove, onMouseOver, ...rest } = props.innerProps;
   const newProps = { ...props, innerProps: rest };
 

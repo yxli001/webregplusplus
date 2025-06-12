@@ -1,11 +1,9 @@
-import path from "path";
-
+import path from "node:path";
 import pg from "pg";
-import { Sequelize, SequelizeOptions } from "sequelize-typescript";
+import { Sequelize, type SequelizeOptions } from "sequelize-typescript";
 
 import { dbLogger, serverLogger } from "../util/logger";
 import env from "../util/validateEnv";
-
 import { envType } from "./envConfig";
 
 export const connectDB = async (): Promise<Sequelize> => {
@@ -14,7 +12,7 @@ export const connectDB = async (): Promise<Sequelize> => {
       models: [path.join(__dirname, "../models/*.model.{ts,js}")],
       dialect: "postgres",
       host: env.POSTGRES_HOST,
-      port: parseInt(env.POSTGRES_PORT),
+      port: Number.parseInt(env.POSTGRES_PORT),
       database: env.POSTGRES_DB,
       username: env.POSTGRES_USER,
       password: env.POSTGRES_PASSWORD,
@@ -47,7 +45,7 @@ export const connectDB = async (): Promise<Sequelize> => {
 
     return sequelize;
   } catch (error) {
-    serverLogger.error("Database connection error:" + (error as Error).stack);
+    serverLogger.error(`Database connection error:${(error as Error).stack}`);
     process.exit(1);
   }
 };

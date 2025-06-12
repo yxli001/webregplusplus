@@ -7,7 +7,7 @@ import {
   useCoursePreference,
   usePreferenceStore,
 } from "@/hooks/usePreferenceStore";
-import { CourseWithSections } from "@/types/course";
+import type { CourseWithSections } from "@/types/course";
 
 const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
   const pref = useCoursePreference(course.id)!;
@@ -184,7 +184,7 @@ const CourseCard = memo(({ course }: { course: CourseWithSections }) => {
           className="h-5 w-5 p-1"
           onChange={toggleIncluded}
         />
-        <h1 className="text-xl font-medium uppercase text-text-dark sm:text-2xl">
+        <h1 className="font-medium text-text-dark text-xl uppercase sm:text-2xl">
           {course.subject} {course.code}
         </h1>
       </div>

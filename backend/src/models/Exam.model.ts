@@ -1,4 +1,4 @@
-import { Optional } from "sequelize";
+import type { Optional } from "sequelize";
 import {
   AllowNull,
   BelongsTo,
@@ -13,8 +13,7 @@ import {
   UpdatedAt,
 } from "sequelize-typescript";
 
-import { ExamType } from "../types";
-
+import type { ExamType } from "../types";
 import MainSection from "./MainSection.model";
 
 // All attributes

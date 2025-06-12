@@ -89,7 +89,7 @@ const Modal = (props: ModalProps): React.JSX.Element => {
   return (
     // backdrop
     <div
-      className={`absolute left-0 top-0 flex h-[100vh] w-[100vw] items-center justify-center ${
+      className={`absolute top-0 left-0 flex h-[100vh] w-[100vw] items-center justify-center ${
         !disableClose && "hover:cursor-pointer"
       } z-50 transition`}
       style={{
@@ -106,7 +106,7 @@ const Modal = (props: ModalProps): React.JSX.Element => {
       >
         {!disableClose && (
           <Cross
-            className="hover:text-primary absolute right-2 top-2 transition hover:cursor-pointer"
+            className="absolute top-2 right-2 transition hover:cursor-pointer hover:text-primary"
             size={20}
             onClick={() => {
               props.onClose();

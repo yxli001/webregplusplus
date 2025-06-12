@@ -1,7 +1,7 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import "winston-daily-rotate-file";
-import fs from "fs";
-import os from "os";
-import path from "path";
 
 import { createLogger, format, transports } from "winston";
 
@@ -31,7 +31,7 @@ const serverLogger = createLogger({
 
     // file-rotate into /tmp/logs on Vercel, or ./logs locally
     new transports.DailyRotateFile({
-      filename: baseLogDir + "/server-%DATE%.log",
+      filename: `${baseLogDir}/server-%DATE%.log`,
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",
@@ -52,7 +52,7 @@ const dbLogger = createLogger({
   ),
   transports: [
     new transports.DailyRotateFile({
-      filename: baseLogDir + "/db-%DATE%.log",
+      filename: `${baseLogDir}/db-%DATE%.log`,
       datePattern: "YYYY-MM-DD",
       maxSize: "10m",
       maxFiles: "14d",
@@ -62,4 +62,4 @@ const dbLogger = createLogger({
   ],
 });
 
-export { serverLogger, dbLogger };
+export { dbLogger, serverLogger };

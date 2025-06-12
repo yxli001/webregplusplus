@@ -1,4 +1,4 @@
-import { Result, ValidationError } from "express-validator";
+import type { Result, ValidationError } from "express-validator";
 
 /**
  * Parses through errors thrown by validator (if any exist). Error messages are
@@ -12,7 +12,7 @@ const validationErrorParser = (errors: Result<ValidationError>): string => {
   if (!errors.isEmpty()) {
     // parse through errors returned by the validator and append them to the error string
     for (const error of errors.array()) {
-      errorString += error.msg + " ";
+      errorString += `${error.msg} `;
     }
   }
   return errorString;

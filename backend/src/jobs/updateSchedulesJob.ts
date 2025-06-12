@@ -1,11 +1,11 @@
-import { Sequelize } from "sequelize";
+import type { Sequelize } from "sequelize";
 
 import Course from "../models/Course.model";
 import Exam from "../models/Exam.model";
 import MainSection from "../models/MainSection.model";
 import QuarterModel from "../models/Quarter.model";
 import SubSection from "../models/SubSection.model";
-import { Quarter } from "../types";
+import type { Quarter } from "../types";
 import { serverLogger } from "../util/logger";
 import { scrapeSchedule } from "../util/scraper";
 
@@ -24,7 +24,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
     }
 
     serverLogger.info(
-      "Scraped schedule data:" + JSON.stringify(quarters.map((q) => q.name)),
+      `Scraped schedule data:${JSON.stringify(quarters.map((q) => q.name))}`,
     );
 
     await saveQuarters(sequelize, quarters);
@@ -32,7 +32,7 @@ const updateSchedules = async (sequelize: Sequelize) => {
     // Log success
     serverLogger.info("Update schedules job completed successfully");
   } catch (error) {
-    serverLogger.error("Error updating schedules:" + (error as Error).stack);
+    serverLogger.error(`Error updating schedules:${(error as Error).stack}`);
 
     // Rethrow the error so the caller (cron.js) can catch it and handle retries
     throw error;
@@ -160,7 +160,7 @@ const saveQuarters = async (sequelize: Sequelize, quarters: Quarter[]) => {
     await t.rollback();
 
     serverLogger.error(
-      "Schedule update failed, rolled back:" + (error as Error).stack,
+      `Schedule update failed, rolled back:${(error as Error).stack}`,
     );
 
     throw new Error("Database update failed");

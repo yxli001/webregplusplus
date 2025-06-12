@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, createContext, useRef } from "react";
+import { type ReactNode, createContext, useRef } from "react";
 
 import { createPreferenceStore } from "@/store/preferenceStore";
 

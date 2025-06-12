@@ -159,6 +159,7 @@ dist
 *.log*
 
 # IDE
+.vscode
 !.vscode/extensions.json
 .idea
 frontend/src/app/lib/dummy_courses.ts

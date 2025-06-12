@@ -30,7 +30,7 @@ const main = async () => {
     console.log("Job completed successfully");
     process.exit(0);
   } catch (error) {
-    console.error("Fatal error in cron job: " + (error as Error).stack);
+    console.error(`Fatal error in cron job: ${(error as Error).stack}`);
     process.exit(1);
   }
 };

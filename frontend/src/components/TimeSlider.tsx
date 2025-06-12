@@ -52,7 +52,7 @@ const TimeSlider = ({
           }}
         />
         <div
-          className="absolute h-4 w-4 -translate-y-1.5 rounded-full bg-primary-light"
+          className="-translate-y-1.5 absolute h-4 w-4 rounded-full bg-primary-light"
           style={{
             left: `calc(${((value - min) / (max - min)) * 100}% - 0.5rem)`,
           }}

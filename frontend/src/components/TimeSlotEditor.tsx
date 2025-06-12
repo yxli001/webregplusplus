@@ -68,7 +68,7 @@ const TimeSlotEditor = ({
             key={slot.id}
             className="flex items-center justify-between rounded-lg border border-border px-2 py-1"
           >
-            <div className="text-md flex items-center gap-4">
+            <div className="flex items-center gap-4 text-md">
               <span>{slot.days}</span>
               <span>
                 {slot.startTime} - {slot.endTime}

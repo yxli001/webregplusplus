@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { useStore } from "zustand";
 
 import { PreferenceStoreContext } from "@/providers/PreferenceStoreProvider";
-import { PreferenceStore } from "@/store/preferenceStore";
+import type { PreferenceStore } from "@/store/preferenceStore";
 
 export const usePreferenceStore = <T>(
   selector: (store: PreferenceStore) => T,

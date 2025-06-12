@@ -1,12 +1,12 @@
-import puppeteer, { Browser } from "puppeteer";
+import puppeteer, { type Browser } from "puppeteer";
 
 import {
-  Course,
-  ExamType,
-  MainSection,
+  type Course,
+  type ExamType,
+  type MainSection,
   MainSectionType,
-  Quarter,
-  SubSection,
+  type Quarter,
+  type SubSection,
   SubSectionType,
 } from "../types";
 import { serverLogger } from "../util/logger";
@@ -88,9 +88,9 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
           "select#selectedSubjects option",
         );
 
-        subjectOptions.forEach((option) => {
+        for (const option of subjectOptions) {
           (option as HTMLOptionElement).selected = true;
-        });
+        }
       });
 
       serverLogger.info("Waiting for checkboxes to load...");
@@ -101,9 +101,9 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
         const checkboxes = document.querySelectorAll(
           "input[id^='schedOption']",
         );
-        checkboxes.forEach((checkbox) => {
+        for (const checkbox of checkboxes) {
           (checkbox as HTMLInputElement).checked = true;
-        });
+        }
       });
 
       serverLogger.info("Searching...");
@@ -119,7 +119,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
           return 1;
         }
 
-        return parseInt(
+        return Number.parseInt(
           pageNumbers.textContent
             ?.substring(
               pageNumbers.textContent.indexOf("of") + 3,
@@ -141,8 +141,8 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
 
         const pages = await Promise.all(
           Array.from({ length: batchEnd - batchStart }, async (_, i) => {
-            const newPage = await browser!.newPage();
-            await newPage.goto(
+            const newPage = await browser?.newPage();
+            await newPage?.goto(
               `${SCHEDULE_OF_CLASSES_RESULT_URL}?page=${batchStart + i + 1}`,
               {
                 waitUntil: "domcontentloaded",
@@ -154,7 +154,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
 
         const pageCoursesArray = await Promise.all(
           pages.map((currPage) =>
-            currPage.evaluate(
+            currPage?.evaluate(
               (MSType, SSType) => {
                 const unacceptableSections = ["IT"];
 
@@ -237,7 +237,12 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                     const sectionId = (cells[2].textContent || "").trim();
                     const sectionType = (cells[3].textContent || "").trim();
                     const sectionCode = (cells[4].textContent || "").trim();
-                    let days, startTime, endTime, instructor, location;
+
+                    let days: string;
+                    let startTime: string;
+                    let endTime: string;
+                    let instructor: string;
+                    let location: string;
 
                     // Not a section type we care about
                     if (unacceptableSections.includes(sectionType)) continue;
@@ -250,7 +255,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                       location = "TBA";
                       instructor = (
                         (cells[6].querySelector("a")
-                          ? cells[6].querySelector("a")!.textContent
+                          ? cells[6].querySelector("a")?.textContent
                           : cells[6].textContent) || ""
                       ).trim();
                     }
@@ -263,7 +268,7 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
                       days = (cells[5].textContent || "").trim();
                       instructor = (
                         (cells[9].querySelector("a")
-                          ? cells[9].querySelector("a")!.textContent
+                          ? cells[9].querySelector("a")?.textContent
                           : cells[9].textContent) || ""
                       ).trim();
                       location = `${(cells[7].textContent || "").trim()} ${(cells[8].textContent || "").trim()}`;
@@ -352,10 +357,14 @@ export async function scrapeSchedule(): Promise<Quarter[]> {
           ),
         );
 
-        currQuarter.courses.push(...pageCoursesArray.flat());
+        currQuarter.courses.push(
+          ...pageCoursesArray
+            .flat()
+            .filter((c): c is Course => c !== undefined),
+        );
 
         // Close the pages after processing
-        await Promise.all(pages.map((p) => p.close()));
+        await Promise.all(pages.map((p) => p?.close()));
       }
 
       // Remove duplicate courses

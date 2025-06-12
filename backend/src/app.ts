@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-
 import errorHandler from "./middleware/errorHandler";
 import { log } from "./middleware/logger";
 import courseRouter from "./routes/course.routes";

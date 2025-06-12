@@ -16,7 +16,8 @@ Try it live: [https://webregplusplus.tech](https://webregplusplus.tech)
 
 - Frontend: Next.js, TypeScript, TailwindCSS
 - Backend: Express.js, TypeScript, PostgreSQL
-- Deployment: Vercel (frontend)
+- Deployment: Vercel
+- Linting: Biome
 
 ## Project Structure
 
@@ -44,6 +45,47 @@ git clone https://github.com/yxli001/webregplusplus.git
 
 _Run in root directory_
 `pnpm install`
+
+### Formatting/Linting
+
+Ensure the **Biome** editor extension ([VSCode Extention Here](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)) is installed and enabled.
+
+Configure your editor to use Biome as a default formatter, and enable import organization using biome.
+
+If you're using VSCode, create a `.vscode` folder in the root directory and add the following configuration to a `.vscode/settings.json` file:
+
+```json
+{
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit"
+  },
+  "biome.enabled": true,
+  "biome.suggestInstallingGlobally": true,
+  "biome.requireConfiguration": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}
+```
+
+Now your files should format on save using the Biome configurations. And you can also run `pnpm run lint-check` and `pnpm run lint-fix` to lint & fix your formatting/code style issues.
 
 ### Environment variables
 

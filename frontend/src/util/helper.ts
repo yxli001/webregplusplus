@@ -1,6 +1,10 @@
-import { Schedule } from "@/lib/scheduler";
-import { CoursePreferences } from "@/store/preferenceStore";
-import { CourseWithSections, MainSection, SubSection } from "@/types/course";
+import type { Schedule } from "@/lib/scheduler";
+import type { CoursePreferences } from "@/store/preferenceStore";
+import type {
+  CourseWithSections,
+  MainSection,
+  SubSection,
+} from "@/types/course";
 
 export function timeToIndex(
   time: string,

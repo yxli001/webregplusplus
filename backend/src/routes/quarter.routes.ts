@@ -1,4 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
+import {
+  type NextFunction,
+  type Request,
+  type Response,
+  Router,
+} from "express";
 import asyncHandler from "express-async-handler";
 
 import Quarter from "../models/Quarter.model";
@@ -12,7 +17,7 @@ const quarterRouter = Router();
  */
 quarterRouter.get(
   "/",
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  asyncHandler(async (_req: Request, res: Response, next: NextFunction) => {
     try {
       // Get all courses
       const quarters = await Quarter.findAll();
