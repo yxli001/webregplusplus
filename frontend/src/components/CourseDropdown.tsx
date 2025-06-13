@@ -1,8 +1,6 @@
 "use client";
 
-import createCache from "@emotion/cache";
-import { CacheProvider } from "@emotion/react";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import Select, {
   ClearIndicatorProps,
   ControlProps,
@@ -16,29 +14,6 @@ import Check from "@/icons/Check";
 import Cross from "@/icons/Cross";
 import Search from "@/icons/Search";
 import { Course } from "@/types/course";
-
-// EmotionCacheProvider to ensure Emotion styles are inserted before Tailwind styles
-const EmotionCacheProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cache, setCache] = useState<ReturnType<typeof createCache> | null>(
-    null,
-  );
-
-  useEffect(() => {
-    // Create the Emotion cache with the insertion point
-    const emotionCache = createCache({
-      key: "with-tailwind",
-      insertionPoint: document.querySelector(
-        'meta[name="emotion-insertion-point"]',
-      ) as HTMLElement | undefined,
-    });
-    setCache(emotionCache);
-  }, []);
-
-  // Render children only after the cache is created
-  if (!cache) return null;
-
-  return <CacheProvider value={cache}>{children}</CacheProvider>;
-};
 
 // Custom control component
 const Control = ({
@@ -141,68 +116,78 @@ const CourseDropdown = ({
     (state) => state.setSelectedCourses,
   );
 
+  const courseOptions = useMemo(
+    () =>
+      courses.map((course) => ({
+        label: `${course.subject} ${course.code}`,
+        value: course,
+      })),
+    [courses],
+  );
+
+  const selectedOptions = useMemo(
+    () =>
+      selectedCourses.map((course) => ({
+        label: `${course.subject} ${course.code}`,
+        value: course,
+      })),
+    [selectedCourses],
+  );
+
   return (
-    <EmotionCacheProvider>
-      <Select
-        classNames={{
-          container: () => `w-full flex flex-col overflow-visible ${className}`,
-          menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
-          control: () => "flex",
-          input: () => "sm:py-1",
-          valueContainer: () => "flex flex-row items-center gap-2",
-          multiValue: () =>
-            "bg-background text-text-light border border-text-light rounded-3xl px-2",
-          noOptionsMessage: () => "p-4 text-text-light",
-          loadingMessage: () => "p-4 text-text-light",
-          placeholder: () => "text-nowrap text-elipsis",
-        }}
-        isLoading={loading}
-        name="course"
-        value={selectedCourses.map((course) => ({
-          label: `${course.subject} ${course.code}`,
-          value: course,
-        }))}
-        onChange={(cArr) => {
-          // If no courses are selected, clear the selection
-          if (!cArr) {
-            setSelectedCourses([]);
-            return;
-          }
+    <Select
+      classNames={{
+        container: () => `w-full flex flex-col overflow-visible ${className}`,
+        menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
+        control: () => "flex",
+        input: () => "sm:py-1",
+        valueContainer: () => "flex flex-row items-center gap-2",
+        multiValue: () =>
+          "bg-background text-text-light border border-text-light rounded-3xl px-2",
+        noOptionsMessage: () => "p-4 text-text-light",
+        loadingMessage: () => "p-4 text-text-light",
+        placeholder: () => "text-nowrap text-elipsis",
+      }}
+      isLoading={loading}
+      name="course"
+      value={selectedOptions}
+      onChange={(cArr) => {
+        // If no courses are selected, clear the selection
+        if (!cArr) {
+          setSelectedCourses([]);
+          return;
+        }
 
-          // Limit to maxCourses
-          if (cArr.length > maxCourses) return;
+        // Limit to maxCourses
+        if (cArr.length > maxCourses) return;
 
-          setSelectedCourses(cArr.map((course) => course.value));
-        }}
-        options={courses.map((course) => ({
-          label: `${course.subject} ${course.code}`,
-          value: course,
-        }))}
-        filterOption={createFilter({
-          ignoreAccents: false,
-          trim: true,
-          ignoreCase: true,
-          matchFrom: "any",
-        })}
-        components={{
-          Option,
-          Control,
-          ClearIndicator,
-          DropdownIndicator: () => null,
-        }}
-        placeholder={"eg. BILD, BILD 3, or CSE 101"}
-        closeMenuOnSelect={false}
-        hideSelectedOptions={false}
-        blurInputOnSelect={false}
-        tabSelectsValue={false}
-        openMenuOnFocus={false}
-        openMenuOnClick={false}
-        isSearchable
-        isClearable
-        isMulti
-        unstyled
-      />
-    </EmotionCacheProvider>
+        setSelectedCourses(cArr.map((course) => course.value));
+      }}
+      options={courseOptions}
+      filterOption={createFilter({
+        ignoreAccents: false,
+        trim: true,
+        ignoreCase: true,
+        matchFrom: "any",
+      })}
+      components={{
+        Option,
+        Control,
+        ClearIndicator,
+        DropdownIndicator: () => null,
+      }}
+      placeholder={"eg. BILD, BILD 3, or CSE 101"}
+      closeMenuOnSelect={false}
+      hideSelectedOptions={false}
+      blurInputOnSelect={false}
+      tabSelectsValue={false}
+      openMenuOnFocus={false}
+      openMenuOnClick={false}
+      isSearchable
+      isClearable
+      isMulti
+      unstyled
+    />
   );
 };
 
