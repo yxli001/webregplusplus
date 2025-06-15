@@ -1,20 +1,27 @@
 import { query } from "express-validator";
 
-const validateParamCourses = query("courses")
+const validateQueryCourses = query("courses")
   .isString()
   .withMessage("Courses must be a comma separated string of courses")
   .toUpperCase();
 
-const validateParamQuarter = query("quarter")
+const validateQueryQuarter = query("quarter")
   .isString()
   .withMessage("Quarter must be a string")
   .isLength({ min: 4, max: 6 })
   .withMessage("Quarter must be between 4 and 6 characters long")
   .toUpperCase();
 
-export const getCoursesValidator = [validateParamQuarter];
+const validateQueryQuery = query("query")
+  .optional()
+  .isString()
+  .withMessage("Query must be a string")
+  .toLowerCase()
+  .trim();
+
+export const getCoursesValidator = [validateQueryQuarter, validateQueryQuery];
 
 export const getCourseDetailsValidator = [
-  validateParamCourses,
-  validateParamQuarter,
+  validateQueryCourses,
+  validateQueryQuarter,
 ];
