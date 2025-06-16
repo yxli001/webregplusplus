@@ -23,7 +23,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-select": "^5.10.1",
-    "react-window": "^1.8.11",
+    "react-virtualized": "^9.22.6",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
@@ -35,6 +35,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-virtualized": "^9.22.2",
+    "@types/react-window": "^1.8.8",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",

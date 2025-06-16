@@ -1,19 +1,89 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ClearIndicatorProps,
   ControlProps,
+  GroupBase,
+  MenuListProps,
   OptionProps,
   components,
 } from "react-select";
 import AsyncSelect from "react-select/async";
+import {
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  List,
+  ListRowProps,
+} from "react-virtualized";
 
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Check from "@/icons/Check";
 import Cross from "@/icons/Cross";
 import Search from "@/icons/Search";
 import { Course } from "@/types/course";
+
+type CourseOption = {
+  label: string;
+  value: Course;
+};
+
+const VirtualizedList = ({
+  children,
+}: MenuListProps<CourseOption, true, GroupBase<CourseOption>>) => {
+  const rows = children;
+
+  const cellCache: CellMeasurerCache = useMemo(() => {
+    return new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: 30,
+    });
+  }, []);
+
+  if (!Array.isArray(rows)) {
+    // For children like: "Loading" or "No Options" provided by 'react-select'
+    return (
+      <div className="z-50 mt-2 rounded-lg bg-foreground shadow-lg">
+        {children}
+      </div>
+    );
+  }
+
+  const rowRenderer = ({ key, parent, index, style }: ListRowProps) => (
+    <CellMeasurer
+      cache={cellCache}
+      key={key}
+      columnIndex={0}
+      rowIndex={index}
+      parent={parent}
+    >
+      <div key={key} style={style}>
+        {rows[index]}
+      </div>
+    </CellMeasurer>
+  );
+
+  return (
+    <div
+      style={{ height: "300px" }}
+      className="z-50 mt-2 rounded-lg bg-foreground shadow-lg"
+    >
+      <AutoSizer>
+        {({ width, height }) => (
+          <List
+            width={width}
+            height={height}
+            deferredMeasurementCache={cellCache}
+            rowHeight={cellCache.rowHeight}
+            rowCount={rows.length}
+            rowRenderer={rowRenderer}
+          />
+        )}
+      </AutoSizer>
+    </div>
+  );
+};
 
 // Custom control component
 const Control = ({
@@ -111,6 +181,8 @@ const CourseDropdown = ({
   className = "",
   loading = false,
 }: CourseDropdownProps) => {
+  const [defaultOptions, setDefaultOptions] = useState([] as CourseOption[]);
+
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setSelectedCourses = usePreferenceStore(
     (state) => state.setSelectedCourses,
@@ -125,9 +197,19 @@ const CourseDropdown = ({
     [selectedCourses],
   );
 
+  const initializeOptions = useCallback(async () => {
+    const courses = await fetchCourses("");
+
+    const options = courses.map((course) => ({
+      label: `${course.subject} ${course.code}`,
+      value: course,
+    }));
+
+    setDefaultOptions(options);
+  }, [fetchCourses]);
+
   const loadOptions = useCallback(
     async (inputValue: string) => {
-      console.log(inputValue);
       const fetchedCourses = await fetchCourses(inputValue.trim());
 
       return fetchedCourses.map((course) => ({
@@ -138,15 +220,19 @@ const CourseDropdown = ({
     [fetchCourses],
   );
 
+  useEffect(() => {
+    void initializeOptions();
+  }, []);
+
   return (
     <AsyncSelect
       name="course"
       value={selectedOptions}
       loadOptions={loadOptions}
+      defaultOptions={defaultOptions}
       isLoading={loading}
       classNames={{
         container: () => `w-full flex flex-col overflow-visible ${className}`,
-        menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
         control: () => "flex",
         input: () => "sm:py-1",
         valueContainer: () => "flex flex-row items-center gap-2",
@@ -173,6 +259,7 @@ const CourseDropdown = ({
         Control,
         ClearIndicator,
         DropdownIndicator: () => null,
+        MenuList: VirtualizedList,
       }}
       placeholder={"eg. BILD, BILD 3, or CSE 101"}
       closeMenuOnSelect={false}
@@ -181,6 +268,7 @@ const CourseDropdown = ({
       tabSelectsValue={false}
       openMenuOnFocus={false}
       openMenuOnClick={false}
+      cacheOptions
       isSearchable
       isClearable
       isMulti
