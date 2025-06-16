@@ -22,7 +22,6 @@ import {
 } from "@/store/preferenceStore";
 import { CalEvent, CalSchedule } from "@/types/calendar";
 import {
-  Course,
   CourseWithSections,
   MainSection,
   Quarter,
@@ -91,7 +90,6 @@ export default function Home() {
   const [allQuarters, setAllQuarters] = useState<Quarter[]>([]);
   const [selectedQuarter, setSelectedQuarter] = useState<string>("");
 
-  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [algorithmRan, setAlgorithmRan] = useState(false);
 
   // Generated schedules
@@ -113,6 +111,31 @@ export default function Home() {
   const schedulePreferences = usePreferenceStore(
     (state) => state.schedulePreferences,
   );
+
+  const fetchCourses = async (query: string) => {
+    setLoadingCourses(true);
+
+    if (!selectedQuarter) {
+      return [];
+    }
+
+    const res = await getCourses(selectedQuarter, query);
+
+    setLoadingCourses(false);
+
+    if (res.success) {
+      return res.data;
+    } else {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error fetching courses",
+        detail: res.error,
+        life: 2000,
+      });
+
+      return [];
+    }
+  };
 
   const handleFetchCourseDetails = () => {
     if (selectedCourses.length < 1) {
@@ -143,59 +166,6 @@ export default function Home() {
 
     void fetchDetails();
   };
-
-  useEffect(() => {
-    const fetchQuarters = async () => {
-      setLoadingQuarters(true);
-
-      const res = await getQuarters();
-
-      if (res.success) {
-        setAllQuarters(res.data);
-      } else {
-        toast.current?.show({
-          severity: "error",
-          summary: "Error fetching courses",
-          detail: res.error,
-          life: 2000,
-        });
-      }
-
-      setLoadingQuarters(false);
-    };
-
-    void fetchQuarters();
-  }, []);
-
-  useEffect(() => {
-    setSelectedCourses([]);
-    setCourseDetails([]);
-    setSchedules([]);
-    setAlgorithmRan(false);
-
-    const fetchCourses = async () => {
-      setLoadingCourses(true);
-
-      if (selectedQuarter) {
-        const res = await getCourses(selectedQuarter);
-
-        if (res.success) {
-          setAllCourses(res.data);
-        } else {
-          toast.current?.show({
-            severity: "error",
-            summary: "Error fetching courses",
-            detail: res.error,
-            life: 2000,
-          });
-        }
-
-        setLoadingCourses(false);
-      }
-    };
-
-    void fetchCourses();
-  }, [selectedQuarter]);
 
   const handleAutoScheduler = useCallback(
     (
@@ -379,6 +349,36 @@ export default function Home() {
     return res;
   }, [schedules, currSchedule]);
 
+  useEffect(() => {
+    const fetchQuarters = async () => {
+      setLoadingQuarters(true);
+
+      const res = await getQuarters();
+
+      if (res.success) {
+        setAllQuarters(res.data);
+      } else {
+        toast.current?.show({
+          severity: "error",
+          summary: "Error fetching courses",
+          detail: res.error,
+          life: 2000,
+        });
+      }
+
+      setLoadingQuarters(false);
+    };
+
+    void fetchQuarters();
+  }, []);
+
+  useEffect(() => {
+    setSelectedCourses([]);
+    setCourseDetails([]);
+    setSchedules([]);
+    setAlgorithmRan(false);
+  }, [selectedQuarter]);
+
   return (
     <div className="flex w-full flex-col gap-10">
       {/* Quarter Selection */}
@@ -404,7 +404,7 @@ export default function Home() {
           <Section title="Select Your Courses">
             <div className="relative mx-auto flex flex-col items-center justify-center gap-4 lg:w-fit lg:flex-row">
               <CourseDropdown
-                courses={allCourses}
+                fetchCourses={fetchCourses}
                 loading={loadingCourses}
                 className="lg:w-[30rem]"
               />

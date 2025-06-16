@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useMemo } from "react";
-import Select, {
+import React, { useCallback, useMemo } from "react";
+import {
   ClearIndicatorProps,
   ControlProps,
   OptionProps,
   components,
-  createFilter,
 } from "react-select";
+import AsyncSelect from "react-select/async";
 
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Check from "@/icons/Check";
@@ -91,7 +91,7 @@ const ClearIndicator = ({
 };
 
 type CourseDropdownProps = {
-  courses: Course[];
+  fetchCourses: (query: string) => Promise<Course[]>;
   maxCourses?: number;
   className?: string;
   loading?: boolean;
@@ -106,7 +106,7 @@ type CourseDropdownProps = {
  * @returns CourseDropdown component
  */
 const CourseDropdown = ({
-  courses,
+  fetchCourses,
   maxCourses = 10,
   className = "",
   loading = false,
@@ -114,15 +114,6 @@ const CourseDropdown = ({
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setSelectedCourses = usePreferenceStore(
     (state) => state.setSelectedCourses,
-  );
-
-  const courseOptions = useMemo(
-    () =>
-      courses.map((course) => ({
-        label: `${course.subject} ${course.code}`,
-        value: course,
-      })),
-    [courses],
   );
 
   const selectedOptions = useMemo(
@@ -134,8 +125,25 @@ const CourseDropdown = ({
     [selectedCourses],
   );
 
+  const loadOptions = useCallback(
+    async (inputValue: string) => {
+      console.log(inputValue);
+      const fetchedCourses = await fetchCourses(inputValue.trim());
+
+      return fetchedCourses.map((course) => ({
+        label: `${course.subject} ${course.code}`,
+        value: course,
+      }));
+    },
+    [fetchCourses],
+  );
+
   return (
-    <Select
+    <AsyncSelect
+      name="course"
+      value={selectedOptions}
+      loadOptions={loadOptions}
+      isLoading={loading}
       classNames={{
         container: () => `w-full flex flex-col overflow-visible ${className}`,
         menuList: () => "mt-2 bg-foreground shadow-lg rounded-lg z-50",
@@ -148,9 +156,6 @@ const CourseDropdown = ({
         loadingMessage: () => "p-4 text-text-light",
         placeholder: () => "text-nowrap text-elipsis",
       }}
-      isLoading={loading}
-      name="course"
-      value={selectedOptions}
       onChange={(cArr) => {
         // If no courses are selected, clear the selection
         if (!cArr) {
@@ -163,13 +168,6 @@ const CourseDropdown = ({
 
         setSelectedCourses(cArr.map((course) => course.value));
       }}
-      options={courseOptions}
-      filterOption={createFilter({
-        ignoreAccents: false,
-        trim: true,
-        ignoreCase: true,
-        matchFrom: "any",
-      })}
       components={{
         Option,
         Control,

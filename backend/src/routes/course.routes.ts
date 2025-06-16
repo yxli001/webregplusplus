@@ -65,7 +65,10 @@ courseRouter.get(
       }
 
       // Get courses based on query
-      const searchQuery = query.trim().toLowerCase().replace(/\s+/g, "");
+      const searchQuery = query
+        .trim()
+        .toLowerCase()
+        .replace(/[\s+]+/g, "");
 
       const filteredCourses = await Course.findAll({
         where: {
