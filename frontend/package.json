@@ -36,7 +36,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-virtualized": "^9.22.2",
-    "@types/react-window": "^1.8.8",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
