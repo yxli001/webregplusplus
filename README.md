@@ -63,7 +63,7 @@ Configure a local PostgreSQL instance and put the following fields in the backen
 
 **Populate DB**
 
-- From the root directory, run `pnpm run cron`, this should run the scraper (~20 minutes) and populate your local PostgreSQL database.
+- From the backend directory, run `pnpm run cron-dev`, this should run the scraper (~20 minutes) and populate your local PostgreSQL database.
 
 **Backend**
 

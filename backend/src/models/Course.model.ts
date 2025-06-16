@@ -47,6 +47,24 @@ type CourseCreationAttributes = Optional<CourseAttributes, "id">;
 }))
 @Table({
   tableName: "course",
+  indexes: [
+    // Index for quarter-based queries
+    {
+      fields: ["quarter_id"],
+      name: "idx_course_quarter_id",
+    },
+    // Index for search queries (subject + code concatenated)
+    {
+      fields: ["subject", "code"],
+      name: "idx_course_subject_code",
+    },
+    // Unique constraint on subject + code + quarter
+    {
+      fields: ["subject", "code", "quarter_id"],
+      unique: true,
+      name: "unique_course_per_quarter",
+    },
+  ],
 })
 class Course extends Model<CourseAttributes, CourseCreationAttributes> {
   @PrimaryKey
