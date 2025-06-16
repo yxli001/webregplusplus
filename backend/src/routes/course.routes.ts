@@ -97,10 +97,6 @@ courseRouter.get(
             ),
           ],
         },
-        order: [
-          ["subject", "ASC"],
-          ["code", "ASC"],
-        ],
       });
 
       res.status(200).json(filteredCourses);

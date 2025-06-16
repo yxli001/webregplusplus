@@ -29,6 +29,123 @@ type CourseOption = {
   value: Course;
 };
 
+type CourseDropdownProps = {
+  fetchCourses: (query: string) => Promise<Course[]>;
+  maxCourses?: number;
+  className?: string;
+  loading?: boolean;
+};
+
+/**
+ * Dropdown to select courses
+ *
+ * @param props.courses - List of courses to display in the dropdown
+ * @param props.maxCourses - Maximum number of courses to select
+ *
+ * @returns CourseDropdown component
+ */
+const CourseDropdown = ({
+  fetchCourses,
+  maxCourses = 10,
+  className = "",
+  loading = false,
+}: CourseDropdownProps) => {
+  const [defaultOptions, setDefaultOptions] = useState([] as CourseOption[]);
+
+  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const setSelectedCourses = usePreferenceStore(
+    (state) => state.setSelectedCourses,
+  );
+
+  const selectedOptions = useMemo(
+    () =>
+      selectedCourses.map((course) => ({
+        label: `${course.subject} ${course.code}`,
+        value: course,
+      })),
+    [selectedCourses],
+  );
+
+  const initializeOptions = useCallback(async () => {
+    const courses = await fetchCourses("");
+
+    const options = courses.map((course) => ({
+      label: `${course.subject} ${course.code}`,
+      value: course,
+    }));
+
+    setDefaultOptions(options);
+  }, [fetchCourses]);
+
+  const loadOptions = useCallback(
+    async (inputValue: string) => {
+      const fetchedCourses = await fetchCourses(inputValue.trim());
+
+      return fetchedCourses.map((course) => ({
+        label: `${course.subject} ${course.code}`,
+        value: course,
+      }));
+    },
+    [fetchCourses],
+  );
+
+  useEffect(() => {
+    void initializeOptions();
+  }, []);
+
+  return (
+    <AsyncSelect
+      name="course"
+      value={selectedOptions}
+      loadOptions={loadOptions}
+      defaultOptions={defaultOptions}
+      isLoading={loading}
+      classNames={{
+        container: () => `w-full flex flex-col overflow-visible ${className}`,
+        control: () => "flex",
+        input: () => "sm:py-1",
+        valueContainer: () => "flex flex-row items-center gap-2",
+        multiValue: () =>
+          "bg-background text-text-light border border-text-light rounded-3xl px-2",
+        noOptionsMessage: () => "p-4 text-text-light",
+        loadingMessage: () => "p-4 text-text-light",
+        placeholder: () => "text-nowrap text-elipsis",
+      }}
+      onChange={(cArr) => {
+        // If no courses are selected, clear the selection
+        if (!cArr) {
+          setSelectedCourses([]);
+          return;
+        }
+
+        // Limit to maxCourses
+        if (cArr.length > maxCourses) return;
+
+        setSelectedCourses(cArr.map((course) => course.value));
+      }}
+      components={{
+        Option,
+        Control,
+        ClearIndicator,
+        DropdownIndicator: () => null,
+        MenuList: VirtualizedList,
+      }}
+      placeholder={"eg. BILD, BILD 3, or CSE 101"}
+      closeMenuOnSelect={false}
+      hideSelectedOptions={false}
+      blurInputOnSelect={false}
+      tabSelectsValue={false}
+      openMenuOnFocus={false}
+      openMenuOnClick={false}
+      cacheOptions
+      isSearchable
+      isClearable
+      isMulti
+      unstyled
+    />
+  );
+};
+
 const VirtualizedList = ({
   children,
 }: MenuListProps<CourseOption, true, GroupBase<CourseOption>>) => {
@@ -157,123 +274,6 @@ const ClearIndicator = ({
         <Cross />
       </div>
     </components.ClearIndicator>
-  );
-};
-
-type CourseDropdownProps = {
-  fetchCourses: (query: string) => Promise<Course[]>;
-  maxCourses?: number;
-  className?: string;
-  loading?: boolean;
-};
-
-/**
- * Dropdown to select courses
- *
- * @param props.courses - List of courses to display in the dropdown
- * @param props.maxCourses - Maximum number of courses to select
- *
- * @returns CourseDropdown component
- */
-const CourseDropdown = ({
-  fetchCourses,
-  maxCourses = 10,
-  className = "",
-  loading = false,
-}: CourseDropdownProps) => {
-  const [defaultOptions, setDefaultOptions] = useState([] as CourseOption[]);
-
-  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
-  const setSelectedCourses = usePreferenceStore(
-    (state) => state.setSelectedCourses,
-  );
-
-  const selectedOptions = useMemo(
-    () =>
-      selectedCourses.map((course) => ({
-        label: `${course.subject} ${course.code}`,
-        value: course,
-      })),
-    [selectedCourses],
-  );
-
-  const initializeOptions = useCallback(async () => {
-    const courses = await fetchCourses("");
-
-    const options = courses.map((course) => ({
-      label: `${course.subject} ${course.code}`,
-      value: course,
-    }));
-
-    setDefaultOptions(options);
-  }, [fetchCourses]);
-
-  const loadOptions = useCallback(
-    async (inputValue: string) => {
-      const fetchedCourses = await fetchCourses(inputValue.trim());
-
-      return fetchedCourses.map((course) => ({
-        label: `${course.subject} ${course.code}`,
-        value: course,
-      }));
-    },
-    [fetchCourses],
-  );
-
-  useEffect(() => {
-    void initializeOptions();
-  }, []);
-
-  return (
-    <AsyncSelect
-      name="course"
-      value={selectedOptions}
-      loadOptions={loadOptions}
-      defaultOptions={defaultOptions}
-      isLoading={loading}
-      classNames={{
-        container: () => `w-full flex flex-col overflow-visible ${className}`,
-        control: () => "flex",
-        input: () => "sm:py-1",
-        valueContainer: () => "flex flex-row items-center gap-2",
-        multiValue: () =>
-          "bg-background text-text-light border border-text-light rounded-3xl px-2",
-        noOptionsMessage: () => "p-4 text-text-light",
-        loadingMessage: () => "p-4 text-text-light",
-        placeholder: () => "text-nowrap text-elipsis",
-      }}
-      onChange={(cArr) => {
-        // If no courses are selected, clear the selection
-        if (!cArr) {
-          setSelectedCourses([]);
-          return;
-        }
-
-        // Limit to maxCourses
-        if (cArr.length > maxCourses) return;
-
-        setSelectedCourses(cArr.map((course) => course.value));
-      }}
-      components={{
-        Option,
-        Control,
-        ClearIndicator,
-        DropdownIndicator: () => null,
-        MenuList: VirtualizedList,
-      }}
-      placeholder={"eg. BILD, BILD 3, or CSE 101"}
-      closeMenuOnSelect={false}
-      hideSelectedOptions={false}
-      blurInputOnSelect={false}
-      tabSelectsValue={false}
-      openMenuOnFocus={false}
-      openMenuOnClick={false}
-      cacheOptions
-      isSearchable
-      isClearable
-      isMulti
-      unstyled
-    />
   );
 };
 
