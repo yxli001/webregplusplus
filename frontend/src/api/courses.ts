@@ -94,16 +94,18 @@ const getQuarters: () => Promise<APIResult<Quarter[]>> = async () => {
 };
 
 /**
- * Fetches all courses from the API.
+ * Fetches all courses from the API matching the quarter and query.
  *
  * @returns A promise that resolves to an APIResult containing an array of Course objects.
  */
-const getCourses: (quarter: string) => Promise<APIResult<Course[]>> = async (
-  quarter,
-) => {
+const getCourses: (
+  quarter: string,
+  query: string,
+) => Promise<APIResult<Course[]>> = async (quarter, query) => {
   try {
     const response = await get(`/api/course`, {
       quarter,
+      query,
     });
     const data = (await response.json()) as CourseJSON[];
 

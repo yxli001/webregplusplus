@@ -2,10 +2,11 @@ import { NextFunction, Request, Response, Router } from "express";
 import asyncHandler from "express-async-handler";
 import { matchedData, validationResult } from "express-validator";
 import createHttpError from "http-errors";
+import { Op } from "sequelize";
+import sequelize from "sequelize";
 
 import Course from "../models/Course.model";
 import Quarter from "../models/Quarter.model";
-import { serverLogger } from "../util/logger";
 import validationErrorParser from "../util/validationErrorParser";
 import {
   getCourseDetailsValidator,
@@ -15,15 +16,16 @@ import {
 const courseRouter = Router();
 
 type CourseQuery = {
-  // comma-separate list of courses
   quarter: string;
+  // comma-separate list of courses
   courses: string;
+  query: string;
 };
 
 /**
- * GET /api/course?quarter=SP25
+ * GET /api/course?quarter=[quarter]&query=[query]
  *
- * Return all courses in a quarter with no details
+ * Return all courses matching the query in a quarter with no details
  */
 courseRouter.get(
   "/",
@@ -34,10 +36,9 @@ courseRouter.get(
 
       if (!results.isEmpty()) {
         next(createHttpError(400, validationErrorParser(results)));
-        return;
       }
 
-      const { quarter } = matchedData(req, {
+      const { quarter, query } = matchedData(req, {
         locations: ["query"],
       }) as CourseQuery;
 
@@ -50,17 +51,56 @@ courseRouter.get(
 
       if (!foundQuarter) {
         next(createHttpError(404, `Quarter ${quarter} not found`));
+      }
+
+      if (!query) {
+        const courses = await Course.findAll({
+          where: {
+            quarterId: foundQuarter!.id,
+          },
+        });
+
+        res.status(200).json(courses);
         return;
       }
 
-      // Get all courses
-      const courses = await Course.findAll({
+      // Get courses based on query
+      const searchQuery = query
+        .trim()
+        .toLowerCase()
+        .replace(/[\s+]+/g, "");
+
+      const filteredCourses = await Course.findAll({
         where: {
-          quarterId: foundQuarter.id,
+          quarterId: foundQuarter!.id,
+          [Op.and]: [
+            // Match subject and code with the search query
+            sequelize.where(
+              // Remove spaces from `${subject} ${code}` and convert to lowercase
+              sequelize.fn(
+                "LOWER",
+                sequelize.fn(
+                  "REGEXP_REPLACE",
+                  sequelize.fn(
+                    "CONCAT",
+                    sequelize.col("subject"),
+                    " ",
+                    sequelize.col("code"),
+                  ),
+                  "\\s+",
+                  "",
+                  "g",
+                ),
+              ),
+              Op.like,
+              `%${searchQuery}%`,
+            ),
+          ],
         },
       });
 
-      res.status(200).json(courses);
+      res.status(200).json(filteredCourses);
+      return;
     } catch (error: unknown) {
       next(error);
     }
@@ -68,7 +108,7 @@ courseRouter.get(
 );
 
 /**
- * GET /api/course/details?quarter=SP25&courses="COURSE 1,COURSE 2,COURSE 3..."
+ * GET /api/course/details?quarter=[quarter]&courses="COURSE 1,COURSE 2,COURSE 3..."
  *
  * Get details for a list of courses
  */
@@ -80,7 +120,6 @@ courseRouter.get(
 
     if (!results.isEmpty()) {
       next(createHttpError(400, validationErrorParser(results)));
-      return;
     }
 
     const { courses, quarter } = matchedData(req, {
@@ -96,27 +135,27 @@ courseRouter.get(
 
       if (!foundQuarter) {
         next(createHttpError(404, `Quarter ${quarter} not found`));
-        return;
       }
 
       const coursesList = courses.split(",").map((course) => course.trim());
 
       const resCourses = [];
       for (const course of coursesList) {
-        serverLogger.debug(`Searching for course ${course}`);
-
         const foundCourse = await Course.scope("details").findOne({
           where: {
             subject: course.split("+")[0],
             code: course.split("+")[1],
-            quarterId: foundQuarter.id,
+            quarterId: foundQuarter!.id,
           },
         });
 
         if (!foundCourse) {
-          res.status(404).json({
-            message: `${course} not found`,
-          });
+          next(
+            createHttpError(
+              404,
+              `Course ${course} not found in quarter ${quarter}`,
+            ),
+          );
           return;
         }
 
