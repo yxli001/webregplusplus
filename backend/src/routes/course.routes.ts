@@ -35,7 +35,7 @@ courseRouter.get(
       const results = validationResult(req);
 
       if (!results.isEmpty()) {
-        next(createHttpError(400, validationErrorParser(results)));
+        return next(createHttpError(400, validationErrorParser(results)));
       }
 
       const { quarter, query } = matchedData(req, {
@@ -50,7 +50,7 @@ courseRouter.get(
       });
 
       if (!foundQuarter) {
-        next(createHttpError(404, `Quarter ${quarter} not found`));
+        return next(createHttpError(404, `Quarter ${quarter} not found`));
       }
 
       if (!query) {
@@ -119,7 +119,7 @@ courseRouter.get(
     const results = validationResult(req);
 
     if (!results.isEmpty()) {
-      next(createHttpError(400, validationErrorParser(results)));
+      return next(createHttpError(400, validationErrorParser(results)));
     }
 
     const { courses, quarter } = matchedData(req, {
@@ -134,7 +134,7 @@ courseRouter.get(
       });
 
       if (!foundQuarter) {
-        next(createHttpError(404, `Quarter ${quarter} not found`));
+        return next(createHttpError(404, `Quarter ${quarter} not found`));
       }
 
       const coursesList = courses.split(",").map((course) => course.trim());
@@ -150,13 +150,12 @@ courseRouter.get(
         });
 
         if (!foundCourse) {
-          next(
+          return next(
             createHttpError(
               404,
               `Course ${course} not found in quarter ${quarter}`,
             ),
           );
-          return;
         }
 
         resCourses.push(foundCourse);

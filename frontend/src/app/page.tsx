@@ -113,11 +113,11 @@ export default function Home() {
   );
 
   const fetchCourses = async (query: string) => {
-    setLoadingCourses(true);
-
     if (!selectedQuarter) {
       return [];
     }
+
+    setLoadingCourses(true);
 
     const res = await getCourses(selectedQuarter, query);
 
