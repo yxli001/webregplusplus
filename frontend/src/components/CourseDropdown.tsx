@@ -39,8 +39,10 @@ type CourseDropdownProps = {
 /**
  * Dropdown to select courses
  *
- * @param props.courses - List of courses to display in the dropdown
+ * @param props.fetchCourses - Function to asynchronously fetch courses based on a query
  * @param props.maxCourses - Maximum number of courses to select
+ * @param props.loading - Whether the dropdown is in a loading state
+ * @param props.className - Additional CSS classes to apply to the dropdown
  *
  * @returns CourseDropdown component
  */
