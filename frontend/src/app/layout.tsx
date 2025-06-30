@@ -68,9 +68,7 @@ export default function RootLayout({
         <PreferenceStoreProvider>
           <PrimeReactProvider>
             <Navbar />
-            <div className="mx-auto flex w-[80%] flex-col items-center py-10">
-              {children}
-            </div>
+            <div>{children}</div>
           </PrimeReactProvider>
         </PreferenceStoreProvider>
       </body>

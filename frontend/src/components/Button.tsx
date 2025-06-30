@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 type ButtonProps = {
   label: string;
   onClick?: () => void;
@@ -9,7 +11,10 @@ const Button = ({ label, onClick, className = "", icon }: ButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-md bg-primary-dark p-3 font-semibold text-text-lighter hover:cursor-pointer ${className}`}
+      className={twMerge(
+        "flex items-center gap-2 rounded-xl bg-primary-light px-4 py-3 text-sm font-semibold text-text-lighter shadow-sm hover:cursor-pointer hover:bg-primary-dark",
+        className,
+      )}
     >
       {icon && icon}
       {label}
