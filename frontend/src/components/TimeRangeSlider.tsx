@@ -1,4 +1,5 @@
 import { Slider, SliderChangeEvent } from "primereact/slider";
+import { twMerge } from "tailwind-merge";
 
 type TimeRangeSliderProps = {
   startTime: string; // 24-hour format HH:mm
@@ -60,7 +61,7 @@ const TimeRangeSlider = ({
   };
 
   return (
-    <div className={`flex flex-col py-4 ${className}`}>
+    <div className={twMerge("flex flex-col py-4", className)}>
       <div className="mb-4 flex justify-between text-sm text-text-light">
         <span>{formatTimeDisplay(startTime)}</span>
         <span>{formatTimeDisplay(endTime)}</span>

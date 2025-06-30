@@ -2,6 +2,7 @@
 
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 import Checkbox from "@/components/Checkbox";
 import UpDownArrows from "@/icons/UpDownArrows";
@@ -146,7 +147,7 @@ const DropdownSelect = ({
   );
 
   return (
-    <div ref={dropdownRef} className={`relative w-full ${className}`}>
+    <div ref={dropdownRef} className={twMerge("relative w-full", className)}>
       <div
         className={`flex items-center justify-between rounded-md border border-text-light bg-white p-2 sm:p-3 ${!disabled ? "hover:cursor-pointer hover:bg-gray-50" : ""}`}
         onClick={toggleDropdown}

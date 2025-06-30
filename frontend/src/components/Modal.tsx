@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { twMerge } from "tailwind-merge";
 
 import Cross from "@/icons/Cross";
 
@@ -102,7 +103,10 @@ const Modal = (props: ModalProps): React.JSX.Element => {
       {/* modal container */}
       <div
         {...restProps}
-        className={`relative mx-auto w-[50%] bg-white p-2 hover:cursor-default ${className}`}
+        className={twMerge(
+          "relative mx-auto w-[50%] bg-white p-2 hover:cursor-default",
+          className,
+        )}
       >
         {!disableClose && (
           <Cross

@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 type DaysSelectProps = {
   value: string[];
   onChange: (days: string[]) => void;
@@ -8,7 +10,7 @@ const DAYS = ["M", "Tu", "W", "Th", "F"];
 
 const DaysSelect = ({ value, onChange, className = "" }: DaysSelectProps) => {
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={twMerge("flex gap-2", className)}>
       {DAYS.map((day) => (
         <button
           key={day}
