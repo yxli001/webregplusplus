@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 import Check from "@/icons/Check";
 
 type CheckboxProps = {
@@ -15,15 +17,18 @@ const Checkbox = ({
 }: CheckboxProps) => {
   return (
     <div
-      className={`flex h-4 w-4 items-center justify-center p-0.5 ${
-        variant === "dark" ? "border-text-dark" : "border-text-light"
-      } cursor-pointer rounded ${
-        checked
-          ? variant === "dark"
-            ? "bg-primary-dark"
-            : "bg-primary-light"
-          : "border bg-transparent"
-      } ${className}`}
+      className={twMerge(
+        `flex h-4 w-4 items-center justify-center p-0.5 ${
+          variant === "dark" ? "border-text-dark" : "border-text-light"
+        } cursor-pointer rounded ${
+          checked
+            ? variant === "dark"
+              ? "bg-primary-dark"
+              : "bg-primary-light"
+            : "border bg-transparent"
+        }`,
+        className,
+      )}
       onClick={onChange}
     >
       {checked && <Check color="white" />}

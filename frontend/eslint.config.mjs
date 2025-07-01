@@ -1,16 +1,25 @@
+/* eslint-disable */
+
 import js from "@eslint/js";
+import { FlatCompat } from "@eslint/eslintrc";
 import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import importPlugin from "eslint-plugin-import";
-import nextPlugin from "@next/eslint-plugin-next";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
+
+const compat = new FlatCompat({
+  baseDirectory: import.meta.dirname,
+  recommendedConfig: js.configs.recommended,
+});
 
 // Create a basic ESLint flat config
 const eslintConfig = [
-  js.configs.recommended,
+  ...compat.config({
+    extends: ["plugin:@next/next/recommended"],
+  }),
   ...typescriptEslint.configs.recommended,
   ...typescriptEslint.configs.strictTypeChecked,
   ...typescriptEslint.configs.stylisticTypeChecked,
@@ -32,7 +41,6 @@ const eslintConfig = [
       "react-hooks": reactHooksPlugin,
       "react-refresh": reactRefreshPlugin,
       import: importPlugin,
-      next: nextPlugin,
       "jsx-a11y": jsxA11yPlugin,
     },
   },

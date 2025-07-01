@@ -2,6 +2,19 @@ import { Schedule } from "@/lib/scheduler";
 import { CoursePreferences } from "@/store/preferenceStore";
 import { CourseWithSections, MainSection, SubSection } from "@/types/course";
 
+export function convertToQuarterFullName(quarter: string): string {
+  const quarterMap: Record<string, string> = {
+    FA: "Fall",
+    WI: "Winter",
+    SP: "Spring",
+  };
+
+  const quarterShort = quarter.slice(0, 2);
+  const year = quarter.slice(2);
+
+  return `${quarterMap[quarterShort] ?? quarterShort} 20${year}`;
+}
+
 export function timeToIndex(
   time: string,
   startTime: number,

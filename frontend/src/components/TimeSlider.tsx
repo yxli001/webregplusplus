@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { twMerge } from "tailwind-merge";
 
 type TimeSliderProps = {
   value: number;
@@ -32,7 +33,7 @@ const TimeSlider = ({
   }, [value]);
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={twMerge("flex flex-col gap-2", className)}>
       <div className="relative h-1 w-full rounded-full bg-gray-200">
         <input
           type="range"
