@@ -28,6 +28,7 @@ export type SchedulePreferences = {
 };
 
 export type PreferenceState = {
+  selectedQuarter: string;
   selectedCourses: Course[];
   courseDetails: CourseWithSections[];
   coursePreferences: CoursePreferences[];
@@ -35,6 +36,7 @@ export type PreferenceState = {
 };
 
 export type PreferenceActions = {
+  setSelectedQuarter: (quarter: string) => void;
   setSelectedCourses: (courses: Course[]) => void;
   setCourseDetails: (details: CourseWithSections[]) => void;
   removeCourse: (id: string) => void;
@@ -48,6 +50,7 @@ export type PreferenceActions = {
 export type PreferenceStore = PreferenceState & PreferenceActions;
 
 const initialPreferences: PreferenceState = {
+  selectedQuarter: "",
   selectedCourses: [],
   courseDetails: [],
   coursePreferences: [],
@@ -68,6 +71,15 @@ export const createPreferenceStore = (
 ) => {
   return createStore<PreferenceStore>((set) => ({
     ...initState,
+
+    setSelectedQuarter: (quarter) => {
+      set(() => ({
+        selectedQuarter: quarter,
+        selectedCourses: [],
+        courseDetails: [],
+        coursePreferences: [],
+      }));
+    },
 
     setSelectedCourses: (courses) => {
       set(() => ({
@@ -131,9 +143,9 @@ export const createPreferenceStore = (
           ...state.schedulePreferences,
           ...update,
           excludedTimeSlots: update.excludedTimeSlots
-            ? update.excludedTimeSlots.map((slot) => ({
+            ? update.excludedTimeSlots.map((slot, index) => ({
                 ...slot,
-                id: Math.random().toString(36).substring(7),
+                id: `slot-${Date.now()}-${index}`,
               }))
             : state.schedulePreferences.excludedTimeSlots,
         },

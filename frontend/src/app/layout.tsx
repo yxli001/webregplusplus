@@ -66,7 +66,21 @@ export default function RootLayout({
       </head>
       <body>
         <PreferenceStoreProvider>
-          <PrimeReactProvider>
+          <PrimeReactProvider
+            value={{
+              pt: {
+                // Default styles for Toast
+                toast: {
+                  content: {
+                    className: "flex p-3 gap-4",
+                  },
+                  icon: {
+                    className: "mt-1",
+                  },
+                },
+              },
+            }}
+          >
             <Navbar />
             <div>{children}</div>
           </PrimeReactProvider>

@@ -4,71 +4,44 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import Checkbox from "@/components/Checkbox";
-import UpDownArrows from "@/icons/UpDownArrows";
+import Check from "@/icons/Check";
+import DownArrow from "@/icons/DownArrow";
 
-type BaseDropdownProps = {
+type DropdownSelectProps = {
   options: { label: string; value: string }[];
   placeholder?: string;
   className?: string;
-  closeOnSelect?: boolean; // Add the new prop here
+  closeOnSelect?: boolean;
   disabled?: boolean;
   loading?: boolean;
-};
-
-type SingleSelectDropdownProps = {
-  multiple?: false;
   value: string;
   onChange: (value: string) => void;
-} & BaseDropdownProps;
-
-type MultiSelectDropdownProps = {
-  multiple: true;
-  value: string[];
-  onChange: (value: string[]) => void;
-  minSelected?: number;
-} & BaseDropdownProps;
-
-type DropdownSelectProps = SingleSelectDropdownProps | MultiSelectDropdownProps;
+};
 
 const DropdownSelect = ({
   options,
   value,
   onChange,
-  placeholder = "Select an option",
+  placeholder = "Select",
   className = "",
-  multiple = false,
   disabled = false,
   closeOnSelect = false, // Default to true
   loading = false,
-  ...props
 }: DropdownSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [initialized, setInitialized] = useState(false);
-
-  const values = Array.isArray(value) ? value : [value];
-
-  useEffect(() => {
-    if (!initialized && options.length > 0 && multiple) {
-      onChange(options.map((option) => option.value) as string & string[]);
-      setInitialized(true);
-    }
-  }, [options, onChange, initialized, multiple]);
 
   const getLabel = () => {
-    if (multiple) {
-      if (values.length === options.length) {
-        return "All Selected";
-      } else if (values.length > 0) {
-        return "Custom";
-      }
-    } else {
-      const selectedOption = options.find((opt) => opt.value === value);
-      if (selectedOption) {
-        return selectedOption.label;
-      }
+    if (loading) {
+      return "Loading...";
     }
+
+    const selectedOption = options.find((opt) => opt.value === value);
+
+    if (selectedOption) {
+      return selectedOption.label;
+    }
+
     return placeholder;
   };
 
@@ -79,19 +52,7 @@ const DropdownSelect = ({
   };
 
   const handleOptionClick = (optionValue: string) => {
-    if (multiple) {
-      const minSelected = (props as MultiSelectDropdownProps).minSelected ?? 1;
-      if (values.includes(optionValue)) {
-        if (values.length <= minSelected) {
-          return;
-        }
-        onChange(values.filter((v) => v !== optionValue) as string & string[]);
-      } else {
-        onChange([...values, optionValue] as string & string[]);
-      }
-    } else {
-      onChange(optionValue as string & string[]);
-    }
+    onChange(optionValue as string & string[]);
 
     // Close the dropdown if closeOnSelect is true
     if (closeOnSelect) {
@@ -127,21 +88,20 @@ const DropdownSelect = ({
     options.map((option) => (
       <div
         key={option.value}
-        className="flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-50"
+        className="flex cursor-pointer items-center justify-between gap-2 px-4 py-[10px] hover:bg-[#fafafa]"
         style={{
-          backgroundColor:
-            !multiple && values.includes(option.value) ? "#f0f0f0" : "",
+          backgroundColor: value === option.value ? "#fafafa" : "",
         }}
         onClick={() => {
           handleOptionClick(option.value);
         }}
       >
-        {multiple && <Checkbox checked={values.includes(option.value)} />}
-        <span className="flex-1 truncate text-base">{option.label}</span>
+        <span className="truncate text-sm text-text-dark">{option.label}</span>
+        {value === option.value && <Check size={13} color="#1570ef" />}
       </div>
     ))
   ) : (
-    <div className="p-2 text-base italic text-gray-500">
+    <div className="px-4 py-[10px] text-sm italic text-text-light">
       No options available
     </div>
   );
@@ -149,15 +109,17 @@ const DropdownSelect = ({
   return (
     <div ref={dropdownRef} className={twMerge("relative w-full", className)}>
       <div
-        className={`flex items-center justify-between rounded-md border border-text-light bg-white p-2 sm:p-3 ${!disabled ? "hover:cursor-pointer hover:bg-gray-50" : ""}`}
+        className={`flex items-center justify-between gap-2 rounded-md border border-border bg-white px-4 py-[10px] ${!disabled ? "hover:cursor-pointer hover:bg-gray-50" : ""}`}
         onClick={toggleDropdown}
       >
-        <span className="truncate text-base">{getLabel()}</span>
-        <UpDownArrows size={16} className="sm:h-5 sm:w-5" />
+        <span className="truncate text-sm font-semibold text-text-dark">
+          {getLabel()}
+        </span>
+        <DownArrow size={12} color="#414651" />
       </div>
 
       {isOpen && (
-        <div className="absolute z-[100] mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
+        <div className="absolute z-[100] mt-1 max-h-60 w-52 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
           {dropDownContent}
         </div>
       )}
