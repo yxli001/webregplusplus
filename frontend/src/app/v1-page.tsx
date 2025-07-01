@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getCourseDetails, getCourses, getQuarters } from "@/api/courses";
 import Button from "@/components/Button";
 import CourseDropdown from "@/components/CourseDropdown";
-import CourseList from "@/components/CourseList";
+// import CourseList from "@/components/CourseList";
 import DropdownSelect from "@/components/DropdownSelect";
 import PageLoading from "@/components/PageLoading";
 import PreferencesComponent from "@/components/Preferences";
@@ -419,9 +419,9 @@ export default function Home() {
           {courseDetails.length > 0 && (
             <>
               {/* Instructor/Section Selection */}
-              <Section title="Course List">
+              {/* <Section title="Course List">
                 <CourseList />
-              </Section>
+              </Section> */}
 
               {/* Preferences */}
               <Section title="Preferences">

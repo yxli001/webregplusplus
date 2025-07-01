@@ -52,7 +52,7 @@ const DropdownSelect = ({
   };
 
   const handleOptionClick = (optionValue: string) => {
-    onChange(optionValue as string & string[]);
+    onChange(optionValue);
 
     // Close the dropdown if closeOnSelect is true
     if (closeOnSelect) {
