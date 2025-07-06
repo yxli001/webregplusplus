@@ -34,6 +34,7 @@ export default {
           lighter: "var(--text-lighter)",
           light: "var(--text-light)",
           dark: "var(--text-dark)",
+          darker: "var(--text-darker)",
         },
       },
       boxShadow: {

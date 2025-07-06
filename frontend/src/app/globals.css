@@ -14,6 +14,7 @@
     --text-lighter: #ffffff;
     --text-light: #627d98;
     --text-dark: #414651;
+    --text-darker: #252b37;
   }
 
   * {
@@ -26,7 +27,7 @@
   body {
     width: 100vw;
     height: 100vh;
-    color: var(--text-light);
+    color: var(--text-dark);
     background: var(--background);
     font-family: Inter, Helvetica, sans-serif;
     overflow-x: hidden;
