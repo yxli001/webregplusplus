@@ -19,7 +19,7 @@ const Button = ({
     <button
       onClick={onClick}
       className={twMerge(
-        "flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm hover:cursor-pointer focus:outline-2 focus:outline-offset-4",
+        "flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm hover:cursor-pointer hover:shadow-xs focus:outline-2 focus:outline-offset-4",
         variant === "primary" &&
           "bg-primary-light text-text-lighter hover:bg-primary-dark",
         variant === "secondary" &&

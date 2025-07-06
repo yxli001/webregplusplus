@@ -36,6 +36,10 @@ export default {
           dark: "var(--text-dark)",
         },
       },
+      boxShadow: {
+        xs: "0 2px 2px 0 rgba(10, 13, 18, 0.05)",
+        lg: "0 12px 16px -4px rgba(10, 13, 18, 0.08)",
+      },
     },
   },
   plugins: [],
