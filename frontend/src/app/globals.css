@@ -5,7 +5,7 @@
 @layer utilities {
   :root {
     --background: #ffffff;
-    --foreground: #ffffff;
+    --foreground: #fafafa;
     --border: #d5d7da;
 
     --primary-light: #1570ef;

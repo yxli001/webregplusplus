@@ -82,10 +82,7 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-2">
           <Button label="Log in" />
-          <Button
-            label="Sign up"
-            className="border border-border bg-background text-text-dark hover:bg-foreground"
-          />
+          <Button label="Sign up" variant="secondary" />
         </div>
       </div>
       <Toast ref={toast} />
