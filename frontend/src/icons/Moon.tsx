@@ -1,10 +1,6 @@
-import { SVGProps } from "react";
+import { BaseIconProps } from "@/types/icon";
 
-type MoonProps = {
-  size?: number; // Add a size prop
-} & SVGProps<SVGSVGElement>;
-
-const Moon = ({ color, size = 16, ...props }: MoonProps) => (
+const Moon = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size} // Use the size prop for width
@@ -14,9 +10,9 @@ const Moon = ({ color, size = 16, ...props }: MoonProps) => (
     {...props}
   >
     <path
-      d="M18.3542 13.3542C17.3176 13.7708 16.1856 14.0001 15 14.0001C10.0294 14.0001 6 9.97062 6 5.00006C6 3.81449 6.22924 2.68246 6.64581 1.64587C3.33648 2.9758 1 6.21507 1 10.0001C1 14.9706 5.02944 19.0001 10 19.0001C13.785 19.0001 17.0243 16.6636 18.3542 13.3542Z"
+      d="M16.9618 12.7952C16.098 13.1423 15.1546 13.3334 14.1667 13.3334C10.0245 13.3334 6.66667 9.9755 6.66667 5.83336C6.66667 4.84539 6.8577 3.90203 7.20484 3.03821C4.44707 4.14648 2.5 6.84587 2.5 10C2.5 14.1422 5.85786 17.5 10 17.5C13.1542 17.5 15.8536 15.553 16.9618 12.7952Z"
       stroke={color ?? "#717680"}
-      strokeWidth="2"
+      strokeWidth="1.66667"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
