@@ -22,6 +22,7 @@ const ButtonGroup = ({ buttons, className }: ButtonGroupProps) => {
     >
       {buttons.map((button, index) => (
         <button
+          type="button"
           key={button.label}
           onClick={button.onClick}
           className={twMerge(

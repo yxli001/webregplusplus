@@ -23,6 +23,7 @@ const IconButton = ({
   return (
     <button
       onClick={onClick}
+      type="button"
       className={twMerge(
         "rounded-lg bg-background p-2 hover:cursor-pointer hover:bg-gray-100",
         className,
