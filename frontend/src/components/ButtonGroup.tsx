@@ -22,7 +22,7 @@ const ButtonGroup = ({ buttons, className }: ButtonGroupProps) => {
     >
       {buttons.map((button, index) => (
         <button
-          key={index}
+          key={button.label}
           onClick={button.onClick}
           className={twMerge(
             "flex items-center gap-2 px-4 py-[10px] text-text-dark hover:bg-foreground",

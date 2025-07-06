@@ -21,7 +21,7 @@ const IconButton = ({
   iconFill = "none",
 }: IconButtonProps) => {
   return (
-    <div
+    <button
       onClick={onClick}
       className={twMerge(
         "rounded-lg bg-background p-2 hover:cursor-pointer hover:bg-gray-100",
@@ -29,7 +29,7 @@ const IconButton = ({
       )}
     >
       <Icon size={iconSize} color={iconColor} fill={iconFill} />
-    </div>
+    </button>
   );
 };
 
