@@ -1,10 +1,6 @@
-import { SVGProps } from "react";
+import { BaseIconProps } from "@/types/icon";
 
-type UpDownArrowsProps = {
-  size?: number; // Add a size prop
-} & SVGProps<SVGSVGElement>;
-
-const UpDownArrows = ({ color, size = 16, ...props }: UpDownArrowsProps) => (
+const UpDownArrows = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size} // Use the size prop for width

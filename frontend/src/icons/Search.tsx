@@ -1,10 +1,6 @@
-import { SVGProps } from "react";
+import { BaseIconProps } from "@/types/icon";
 
-type SearchProps = {
-  size?: number; // Add a size prop
-} & SVGProps<SVGSVGElement>;
-
-const Search = ({ color, size = 16, ...props }: SearchProps) => (
+const Search = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size} // Use the size prop for width
@@ -14,9 +10,9 @@ const Search = ({ color, size = 16, ...props }: SearchProps) => (
     {...props}
   >
     <path
-      d="M19 19L13 13M15 8C15 11.866 11.866 15 8 15C4.13401 15 1 11.866 1 8C1 4.13401 4.13401 1 8 1C11.866 1 15 4.13401 15 8Z"
-      stroke={color ?? "#627D98"}
-      strokeWidth="2"
+      d="M17.5 17.5L14.5834 14.5833M16.6667 9.58333C16.6667 13.4953 13.4953 16.6667 9.58333 16.6667C5.67132 16.6667 2.5 13.4953 2.5 9.58333C2.5 5.67132 5.67132 2.5 9.58333 2.5C13.4953 2.5 16.6667 5.67132 16.6667 9.58333Z"
+      stroke={color ?? "#717680"}
+      strokeWidth="1.66667"
       strokeLinecap="round"
       strokeLinejoin="round"
     />

@@ -1,6 +1,6 @@
 import { BaseIconProps } from "@/types/icon";
 
-const Check = ({ color, size = 16, ...props }: BaseIconProps) => (
+const Plus = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 20 20" // Define the coordinate system for scaling
@@ -10,7 +10,7 @@ const Check = ({ color, size = 16, ...props }: BaseIconProps) => (
     {...props}
   >
     <path
-      d="M16.6668 5L7.50016 14.1667L3.3335 10"
+      d="M9.99984 4.16663V15.8333M4.1665 9.99996H15.8332"
       stroke={color ?? "#717680"}
       strokeWidth="1.66667"
       strokeLinecap="round"
@@ -19,4 +19,4 @@ const Check = ({ color, size = 16, ...props }: BaseIconProps) => (
   </svg>
 );
 
-export default Check;
+export default Plus;

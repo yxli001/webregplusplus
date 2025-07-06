@@ -1,10 +1,6 @@
-import { SVGProps } from "react";
+import { BaseIconProps } from "@/types/icon";
 
-type SunProps = {
-  size?: number; // Add a size prop
-} & SVGProps<SVGSVGElement>;
-
-const Sun = ({ color, size = 16, ...props }: SunProps) => (
+const Sun = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size} // Use the size prop for width
@@ -14,9 +10,9 @@ const Sun = ({ color, size = 16, ...props }: SunProps) => (
     {...props}
   >
     <path
-      d="M10 1V2M10 18V19M19 10H18M2 10H1M16.364 16.364L15.6569 15.6569M4.34315 4.34315L3.63604 3.63604M16.364 3.63609L15.6569 4.3432M4.3432 15.6569L3.63609 16.364M14 10C14 12.2091 12.2091 14 10 14C7.79086 14 6 12.2091 6 10C6 7.79086 7.79086 6 10 6C12.2091 6 14 7.79086 14 10Z"
+      d="M10 2.5V3.33333M10 16.6667V17.5M17.5 10H16.6667M3.33333 10H2.5M15.3033 15.3033L14.714 14.714M5.28595 5.28595L4.6967 4.6967M15.3033 4.69674L14.7141 5.286M5.286 14.7141L4.69674 15.3033M13.3333 10C13.3333 11.8409 11.8409 13.3333 10 13.3333C8.15905 13.3333 6.66667 11.8409 6.66667 10C6.66667 8.15905 8.15905 6.66667 10 6.66667C11.8409 6.66667 13.3333 8.15905 13.3333 10Z"
       stroke={color ?? "#717680"}
-      strokeWidth="2"
+      strokeWidth="1.66667"
       strokeLinecap="round"
       strokeLinejoin="round"
     />

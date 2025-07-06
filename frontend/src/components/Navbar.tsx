@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import Button from "./Button";
 import DropdownSelect from "./DropdownSelect";
+import IconButton from "./IconButton";
 
 import { getQuarters } from "@/api/courses";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
@@ -62,7 +63,7 @@ const Navbar = () => {
         <h1 className="text-2xl font-bold text-[#181D27]">Webreg++</h1>
       </Link>
       <DropdownSelect
-        className="w-36"
+        className="w-fit"
         options={allQuarters.map((quarter) => ({
           label: convertToQuarterFullName(quarter.name),
           value: quarter.name,
@@ -75,12 +76,12 @@ const Navbar = () => {
         closeOnSelect
       />
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-6">
-          <Sun size={20} className="hover:cursor-pointer" />
-          <Feedback size={20} className="hover:cursor-pointer" />
-          <Tutorial size={20} className="hover:cursor-pointer" />
+        <div className="flex items-center gap-1">
+          <IconButton icon={Sun} />
+          <IconButton icon={Feedback} />
+          <IconButton icon={Tutorial} />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button label="Log in" />
           <Button label="Sign up" variant="secondary" />
         </div>
