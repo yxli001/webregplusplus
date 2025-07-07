@@ -96,6 +96,39 @@ const CourseDropdown = ({
     void initializeOptions();
   }, []);
 
+  // Needs to be defined inside the component to access selectedCourses
+  const Option = ({
+    ...props
+  }: OptionProps<{ label: string; value: Course }, true>) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { onMouseMove, onMouseOver, ...rest } = props.innerProps;
+    const newProps = { ...props, innerProps: rest };
+
+    const {
+      isFocused,
+      data: { label, value: course },
+    } = props;
+
+    // Get selected courses from store to check if this option is selected
+    const isSelected = selectedCourses.some(
+      (selectedCourse) => selectedCourse.id === course.id,
+    );
+
+    return (
+      <components.Option {...newProps}>
+        <div
+          className={twMerge(
+            "flex flex-row items-center justify-between p-4 hover:cursor-pointer hover:bg-foreground",
+            isFocused ? "bg-foreground" : "",
+          )}
+        >
+          <p>{label}</p>
+          {isSelected && <Check size={20} color="#1570ef" />}
+        </div>
+      </components.Option>
+    );
+  };
+
   return (
     <AsyncSelect
       name="course"
@@ -243,40 +276,6 @@ const Control = ({
         {children}
       </div>
     </components.Control>
-  );
-};
-
-// Custom Option component
-const Option = ({
-  ...props
-}: OptionProps<{ label: string; value: Course }, true>) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onMouseMove, onMouseOver, ...rest } = props.innerProps;
-  const newProps = { ...props, innerProps: rest };
-
-  const {
-    isFocused,
-    data: { label, value: course },
-  } = props;
-
-  // Get selected courses from store to check if this option is selected
-  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
-  const isSelected = selectedCourses.some(
-    (selectedCourse) => selectedCourse.id === course.id,
-  );
-
-  return (
-    <components.Option {...newProps}>
-      <div
-        className={twMerge(
-          "flex flex-row items-center justify-between p-4 hover:cursor-pointer hover:bg-foreground",
-          isFocused ? "bg-foreground" : "",
-        )}
-      >
-        <p>{label}</p>
-        {isSelected && <Check size={20} color="#1570ef" />}
-      </div>
-    </components.Option>
   );
 };
 
