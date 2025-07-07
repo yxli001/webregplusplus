@@ -148,7 +148,7 @@ const CourseDropdown = ({
           "bg-background text-text-light border border-text-light rounded-3xl px-2",
         noOptionsMessage: () => "p-4 text-text-light",
         loadingMessage: () => "p-4 text-text-light",
-        placeholder: () => "text-nowrap text-elipsis text-text-light",
+        placeholder: () => "text-nowrap text-text-light",
       }}
       onChange={(cArr) => {
         // If no courses are selected, clear the selection
