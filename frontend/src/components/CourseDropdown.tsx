@@ -103,6 +103,8 @@ const CourseDropdown = ({
       loadOptions={loadOptions}
       defaultOptions={defaultOptions}
       isLoading={loading}
+      getOptionValue={(option) => option.value.id}
+      getOptionLabel={(option) => option.label}
       classNames={{
         container: () =>
           twMerge("w-full flex flex-col overflow-visible", className),
@@ -254,9 +256,14 @@ const Option = ({
 
   const {
     isFocused,
-    isSelected,
-    data: { label },
+    data: { label, value: course },
   } = props;
+
+  // Get selected courses from store to check if this option is selected
+  const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
+  const isSelected = selectedCourses.some(
+    (selectedCourse) => selectedCourse.id === course.id,
+  );
 
   return (
     <components.Option {...newProps}>
