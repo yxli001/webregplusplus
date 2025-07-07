@@ -17,6 +17,7 @@ import {
   List,
   ListRowProps,
 } from "react-virtualized";
+import { twMerge } from "tailwind-merge";
 
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import Check from "@/icons/Check";
@@ -103,15 +104,16 @@ const CourseDropdown = ({
       defaultOptions={defaultOptions}
       isLoading={loading}
       classNames={{
-        container: () => `w-full flex flex-col overflow-visible ${className}`,
-        control: () => "flex",
+        container: () =>
+          twMerge("w-full flex flex-col overflow-visible", className),
+        control: () => "flex focus:outline-2",
         input: () => "sm:py-1",
         valueContainer: () => "flex flex-row items-center gap-2",
         multiValue: () =>
           "bg-background text-text-light border border-text-light rounded-3xl px-2",
         noOptionsMessage: () => "p-4 text-text-light",
         loadingMessage: () => "p-4 text-text-light",
-        placeholder: () => "text-nowrap text-elipsis",
+        placeholder: () => "text-nowrap text-elipsis text-text-light",
       }}
       onChange={(cArr) => {
         // If no courses are selected, clear the selection
@@ -132,13 +134,14 @@ const CourseDropdown = ({
         DropdownIndicator: () => null,
         MenuList: VirtualizedList,
       }}
-      placeholder={"eg. BILD, BILD 3, or CSE 101"}
+      placeholder={"Search"}
       closeMenuOnSelect={false}
       hideSelectedOptions={false}
       blurInputOnSelect={false}
       tabSelectsValue={false}
       openMenuOnFocus={false}
       openMenuOnClick={false}
+      controlShouldRenderValue={false}
       cacheOptions
       isSearchable
       isClearable
@@ -163,7 +166,7 @@ const VirtualizedList = ({
   if (!Array.isArray(rows)) {
     // For children like: "Loading" or "No Options" provided by 'react-select'
     return (
-      <div className="z-50 mt-2 rounded-lg bg-foreground shadow-lg">
+      <div className="z-50 mt-2 rounded-lg border border-border bg-background shadow-lg">
         {children}
       </div>
     );
@@ -186,7 +189,7 @@ const VirtualizedList = ({
   return (
     <div
       style={{ height: "300px" }}
-      className="z-50 mt-2 rounded-lg bg-foreground shadow-lg"
+      className="z-50 mt-2 rounded-lg border border-border bg-background shadow-lg"
     >
       <AutoSizer>
         {({ width, height }) => (
@@ -233,8 +236,8 @@ const Control = ({
         },
       }}
     >
-      <div className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-text-light bg-foreground px-3 py-2 hover:cursor-pointer">
-        <Search size={18} />
+      <div className="flex w-full flex-row items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 text-text-darker hover:cursor-pointer">
+        <Search size={20} />
         {children}
       </div>
     </components.Control>
@@ -258,10 +261,13 @@ const Option = ({
   return (
     <components.Option {...newProps}>
       <div
-        className={`flex flex-row items-center justify-between p-4 hover:cursor-pointer hover:bg-gray-100 ${isFocused ? "bg-gray-100" : ""}`}
+        className={twMerge(
+          "flex flex-row items-center justify-between p-4 hover:cursor-pointer hover:bg-foreground",
+          isFocused ? "bg-foreground" : "",
+        )}
       >
         <p>{label}</p>
-        {isSelected && <Check />}
+        {isSelected && <Check size={20} color="#1570ef" />}
       </div>
     </components.Option>
   );
