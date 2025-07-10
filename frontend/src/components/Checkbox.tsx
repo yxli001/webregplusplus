@@ -28,7 +28,16 @@ const Checkbox = ({ checked, onChange, className = "" }: CheckboxProps) => {
 
   return (
     <div
+      role="checkbox"
+      aria-checked={checked ?? "mixed"}
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       className={twMerge(
         "flex h-5 w-5 cursor-pointer appearance-none items-center justify-center rounded border border-border p-0.5 focus:outline-4 focus:outline-offset-4 focus:outline-primary-light",
         checked === undefined || checked
