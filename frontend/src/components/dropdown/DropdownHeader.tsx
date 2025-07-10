@@ -5,10 +5,10 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 export type DropdownHeaderProps = {
   title: string;
   icon?: ReactNode;
-  actions?: ReactNode;
+  actions?: ReactNode[];
   open?: boolean; // flips the chevron
   toggleProps?: ButtonHTMLAttributes<HTMLButtonElement>;
-} & ButtonHTMLAttributes<HTMLButtonElement>;
+} & ButtonHTMLAttributes<HTMLDivElement>;
 
 export default function DropdownHeader({
   title,
@@ -20,7 +20,7 @@ export default function DropdownHeader({
   ...buttonProps
 }: DropdownHeaderProps) {
   return (
-    <button
+    <div
       {...buttonProps}
       className={twMerge(
         "flex w-full items-center justify-between gap-2 p-3",
@@ -32,7 +32,7 @@ export default function DropdownHeader({
         {title}
       </span>
 
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-3">
         {actions}
         <button
           type="button"
@@ -51,6 +51,6 @@ export default function DropdownHeader({
           </svg>
         </button>
       </span>
-    </button>
+    </div>
   );
 }

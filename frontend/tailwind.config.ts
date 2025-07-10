@@ -23,6 +23,9 @@ export default {
           dark: "var(--text-dark)",
         },
       },
+      fontFamily: {
+        inter: ["Inter", "ui-sans-serif", "system-ui"],
+      },
     },
   },
   plugins: [],

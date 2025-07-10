@@ -3,6 +3,7 @@
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { useEffect, useRef } from "react";
 
 import { CalEvent } from "@/types/calendar";
 
@@ -11,9 +12,20 @@ type ScheduleDisplayProps = {
 };
 
 export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
+  const calRef = useRef<FullCalendar | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  // Resize observer to adjust calendar size based on wrapper dimensions
+  useEffect(() => {
+    const ro = new ResizeObserver(() => calRef.current?.getApi().updateSize());
+    if (wrapperRef.current) ro.observe(wrapperRef.current);
+    return () => {
+      ro.disconnect();
+    };
+  }, []);
   return (
-    <div className="mx-auto w-full">
+    <div ref={wrapperRef} className="mx-auto w-full p-4">
       <FullCalendar
+        ref={calRef}
         viewClassNames="w-full"
         dayHeaderClassNames="!py-[0.3rem]"
         slotLabelClassNames="uppercase !px-[0.5rem]"

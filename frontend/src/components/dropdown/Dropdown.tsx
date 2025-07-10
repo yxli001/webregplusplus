@@ -11,7 +11,7 @@ export type DropdownProps = {
   value: string; // unique key if used in a list
   title: string;
   icon?: ReactNode;
-  actions?: ReactNode;
+  actions?: ReactNode[];
   defaultOpen?: boolean;
   children: ReactNode;
   className?: string;
@@ -30,7 +30,12 @@ export default function Dropdown({
   const collapse = useCollapse({ isExpanded: isOpen });
 
   return (
-    <div className={twMerge("rounded-lg border bg-white", className)}>
+    <div
+      className={twMerge(
+        "rounded-lg border border-[#D5D7DA] bg-white font-inter font-semibold text-[#181D27]",
+        className,
+      )}
+    >
       <DropdownHeader
         title={title}
         icon={icon}
