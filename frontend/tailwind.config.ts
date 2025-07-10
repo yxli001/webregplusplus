@@ -10,6 +10,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        gray: {
+          25: "#fdfdfd",
+          50: "#fafafa",
+          100: "#f5f5f5",
+          200: "#e8eaec",
+          300: "#d5d7db",
+          400: "#a5a7ad",
+          500: "#707680",
+          600: "#525862",
+          700: "#414651",
+          800: "#262b36",
+          900: "#181e27",
+        },
         background: "var(--background)",
         foreground: "var(--foreground)",
         border: "var(--border)",
@@ -21,10 +34,15 @@ export default {
           lighter: "var(--text-lighter)",
           light: "var(--text-light)",
           dark: "var(--text-dark)",
+          darker: "var(--text-darker)",
         },
       },
       fontFamily: {
         inter: ["Inter", "ui-sans-serif", "system-ui"],
+      },
+      boxShadow: {
+        xs: "0 2px 2px 0 rgba(10, 13, 18, 0.05)",
+        lg: "0 12px 16px -4px rgba(10, 13, 18, 0.08)",
       },
     },
   },

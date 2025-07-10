@@ -120,7 +120,7 @@ const TimeSlotModal = ({ isOpen, onClose, onSave }: TimeSlotModalProps) => {
       <div className="flex justify-end gap-2">
         <button
           onClick={handleClose}
-          className="hover:text-text-darker px-4 py-2 text-text-dark"
+          className="px-4 py-2 text-text-dark hover:text-text-darker"
         >
           Cancel
         </button>

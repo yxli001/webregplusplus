@@ -97,7 +97,7 @@ const DropdownSelect = ({
         }}
       >
         <span className="truncate text-sm text-text-dark">{option.label}</span>
-        {value === option.value && <Check size={13} color="#1570ef" />}
+        {value === option.value && <Check size={20} color="#1570ef" />}
       </div>
     ))
   ) : (
@@ -115,7 +115,7 @@ const DropdownSelect = ({
         <span className="truncate text-sm font-semibold text-text-dark">
           {getLabel()}
         </span>
-        <DownArrow size={12} color="#414651" />
+        <DownArrow size={20} color="#414651" />
       </div>
 
       {isOpen && (

@@ -1,6 +1,6 @@
 import { BaseIconProps } from "@/types/icon";
 
-const DownArrow = ({ color, size = 16, ...props }: BaseIconProps) => (
+const UpArrow = ({ color, size = 16, ...props }: BaseIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -10,7 +10,7 @@ const DownArrow = ({ color, size = 16, ...props }: BaseIconProps) => (
     {...props}
   >
     <path
-      d="M5 7.5L10 12.5L15 7.5"
+      d="M5 12.5L10 7.5L15 12.5"
       stroke={color ?? "#717680"}
       strokeWidth="1.66667"
       strokeLinecap="round"
@@ -19,4 +19,4 @@ const DownArrow = ({ color, size = 16, ...props }: BaseIconProps) => (
   </svg>
 );
 
-export default DownArrow;
+export default UpArrow;
