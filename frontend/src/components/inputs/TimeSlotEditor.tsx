@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import TimeSlotModal from "./TimeSlotModal";
+import TimeSlotModal from "../TimeSlotModal";
 
 type TimeSlot = {
   id: string;

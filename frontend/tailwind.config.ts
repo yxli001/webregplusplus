@@ -37,6 +37,9 @@ export default {
           darker: "var(--text-darker)",
         },
       },
+      fontFamily: {
+        inter: ["Inter", "ui-sans-serif", "system-ui"],
+      },
       boxShadow: {
         xs: "0 2px 2px 0 rgba(10, 13, 18, 0.05)",
         lg: "0 12px 16px -4px rgba(10, 13, 18, 0.08)",

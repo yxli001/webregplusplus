@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-import Checkbox from "./Checkbox";
-import DaysSelect from "./DaysSelect";
-import DropdownSelect from "./DropdownSelect";
-import TimeRangeSlider from "./TimeRangeSlider";
-import TimeSlotEditor from "./TimeSlotEditor";
+import Checkbox from "./inputs/Checkbox";
+import DaysSelect from "./inputs/DaysSelect";
+import DropdownSelect from "./inputs/DropdownSelect";
+import TimeRangeSlider from "./inputs/TimeRangeSlider";
+import TimeSlotEditor from "./inputs/TimeSlotEditor";
 
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import { SpreadPreference } from "@/types/preferences";

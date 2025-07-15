@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layouts/Navbar";
 import { PreferenceStoreProvider } from "@/providers/PreferenceStoreProvider";
 
 export const metadata: Metadata = {

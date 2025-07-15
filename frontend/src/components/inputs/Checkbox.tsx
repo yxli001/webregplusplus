@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
-import Check from "@/icons/Check";
-import Minus from "@/icons/Minus";
+import Check from "@/components/icons/Check";
+import Minus from "@/components/icons/Minus";
 
 type CheckboxProps = {
   checked?: boolean | undefined;

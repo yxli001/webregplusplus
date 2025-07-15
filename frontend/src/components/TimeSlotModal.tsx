@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
-import DaysSelect from "./DaysSelect";
 import Modal from "./Modal";
+import DaysSelect from "./inputs/DaysSelect";
 
 type TimeSlotModalProps = {
   isOpen: boolean;
