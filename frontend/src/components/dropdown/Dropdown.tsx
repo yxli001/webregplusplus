@@ -32,7 +32,7 @@ export default function Dropdown({
   return (
     <div
       className={twMerge(
-        "rounded-lg border border-[#D5D7DA] bg-white font-inter font-semibold text-[#181D27]",
+        "rounded-lg border border-border bg-white font-inter font-semibold text-[#181D27]",
         className,
       )}
     >
