@@ -114,7 +114,7 @@ export default function Home() {
       center={
         <main className="flex h-full w-full flex-col items-end p-6">
           <ButtonGroup
-            className="mx-4 mt-4 flex"
+            className="flex"
             buttons={[
               {
                 label: "Calendar",
