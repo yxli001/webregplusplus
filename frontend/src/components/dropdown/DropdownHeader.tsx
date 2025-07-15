@@ -1,11 +1,18 @@
+import { ChevronUp } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+
+import IconButton from "../inputs/IconButton";
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+export type DropdownIcon = {
+  icon: ReactNode;
+  onClick?: () => void;
+};
 export type DropdownHeaderProps = {
   title: string;
-  icon?: ReactNode;
-  actions?: ReactNode[];
+  icon: ReactNode;
+  actions: DropdownIcon[];
   open?: boolean; // flips the chevron
   toggleProps?: ButtonHTMLAttributes<HTMLButtonElement>;
 } & ButtonHTMLAttributes<HTMLDivElement>;
@@ -33,7 +40,9 @@ export default function DropdownHeader({
       </span>
 
       <span className="flex items-center gap-3">
-        {actions}
+        {actions.map((action, idx) => (
+          <IconButton key={idx} icon={action.icon} onClick={action.onClick} />
+        ))}
         <button
           type="button"
           aria-label={open ? "Collapse" : "Expand"}
@@ -43,12 +52,10 @@ export default function DropdownHeader({
             toggleProps?.className,
           )}
         >
-          <svg
-            viewBox="0 0 24 24"
+          <ChevronUp
+            size={16}
             className={twMerge("h-4 w-4", open ? "rotate-180" : "")}
-          >
-            <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" />
-          </svg>
+          />
         </button>
       </span>
     </div>

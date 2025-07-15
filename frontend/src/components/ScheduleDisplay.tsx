@@ -22,8 +22,9 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
       ro.disconnect();
     };
   }, []);
+
   return (
-    <div ref={wrapperRef} className="mx-auto w-full p-4">
+    <div ref={wrapperRef} className="mx-auto h-full w-full p-4">
       <FullCalendar
         ref={calRef}
         viewClassNames="w-full"
@@ -32,7 +33,11 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
         plugins={[timeGridPlugin, dayGridPlugin]}
         initialView="timeGridWeek"
         firstDay={1} // 0 = Sunday, 1 = Monday
-        dayHeaderFormat={{ weekday: "long" }}
+        slotLabelFormat={{
+          hour: "numeric",
+          hour12: true,
+        }}
+        dayHeaderFormat={{ weekday: "short" }}
         hiddenDays={[0, 6]} // Hide Sunday and Saturday
         headerToolbar={false}
         events={events}
@@ -48,7 +53,7 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
             eventInfo.event;
           return (
             <div
-              className={`flex h-full items-center overflow-x-hidden px-[4px] py-[6px] text-[0.5rem]`}
+              className={`flex items-center px-[4px] py-[6px] text-[0.5rem]`}
               style={{
                 backgroundColor: backgroundColor ? backgroundColor : "#e3f8ff",
                 color: textColor ? textColor : "#1992d4",
@@ -61,17 +66,13 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
                   backgroundColor: textColor ? textColor : "#1992D4",
                 }}
               ></div>
-
               {/* Text content */}
               <div className="leading-[1.2]">
-                <div className="text-[0.6rem] font-semibold">
-                  {title} |{" "}
-                  <span className="font-semibold">
-                    {extendedProps.lecture}
-                    {extendedProps.section} / {extendedProps.meetingType}
-                  </span>
-                </div>
-                <div>{extendedProps.instructor}</div>
+                <div className="text-[0.6rem] font-semibold">{title}</div>
+                <span className="font-semibold">
+                  {extendedProps.lecture}
+                  {extendedProps.section} / {extendedProps.meetingType}
+                </span>
               </div>
             </div>
           );

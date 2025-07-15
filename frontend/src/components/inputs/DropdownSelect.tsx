@@ -4,8 +4,8 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import Check from "@/icons/Check";
-import DownArrow from "@/icons/DownArrow";
+import Check from "@/components/icons/Check";
+import DownArrow from "@/components/icons/DownArrow";
 
 type DropdownSelectProps = {
   options: { label: string; value: string }[];

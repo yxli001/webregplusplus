@@ -19,10 +19,10 @@ import {
 } from "react-virtualized";
 import { twMerge } from "tailwind-merge";
 
+import Check from "@/components/icons/Check";
+import Cross from "@/components/icons/Cross";
+import Search from "@/components/icons/Search";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
-import Check from "@/icons/Check";
-import Cross from "@/icons/Cross";
-import Search from "@/icons/Search";
 import { Course } from "@/types/course";
 
 type CourseOption = {

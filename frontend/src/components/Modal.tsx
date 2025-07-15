@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
-import Cross from "@/icons/Cross";
+import Cross from "@/components/icons/Cross";
 
 type BaseModalProps = {
   open: boolean;

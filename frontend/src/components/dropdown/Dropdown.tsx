@@ -3,15 +3,15 @@ import { useState } from "react";
 import { useCollapse } from "react-collapsed";
 import { twMerge } from "tailwind-merge";
 
-import DropdownHeader from "./DropdownHeader";
+import DropdownHeader, { DropdownIcon } from "./DropdownHeader";
 
 import type { ReactNode } from "react";
 
 export type DropdownProps = {
   value: string; // unique key if used in a list
   title: string;
-  icon?: ReactNode;
-  actions?: ReactNode[];
+  icon: ReactNode;
+  actions: DropdownIcon[];
   defaultOpen?: boolean;
   children: ReactNode;
   className?: string;

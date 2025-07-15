@@ -5,15 +5,15 @@ import Link from "next/link";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 
-import Button from "./Button";
-import DropdownSelect from "./DropdownSelect";
-import IconButton from "./IconButton";
+import Button from "../inputs/Button";
+import DropdownSelect from "../inputs/DropdownSelect";
+import IconButton from "../inputs/IconButton";
 
 import { getQuarters } from "@/api/courses";
+import Feedback from "@/components/icons/Feedback";
+import Sun from "@/components/icons/Sun";
+import Tutorial from "@/components/icons/Tutorial";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
-import Feedback from "@/icons/Feedback";
-import Sun from "@/icons/Sun";
-import Tutorial from "@/icons/Tutorial";
 import { Quarter } from "@/types/course";
 import { convertToQuarterFullName } from "@/util/helper";
 
