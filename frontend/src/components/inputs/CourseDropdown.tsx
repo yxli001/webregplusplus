@@ -35,6 +35,7 @@ type CourseDropdownProps = {
   maxCourses?: number;
   className?: string;
   loading?: boolean;
+  disabled?: boolean;
 };
 
 /**
@@ -52,7 +53,10 @@ const CourseDropdown = ({
   maxCourses = 10,
   className = "",
   loading = false,
+  disabled = false,
 }: CourseDropdownProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+
   const [defaultOptions, setDefaultOptions] = useState([] as CourseOption[]);
 
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
@@ -93,6 +97,11 @@ const CourseDropdown = ({
   );
 
   useEffect(() => {
+    // Only render select on mount to avoid hydration errors
+    // This is an internal issue with react-select as far as I know
+    // Refer to https://github.com/JedWatson/react-select/issues/5459 for more details
+    setIsMounted(true);
+
     void initializeOptions();
   }, []);
 
@@ -130,59 +139,63 @@ const CourseDropdown = ({
   };
 
   return (
-    <AsyncSelect
-      name="course"
-      value={selectedOptions}
-      loadOptions={loadOptions}
-      defaultOptions={defaultOptions}
-      isLoading={loading}
-      getOptionValue={(option) => option.value.id}
-      getOptionLabel={(option) => option.label}
-      classNames={{
-        container: () =>
-          twMerge("w-full flex flex-col overflow-visible", className),
-        control: () => "flex focus:outline-2",
-        input: () => "sm:py-1",
-        valueContainer: () => "flex flex-row items-center gap-2",
-        multiValue: () =>
-          "bg-background text-text-light border border-text-light rounded-3xl px-2",
-        noOptionsMessage: () => "p-4 text-text-light",
-        loadingMessage: () => "p-4 text-text-light",
-        placeholder: () => "text-nowrap text-text-light",
-      }}
-      onChange={(cArr) => {
-        // If no courses are selected, clear the selection
-        if (!cArr) {
-          setSelectedCourses([]);
-          return;
-        }
+    isMounted && (
+      <AsyncSelect
+        name="course"
+        value={selectedOptions}
+        loadOptions={loadOptions}
+        defaultOptions={defaultOptions}
+        isLoading={loading}
+        isDisabled={disabled}
+        getOptionValue={(option) => option.value.id}
+        getOptionLabel={(option) => option.label}
+        classNames={{
+          container: () =>
+            twMerge("w-full flex flex-col overflow-visible", className),
+          control: () => "flex focus:outline-2",
+          input: () => "sm:py-1",
+          valueContainer: () => "flex flex-row items-center gap-2",
+          multiValue: () =>
+            "bg-background text-text-light border border-text-light rounded-3xl px-2",
+          noOptionsMessage: () => "p-4 text-text-light",
+          loadingMessage: () => "p-4 text-text-light",
+          placeholder: () => "text-nowrap text-text-light",
+        }}
+        onChange={(cArr) => {
+          // If no courses are selected, clear the selection
+          if (!cArr) {
+            setSelectedCourses([]);
+            return;
+          }
 
-        // Limit to maxCourses
-        if (cArr.length > maxCourses) return;
+          // Limit to maxCourses
+          if (cArr.length > maxCourses) return;
 
-        setSelectedCourses(cArr.map((course) => course.value));
-      }}
-      components={{
-        Option,
-        Control,
-        ClearIndicator,
-        DropdownIndicator: () => null,
-        MenuList: VirtualizedList,
-      }}
-      placeholder={"Search"}
-      closeMenuOnSelect={false}
-      hideSelectedOptions={false}
-      blurInputOnSelect={false}
-      tabSelectsValue={false}
-      openMenuOnFocus={false}
-      openMenuOnClick={false}
-      controlShouldRenderValue={false}
-      cacheOptions
-      isSearchable
-      isClearable
-      isMulti
-      unstyled
-    />
+          setSelectedCourses(cArr.map((course) => course.value));
+        }}
+        components={{
+          Option,
+          Control,
+          ClearIndicator,
+          DropdownIndicator: () => null,
+          MenuList: VirtualizedList,
+        }}
+        placeholder={"Search"}
+        closeMenuOnSelect={false}
+        hideSelectedOptions={false}
+        blurInputOnSelect={false}
+        tabSelectsValue={false}
+        openMenuOnFocus={false}
+        openMenuOnClick={false}
+        controlShouldRenderValue={false}
+        // No cache because cache retains through quarter changes
+        // cacheOptions
+        isSearchable
+        isClearable
+        isMulti
+        unstyled
+      />
+    )
   );
 };
 

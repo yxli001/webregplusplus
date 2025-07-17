@@ -1,13 +1,18 @@
 "use client";
 import { BookOpen, Calendar, Eye, Trash2, Upload } from "lucide-react";
-import { useState } from "react";
+import { Toast } from "primereact/toast";
+import { useRef, useState } from "react";
 
+import { getCourses } from "@/api/courses";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import Dropdown from "@/components/dropdown/Dropdown";
 import Pin from "@/components/icons/Pin";
 import ButtonGroup from "@/components/inputs/ButtonGroup";
+import CourseDropdown from "@/components/inputs/CourseDropdown";
 import ThreePane from "@/components/layouts/ThreePane";
+import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import { CalEvent } from "@/types/calendar";
+
 export default function Home() {
   const sampleEvents: CalEvent[] = [
     {
@@ -89,79 +94,121 @@ export default function Home() {
       },
     },
   ];
+  const selectedQuarter = usePreferenceStore((state) => state.selectedQuarter);
+  const [loadingCourses, setLoadingCourses] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "finals" | "list">(
     "calendar",
   );
 
+  const errorToast = useRef<Toast>(null);
+
+  // Helper functions
+  const fetchCourses = async (q: string) => {
+    if (!selectedQuarter) {
+      return [];
+    }
+
+    setLoadingCourses(true);
+
+    const res = await getCourses(selectedQuarter, q);
+
+    setLoadingCourses(false);
+
+    if (!res.success) {
+      errorToast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch courses",
+        life: 2000,
+      });
+
+      return [];
+    }
+
+    return res.data;
+  };
+
+  // Event handlers
+
   return (
-    <ThreePane
-      left={
-        <aside className="flex flex-col gap-6 p-6">
-          <Dropdown
-            value="cogs1"
-            title="COGS 108A"
-            icon={<BookOpen size={16} />}
-            actions={[
-              { icon: <Trash2 size={16} /> },
-              { icon: <Eye size={16} /> },
-            ]}
-            defaultOpen
-          >
-            <div>test</div>
-          </Dropdown>
-        </aside>
-      }
-      center={
-        <main className="flex h-full w-full flex-col items-end p-6">
-          <ButtonGroup
-            className="flex"
-            buttons={[
-              {
-                label: "Calendar",
-                active: activeTab === "calendar",
-                onClick: () => {
-                  setActiveTab("calendar");
+    <>
+      <ThreePane
+        left={
+          <aside className="flex flex-col gap-6 p-6">
+            <CourseDropdown
+              fetchCourses={fetchCourses}
+              loading={loadingCourses}
+              disabled={!selectedQuarter}
+            />
+            <Dropdown
+              value="cogs1"
+              title="COGS 108A"
+              icon={<BookOpen size={16} />}
+              actions={[
+                { icon: <Trash2 size={16} /> },
+                { icon: <Eye size={16} /> },
+              ]}
+              defaultOpen
+            >
+              <div>test</div>
+            </Dropdown>
+          </aside>
+        }
+        center={
+          <main className="flex h-full w-full flex-col items-end p-6">
+            <ButtonGroup
+              className="flex"
+              buttons={[
+                {
+                  label: "Calendar",
+                  active: activeTab === "calendar",
+                  onClick: () => {
+                    setActiveTab("calendar");
+                  },
                 },
-              },
-              {
-                label: "Finals",
-                active: activeTab === "finals",
-                onClick: () => {
-                  setActiveTab("finals");
+                {
+                  label: "Finals",
+                  active: activeTab === "finals",
+                  onClick: () => {
+                    setActiveTab("finals");
+                  },
                 },
-              },
-              {
-                label: "List",
-                active: activeTab === "list",
-                onClick: () => {
-                  setActiveTab("list");
+                {
+                  label: "List",
+                  active: activeTab === "list",
+                  onClick: () => {
+                    setActiveTab("list");
+                  },
                 },
-              },
-            ]}
-          />
-          {activeTab === "calendar" && (
-            <ScheduleDisplay events={sampleEvents} />
-          )}
-          {activeTab === "finals" && <ScheduleDisplay events={sampleEvents} />}
-          {activeTab === "list" && <ScheduleDisplay events={[]} />}
-        </main>
-      }
-      right={
-        <aside className="flex flex-col gap-6 p-6">
-          <Dropdown
-            value="sched1"
-            title="Schedule 1"
-            icon={<Calendar size={16} />}
-            actions={[
-              { icon: <Pin size={16} /> },
-              { icon: <Upload size={16} /> },
-            ]}
-            defaultOpen
-          >
-            <div>test</div>
-          </Dropdown>
-        </aside>
-      }
-    />
+              ]}
+            />
+            {activeTab === "calendar" && (
+              <ScheduleDisplay events={sampleEvents} />
+            )}
+            {activeTab === "finals" && (
+              <ScheduleDisplay events={sampleEvents} />
+            )}
+            {activeTab === "list" && <ScheduleDisplay events={[]} />}
+          </main>
+        }
+        right={
+          <aside className="flex flex-col gap-6 p-6">
+            <Dropdown
+              value="sched1"
+              title="Schedule 1"
+              icon={<Calendar size={16} />}
+              actions={[
+                { icon: <Pin size={16} /> },
+                { icon: <Upload size={16} /> },
+              ]}
+              defaultOpen
+            >
+              <div>test</div>
+            </Dropdown>
+          </aside>
+        }
+      />
+      <Toast ref={errorToast} />
+    </>
   );
 }
