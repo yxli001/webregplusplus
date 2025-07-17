@@ -11,6 +11,8 @@ import ButtonGroup from "@/components/inputs/ButtonGroup";
 import CourseDropdown from "@/components/inputs/CourseDropdown";
 import ThreePane from "@/components/layouts/ThreePane";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
+import { useScheduleStore } from "@/hooks/useScheduleStore";
+import { scheduleColors } from "@/lib/constants";
 import generateOptimalSchedule from "@/lib/scheduler";
 import {
   CoursePreferences,
@@ -27,24 +29,6 @@ import {
   parseAvailableCourses,
 } from "@/util/helper";
 
-const COLORS: {
-  backgroundColor: string;
-  textColor: string;
-}[] = [
-  {
-    backgroundColor: "#E3F8FF",
-    textColor: "#1992D4",
-  },
-  {
-    backgroundColor: "#FCECF8",
-    textColor: "#BB3894",
-  },
-  {
-    backgroundColor: "#EFF7EB",
-    textColor: "#45832A",
-  },
-];
-
 export default function Home() {
   const toast = useRef<Toast>(null);
 
@@ -57,9 +41,11 @@ export default function Home() {
     (state) => state.schedulePreferences,
   );
 
-  // Generated schedules
-  const [schedules, setSchedules] = useState<CalSchedule[]>([]);
-  const [currSchedule, setCurrSchedule] = useState<CalSchedule | null>();
+  // Schedules states
+  const schedules = useScheduleStore((state) => state.schedules);
+  const setSchedules = useScheduleStore((state) => state.setSchedules);
+  const currSchedule = useScheduleStore((state) => state.currSchedule);
+  const setCurrSchedule = useScheduleStore((state) => state.setCurrSchedule);
 
   const [activeTab, setActiveTab] = useState<"calendar" | "finals" | "list">(
     "calendar",
@@ -74,8 +60,8 @@ export default function Home() {
           .map((schedule, index) => {
             return {
               ...schedule,
-              backgroundColor: COLORS[index].backgroundColor,
-              textColor: COLORS[index].textColor,
+              backgroundColor: scheduleColors[index].backgroundColor,
+              textColor: scheduleColors[index].textColor,
             };
           })
           .sort((a, b) => a.id - b.id);
@@ -144,6 +130,11 @@ export default function Home() {
     cPreferences: CoursePreferences[],
     sPreferences: SchedulePreferences,
   ) => {
+    // Don't run if no courses or preferences are set
+    if (cDetails.length === 0 || cPreferences.length === 0) {
+      return;
+    }
+
     const fetchSchedule = () => {
       const availableCourses = parseAvailableCourses(cDetails, cPreferences);
 
@@ -222,8 +213,8 @@ export default function Home() {
           id: index + 1,
           pinned: false,
           events,
-          backgroundColor: COLORS[0].backgroundColor,
-          textColor: COLORS[0].textColor,
+          backgroundColor: scheduleColors[0].backgroundColor,
+          textColor: scheduleColors[0].textColor,
         } as CalSchedule;
       });
 

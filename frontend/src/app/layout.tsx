@@ -7,6 +7,7 @@ import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Navbar from "@/components/layouts/Navbar";
 import { PreferenceStoreProvider } from "@/providers/PreferenceStoreProvider";
+import { ScheduleStoreProvider } from "@/providers/ScheduleStoreProvider";
 
 export const metadata: Metadata = {
   title: "Webreg++ | Smarter UCSD Class Scheduling",
@@ -66,24 +67,26 @@ export default function RootLayout({
       </head>
       <body>
         <PreferenceStoreProvider>
-          <PrimeReactProvider
-            value={{
-              pt: {
-                // Default styles for Toast
-                toast: {
-                  content: {
-                    className: "flex p-3 gap-4",
-                  },
-                  icon: {
-                    className: "mt-1",
+          <ScheduleStoreProvider>
+            <PrimeReactProvider
+              value={{
+                pt: {
+                  // Default styles for Toast
+                  toast: {
+                    content: {
+                      className: "flex p-3 gap-4",
+                    },
+                    icon: {
+                      className: "mt-1",
+                    },
                   },
                 },
-              },
-            }}
-          >
-            <Navbar />
-            <div>{children}</div>
-          </PrimeReactProvider>
+              }}
+            >
+              <Navbar />
+              <div>{children}</div>
+            </PrimeReactProvider>
+          </ScheduleStoreProvider>
         </PreferenceStoreProvider>
       </body>
     </html>
