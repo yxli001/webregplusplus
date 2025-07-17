@@ -1,9 +1,9 @@
 "use client";
-import { BookOpen, Calendar, Eye, Trash2, Upload } from "lucide-react";
+import { Calendar, Upload } from "lucide-react";
 import { Toast } from "primereact/toast";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { getCourses } from "@/api/courses";
+import CourseList from "@/components/CourseList";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import Dropdown from "@/components/dropdown/Dropdown";
 import Pin from "@/components/icons/Pin";
@@ -11,147 +11,242 @@ import ButtonGroup from "@/components/inputs/ButtonGroup";
 import CourseDropdown from "@/components/inputs/CourseDropdown";
 import ThreePane from "@/components/layouts/ThreePane";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
-import { CalEvent } from "@/types/calendar";
+import generateOptimalSchedule from "@/lib/scheduler";
+import {
+  CoursePreferences,
+  SchedulePreferences,
+} from "@/store/preferenceStore";
+import { CalEvent, CalSchedule } from "@/types/calendar";
+import { CourseWithSections, MainSection, SubSection } from "@/types/course";
+import {
+  convertDaysToNumbers,
+  createMainSectionByCourseIdLookup,
+  createMainSectionByIdLookup,
+  createSubSectionByIdLookup,
+  createSubSectionByMainSectionIdLookup,
+  parseAvailableCourses,
+} from "@/util/helper";
+
+const COLORS: {
+  backgroundColor: string;
+  textColor: string;
+}[] = [
+  {
+    backgroundColor: "#E3F8FF",
+    textColor: "#1992D4",
+  },
+  {
+    backgroundColor: "#FCECF8",
+    textColor: "#BB3894",
+  },
+  {
+    backgroundColor: "#EFF7EB",
+    textColor: "#45832A",
+  },
+];
 
 export default function Home() {
-  const sampleEvents: CalEvent[] = [
-    {
-      id: "cse101-lec",
-      title: "CSE 101",
-      startTime: "11:00",
-      endTime: "12:20",
-      daysOfWeek: [2, 4], // Tue, Thu
-      extendedProps: {
-        lecture: "A00",
-        meetingType: "LE",
-        instructor: "Prof. Li",
-        location: "Center Hall 119",
-      },
-    },
-    {
-      id: "cse101-disc",
-      title: "CSE 101",
-      startTime: "14:00",
-      endTime: "14:50",
-      daysOfWeek: [5], // Fri
-      extendedProps: {
-        section: "D01",
-        meetingType: "DI",
-        instructor: "TA Singh",
-        location: "PCYNH 122",
-      },
-    },
-    {
-      id: "math20b-lec",
-      title: "MATH 20B",
-      startTime: "10:00",
-      endTime: "10:50",
-      daysOfWeek: [1, 3, 5], // Mon, Wed, Fri
-      extendedProps: {
-        lecture: "B00",
-        meetingType: "LE",
-        instructor: "Dr. Alvarez",
-        location: "Warren Lecture Hall 2005",
-      },
-    },
-    {
-      id: "math20b-disc",
-      title: "MATH 20B",
-      startTime: "16:00",
-      endTime: "16:50",
-      daysOfWeek: [2], // Tue
-      extendedProps: {
-        section: "D02",
-        meetingType: "DI",
-        instructor: "TA García",
-        location: "AP&M 2402",
-      },
-    },
-    {
-      id: "phys2a-lec",
-      title: "PHYS 2A",
-      startTime: "13:00",
-      endTime: "13:50",
-      daysOfWeek: [1, 3, 5], // Mon, Wed, Fri
-      extendedProps: {
-        lecture: "C00",
-        meetingType: "LE",
-        instructor: "Prof. Bennett",
-        location: "York Hall 2622",
-      },
-    },
-    {
-      id: "phys2a-lab",
-      title: "PHYS 2A",
-      startTime: "14:00",
-      endTime: "16:50",
-      daysOfWeek: [4], // Thu
-      extendedProps: {
-        section: "L04",
-        meetingType: "LA",
-        instructor: "Lab Staff",
-        location: "Revelle Phys Lab B10",
-      },
-    },
-  ];
-  const selectedQuarter = usePreferenceStore((state) => state.selectedQuarter);
-  const [loadingCourses, setLoadingCourses] = useState(false);
+  const toast = useRef<Toast>(null);
+
+  // Preferences
+  const courseDetails = usePreferenceStore((state) => state.courseDetails);
+  const coursePreferences = usePreferenceStore(
+    (state) => state.coursePreferences,
+  );
+  const schedulePreferences = usePreferenceStore(
+    (state) => state.schedulePreferences,
+  );
+
+  // Generated schedules
+  const [schedules, setSchedules] = useState<CalSchedule[]>([]);
+  const [currSchedule, setCurrSchedule] = useState<CalSchedule | null>();
+
   const [activeTab, setActiveTab] = useState<"calendar" | "finals" | "list">(
     "calendar",
   );
 
-  const errorToast = useRef<Toast>(null);
-
   // Helper functions
-  const fetchCourses = async (q: string) => {
-    if (!selectedQuarter) {
-      return [];
-    }
+  const updateScheduleColors = useCallback(
+    (schedulesToUpdate: CalSchedule[]) => {
+      if (schedulesToUpdate.length > 0) {
+        const pinned = schedulesToUpdate
+          .filter((schedule) => schedule.pinned)
+          .map((schedule, index) => {
+            return {
+              ...schedule,
+              backgroundColor: COLORS[index].backgroundColor,
+              textColor: COLORS[index].textColor,
+            };
+          })
+          .sort((a, b) => a.id - b.id);
 
-    setLoadingCourses(true);
+        const unpinned = schedulesToUpdate
+          .filter((schedule) => !schedule.pinned)
+          .sort((a, b) => a.id - b.id)
+          .map((schedule) => {
+            if (currSchedule && currSchedule.id === schedule.id) {
+              return {
+                ...schedule,
+                backgroundColor: currSchedule.backgroundColor,
+                textColor: currSchedule.textColor,
+              };
+            }
 
-    const res = await getCourses(selectedQuarter, q);
+            return schedule;
+          });
 
-    setLoadingCourses(false);
+        return [...pinned, ...unpinned];
+      }
 
-    if (!res.success) {
-      errorToast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch courses",
-        life: 2000,
+      return schedulesToUpdate;
+    },
+    [currSchedule],
+  );
+
+  const getEvents = useCallback(() => {
+    let res: CalEvent[] = [];
+
+    const pinned = schedules.filter((schedule) => schedule.pinned);
+
+    // Add pinned events with their colors
+    const pinnedEvents = pinned
+      .map((schedule) =>
+        schedule.events.map((event) => {
+          return {
+            ...event,
+            backgroundColor: schedule.backgroundColor,
+            textColor: schedule.textColor,
+          };
+        }),
+      )
+      .flat();
+
+    res = [...pinnedEvents];
+
+    if (currSchedule) {
+      const currEvents = currSchedule.events.map((event) => {
+        return {
+          ...event,
+          backgroundColor: currSchedule.backgroundColor,
+          textColor: currSchedule.textColor,
+        };
       });
 
-      return [];
+      res = [...res, ...currEvents];
     }
 
-    return res.data;
-  };
+    return res;
+  }, [schedules, currSchedule]);
 
   // Event handlers
+  const handleAutoScheduler = (
+    cDetails: CourseWithSections[],
+    cPreferences: CoursePreferences[],
+    sPreferences: SchedulePreferences,
+  ) => {
+    const fetchSchedule = () => {
+      const availableCourses = parseAvailableCourses(cDetails, cPreferences);
+
+      const courses = availableCourses.courses;
+      const courseIds: string[] = courses.map((course) => course.id);
+      const mainSections = availableCourses.mainSection;
+      const subSections = availableCourses.subSection;
+
+      const mainSectionByCourseIdMap =
+        createMainSectionByCourseIdLookup(mainSections);
+      const subSectionByMainSectionIdMap =
+        createSubSectionByMainSectionIdLookup(subSections);
+      const mainSectionByIdMap = createMainSectionByIdLookup(mainSections);
+      const subSectionByIdMap = createSubSectionByIdLookup(subSections);
+
+      const scheds = generateOptimalSchedule(
+        courseIds,
+        sPreferences,
+        mainSectionByCourseIdMap,
+        subSectionByMainSectionIdMap,
+        mainSectionByIdMap,
+        subSectionByIdMap,
+      );
+
+      if (scheds.length === 0) {
+        toast.current?.show({
+          severity: "warn",
+          summary: "Warning",
+          detail:
+            "No valid schedules found. Please try again with different preferences.",
+          life: 2000,
+        });
+        return;
+      }
+
+      const formattedEvents: CalSchedule[] = scheds.map((schedule, index) => {
+        const events = schedule.classes.map(
+          (entry: MainSection | SubSection, i) => {
+            const isMain = "letter" in entry;
+
+            // If it's a MainSection, grab course directly
+            const course = isMain
+              ? courses.find((c) => c.id === entry.courseId)
+              : courses.find(
+                  (c) =>
+                    c.id ===
+                    mainSections.find(
+                      (mainSection) => mainSection.id === entry.mainSectionId,
+                    )?.courseId,
+                );
+
+            const mainSection = isMain
+              ? entry
+              : mainSections.find((ms) => ms.id === entry.mainSectionId);
+
+            const title = `${course?.subject ?? "?"} ${course?.code}`;
+
+            return {
+              id: `${index}-${i}`,
+              title,
+              startTime: entry.startTime,
+              endTime: entry.endTime,
+              daysOfWeek: convertDaysToNumbers(entry.days),
+              extendedProps: {
+                lecture: isMain ? entry.letter : mainSection?.letter,
+                section: isMain ? "00" : entry.section,
+                instructor: isMain ? entry.instructor : mainSection?.instructor,
+                location: entry.location || "TBD",
+                meetingType: entry.type,
+              },
+            } as CalEvent;
+          },
+        );
+
+        return {
+          id: index + 1,
+          pinned: false,
+          events,
+          backgroundColor: COLORS[0].backgroundColor,
+          textColor: COLORS[0].textColor,
+        } as CalSchedule;
+      });
+
+      // Apply colors to the schedules before setting them
+      const coloredSchedules = updateScheduleColors(formattedEvents);
+      setSchedules(coloredSchedules);
+      setCurrSchedule(coloredSchedules[0]);
+    };
+
+    fetchSchedule();
+  };
+
+  useEffect(() => {
+    handleAutoScheduler(courseDetails, coursePreferences, schedulePreferences);
+  }, [coursePreferences, schedulePreferences]);
 
   return (
     <>
       <ThreePane
         left={
           <aside className="flex flex-col gap-6 p-6">
-            <CourseDropdown
-              fetchCourses={fetchCourses}
-              loading={loadingCourses}
-              disabled={!selectedQuarter}
-            />
-            <Dropdown
-              value="cogs1"
-              title="COGS 108A"
-              icon={<BookOpen size={16} />}
-              actions={[
-                { icon: <Trash2 size={16} /> },
-                { icon: <Eye size={16} /> },
-              ]}
-              defaultOpen
-            >
-              <div>test</div>
-            </Dropdown>
+            <CourseDropdown />
+            <CourseList />
           </aside>
         }
         center={
@@ -183,11 +278,9 @@ export default function Home() {
               ]}
             />
             {activeTab === "calendar" && (
-              <ScheduleDisplay events={sampleEvents} />
+              <ScheduleDisplay events={getEvents()} />
             )}
-            {activeTab === "finals" && (
-              <ScheduleDisplay events={sampleEvents} />
-            )}
+            {activeTab === "finals" && <ScheduleDisplay events={getEvents()} />}
             {activeTab === "list" && <ScheduleDisplay events={[]} />}
           </main>
         }
@@ -208,7 +301,7 @@ export default function Home() {
           </aside>
         }
       />
-      <Toast ref={errorToast} />
+      <Toast ref={toast} />
     </>
   );
 }

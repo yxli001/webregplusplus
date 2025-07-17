@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Toast } from "primereact/toast";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ClearIndicatorProps,
   ControlProps,
@@ -19,6 +26,7 @@ import {
 } from "react-virtualized";
 import { twMerge } from "tailwind-merge";
 
+import { getCourseDetails, getCourses } from "@/api/courses";
 import Check from "@/components/icons/Check";
 import Cross from "@/components/icons/Cross";
 import Search from "@/components/icons/Search";
@@ -31,10 +39,8 @@ type CourseOption = {
 };
 
 type CourseDropdownProps = {
-  fetchCourses: (query: string) => Promise<Course[]>;
   maxCourses?: number;
   className?: string;
-  loading?: boolean;
   disabled?: boolean;
 };
 
@@ -49,19 +55,24 @@ type CourseDropdownProps = {
  * @returns CourseDropdown component
  */
 const CourseDropdown = ({
-  fetchCourses,
   maxCourses = 10,
   className = "",
-  loading = false,
   disabled = false,
 }: CourseDropdownProps) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const errorToast = useRef<Toast>(null);
 
   const [defaultOptions, setDefaultOptions] = useState([] as CourseOption[]);
 
+  const selectedQuarter = usePreferenceStore((state) => state.selectedQuarter);
   const selectedCourses = usePreferenceStore((state) => state.selectedCourses);
   const setSelectedCourses = usePreferenceStore(
     (state) => state.setSelectedCourses,
+  );
+  const setCourseDetails = usePreferenceStore(
+    (state) => state.setCourseDetails,
   );
 
   const selectedOptions = useMemo(
@@ -72,6 +83,49 @@ const CourseDropdown = ({
       })),
     [selectedCourses],
   );
+
+  const fetchCourses = async (q: string) => {
+    if (!selectedQuarter) {
+      return [];
+    }
+
+    setLoading(true);
+
+    const res = await getCourses(selectedQuarter, q);
+
+    setLoading(false);
+
+    if (!res.success) {
+      errorToast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch courses",
+        life: 2000,
+      });
+
+      return [];
+    }
+
+    return res.data;
+  };
+
+  const fetchCourseDetails = async () => {
+    const res = await getCourseDetails(
+      selectedQuarter,
+      selectedCourses.map((c) => `${c.subject} ${c.code}`),
+    );
+
+    if (!res.success) {
+      return errorToast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch course details",
+        life: 2000,
+      });
+    }
+
+    setCourseDetails(res.data);
+  };
 
   const initializeOptions = useCallback(async () => {
     const courses = await fetchCourses("");
@@ -104,6 +158,14 @@ const CourseDropdown = ({
 
     void initializeOptions();
   }, []);
+
+  // Update course details when selectedCourses change
+  // TODO: do atomized updates rather than refetching all selectedCourses
+  // Should probably happens in the onChange handler of the Select component
+  // Performance isn't a big concern since it's only one API call either way
+  useEffect(() => {
+    void fetchCourseDetails();
+  }, [selectedCourses]);
 
   // Needs to be defined inside the component to access selectedCourses
   const Option = ({
@@ -140,61 +202,64 @@ const CourseDropdown = ({
 
   return (
     isMounted && (
-      <AsyncSelect
-        name="course"
-        value={selectedOptions}
-        loadOptions={loadOptions}
-        defaultOptions={defaultOptions}
-        isLoading={loading}
-        isDisabled={disabled}
-        getOptionValue={(option) => option.value.id}
-        getOptionLabel={(option) => option.label}
-        classNames={{
-          container: () =>
-            twMerge("w-full flex flex-col overflow-visible", className),
-          control: () => "flex focus:outline-2",
-          input: () => "sm:py-1",
-          valueContainer: () => "flex flex-row items-center gap-2",
-          multiValue: () =>
-            "bg-background text-text-light border border-text-light rounded-3xl px-2",
-          noOptionsMessage: () => "p-4 text-text-light",
-          loadingMessage: () => "p-4 text-text-light",
-          placeholder: () => "text-nowrap text-text-light",
-        }}
-        onChange={(cArr) => {
-          // If no courses are selected, clear the selection
-          if (!cArr) {
-            setSelectedCourses([]);
-            return;
-          }
+      <>
+        <AsyncSelect
+          name="course"
+          value={selectedOptions}
+          loadOptions={loadOptions}
+          defaultOptions={defaultOptions}
+          isLoading={loading}
+          isDisabled={disabled}
+          getOptionValue={(option) => option.value.id}
+          getOptionLabel={(option) => option.label}
+          classNames={{
+            container: () =>
+              twMerge("w-full flex flex-col overflow-visible", className),
+            control: () => "flex focus:outline-2",
+            input: () => "sm:py-1",
+            valueContainer: () => "flex flex-row items-center gap-2",
+            multiValue: () =>
+              "bg-background text-text-light border border-text-light rounded-3xl px-2",
+            noOptionsMessage: () => "p-4 text-text-light",
+            loadingMessage: () => "p-4 text-text-light",
+            placeholder: () => "text-nowrap text-text-light",
+          }}
+          onChange={(cArr) => {
+            // If no courses are selected, clear the selection
+            if (!cArr) {
+              setSelectedCourses([]);
+              return;
+            }
 
-          // Limit to maxCourses
-          if (cArr.length > maxCourses) return;
+            // Limit to maxCourses
+            // TODO: Add feedback if user tries to select more than maxCourses
+            if (cArr.length > maxCourses) return;
 
-          setSelectedCourses(cArr.map((course) => course.value));
-        }}
-        components={{
-          Option,
-          Control,
-          ClearIndicator,
-          DropdownIndicator: () => null,
-          MenuList: VirtualizedList,
-        }}
-        placeholder={"Search"}
-        closeMenuOnSelect={false}
-        hideSelectedOptions={false}
-        blurInputOnSelect={false}
-        tabSelectsValue={false}
-        openMenuOnFocus={false}
-        openMenuOnClick={false}
-        controlShouldRenderValue={false}
-        // No cache because cache retains through quarter changes
-        // cacheOptions
-        isSearchable
-        isClearable
-        isMulti
-        unstyled
-      />
+            setSelectedCourses(cArr.map((course) => course.value));
+          }}
+          components={{
+            Option,
+            Control,
+            ClearIndicator,
+            DropdownIndicator: () => null,
+            MenuList: VirtualizedList,
+          }}
+          placeholder={"Search"}
+          closeMenuOnSelect={false}
+          hideSelectedOptions={false}
+          blurInputOnSelect={false}
+          tabSelectsValue={false}
+          openMenuOnFocus={false}
+          openMenuOnClick={false}
+          controlShouldRenderValue={false}
+          // No cache because cache retains through quarter changes
+          // cacheOptions
+          isSearchable
+          isClearable
+          isMulti
+          unstyled
+        />
+      </>
     )
   );
 };
