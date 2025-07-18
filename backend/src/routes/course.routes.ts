@@ -141,7 +141,6 @@ courseRouter.get(
 
       const resCourses = [];
       for (const course of coursesList) {
-        console.log(course.replace(/\s*\+\s*/g, " "));
         const foundCourse = await Course.scope("details").findOne({
           where: {
             subject: course.replace(/\s*\+\s*/g, " ").split(" ")[0],
