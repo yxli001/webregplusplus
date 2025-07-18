@@ -62,6 +62,7 @@ export default function Home() {
               ...schedule,
               backgroundColor: scheduleColors[index].backgroundColor,
               textColor: scheduleColors[index].textColor,
+              borderColor: scheduleColors[index].borderColor,
             };
           })
           .sort((a, b) => a.id - b.id);
@@ -74,6 +75,7 @@ export default function Home() {
               return {
                 ...schedule,
                 backgroundColor: currSchedule.backgroundColor,
+                borderColor: currSchedule.borderColor,
                 textColor: currSchedule.textColor,
               };
             }
@@ -102,6 +104,7 @@ export default function Home() {
             ...event,
             backgroundColor: schedule.backgroundColor,
             textColor: schedule.textColor,
+            borderColor: schedule.borderColor,
           };
         }),
       )
@@ -115,6 +118,7 @@ export default function Home() {
           ...event,
           backgroundColor: currSchedule.backgroundColor,
           textColor: currSchedule.textColor,
+          borderColor: currSchedule.borderColor,
         };
       });
 
@@ -216,6 +220,7 @@ export default function Home() {
           events,
           backgroundColor: scheduleColors[0].backgroundColor,
           textColor: scheduleColors[0].textColor,
+          borderColor: scheduleColors[0].borderColor,
         } as CalSchedule;
       });
 

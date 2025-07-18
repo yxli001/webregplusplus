@@ -213,7 +213,7 @@ const CourseDropdown = ({
           loadOptions={loadOptions}
           defaultOptions={defaultOptions}
           isLoading={loading}
-          isDisabled={disabled}
+          isDisabled={disabled || !selectedQuarter}
           getOptionValue={(option) => option.value.id}
           getOptionLabel={(option) => option.label}
           classNames={{
