@@ -164,6 +164,10 @@ const CourseDropdown = ({
   // Should probably happens in the onChange handler of the Select component
   // Performance isn't a big concern since it's only one API call either way
   useEffect(() => {
+    if (!selectedQuarter || selectedCourses.length === 0) {
+      return;
+    }
+
     void fetchCourseDetails();
   }, [selectedCourses]);
 
@@ -245,7 +249,7 @@ const CourseDropdown = ({
             MenuList: VirtualizedList,
           }}
           placeholder={"Search"}
-          closeMenuOnSelect={false}
+          closeMenuOnSelect={true}
           hideSelectedOptions={false}
           blurInputOnSelect={false}
           tabSelectsValue={false}
@@ -254,8 +258,8 @@ const CourseDropdown = ({
           controlShouldRenderValue={false}
           // No cache because cache retains through quarter changes
           // cacheOptions
+          isClearable={false}
           isSearchable
-          isClearable
           isMulti
           unstyled
         />

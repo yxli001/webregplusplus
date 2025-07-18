@@ -159,7 +159,8 @@ export default function Home() {
         subSectionByIdMap,
       );
 
-      if (scheds.length === 0) {
+      const includedCourses = cPreferences.filter((course) => course.included);
+      if (includedCourses.length > 0 && scheds.length === 0) {
         toast.current?.show({
           severity: "warn",
           summary: "Warning",
@@ -236,7 +237,7 @@ export default function Home() {
       <ThreePane
         left={
           <aside className="flex flex-col gap-6 p-6">
-            <CourseDropdown />
+            <CourseDropdown maxCourses={10} />
             <CourseList />
           </aside>
         }
