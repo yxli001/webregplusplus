@@ -34,7 +34,7 @@ export default function DropdownHeader({
         className,
       )}
     >
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-2 text-sm text-text-darker">
         {icon}
         {title}
       </span>
