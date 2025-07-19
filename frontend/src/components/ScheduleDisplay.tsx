@@ -76,9 +76,9 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
                 )}
               ></div>
               {/* Text content */}
-              <div className="flex flex-col items-start gap-1 leading-[1.2]">
-                <div className="font-semibold">{title}</div>
-                <span className="font-normal">
+              <div className="flex flex-col items-start gap-1 overflow-hidden whitespace-nowrap leading-[1.2]">
+                <div className="truncate font-semibold">{title}</div>
+                <span className="truncate font-normal">
                   {extendedProps.lecture}
                   {extendedProps.section} / {extendedProps.meetingType}
                 </span>
