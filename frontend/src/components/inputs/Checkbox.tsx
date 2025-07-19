@@ -39,7 +39,7 @@ const Checkbox = ({ checked, onChange, className = "" }: CheckboxProps) => {
         }
       }}
       className={twMerge(
-        "flex h-5 w-5 cursor-pointer appearance-none items-center justify-center rounded border border-border p-0.5 focus:outline-4 focus:outline-offset-4 focus:outline-primary-light",
+        "flex h-5 w-5 flex-shrink-0 cursor-pointer appearance-none items-center justify-center rounded border border-border p-0.5 focus:outline-4 focus:outline-offset-4 focus:outline-primary-light",
         checked === undefined || checked
           ? "bg-primary-light hover:bg-primary-dark"
           : "",
