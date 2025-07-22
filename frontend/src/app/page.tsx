@@ -136,6 +136,8 @@ export default function Home() {
   ) => {
     // Don't run if no courses or preferences are set
     if (cDetails.length === 0 || cPreferences.length === 0) {
+      setSchedules([]);
+      setCurrSchedule(null);
       return;
     }
 
@@ -234,8 +236,9 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log(coursePreferences);
     handleAutoScheduler(courseDetails, coursePreferences, schedulePreferences);
-  }, [coursePreferences, schedulePreferences]);
+  }, [courseDetails, coursePreferences, schedulePreferences]);
 
   return (
     <>

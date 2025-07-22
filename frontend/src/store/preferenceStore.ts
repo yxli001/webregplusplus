@@ -88,28 +88,33 @@ export const createPreferenceStore = (
     },
 
     setCourseDetails: (details) => {
-      set(() => ({
+      set((state) => ({
         courseDetails: details,
         coursePreferences: details.map((course) => {
-          // Get unique instructors for this course
-          const uniqueInstructors = Array.from(
-            new Set(course.mainSections.map((section) => section.instructor)),
-          );
+          // Don't update preferences if already exists - prevents overwriting preferences when a new course is added
+          const existingPref = state.coursePreferences.find((pref) => {
+            return pref.courseId === course.id;
+          });
 
-          // Get all subsections from sections with the first instructor
-          const firstInstructor = uniqueInstructors[0];
-          const initialSubSections = course.mainSections
-            .filter((section) => section.instructor === firstInstructor)
-            .flatMap((section) =>
-              section.subSections
-                .filter((subSection) => !subSection.isRequired)
-                .map((subSection) => `${section.letter}${subSection.section}`),
-            );
+          if (existingPref) return existingPref;
+
+          // Get all unique instructors
+          const uniqueInstructors = new Set<string>();
+          course.mainSections.forEach((section) => {
+            uniqueInstructors.add(section.instructor);
+          });
+
+          // Get all subsections
+          const initialSubSections = course.mainSections.flatMap((section) =>
+            section.subSections.map(
+              (subSection) => `${section.letter}${subSection.section}`,
+            ),
+          );
 
           return {
             included: true,
             courseId: course.id,
-            selectedInstructors: [firstInstructor],
+            selectedInstructors: Array.from(uniqueInstructors),
             selectedSubSections: initialSubSections,
           };
         }),
