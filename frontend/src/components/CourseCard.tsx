@@ -274,9 +274,16 @@ const CourseCard = ({ course }: { course: CourseWithSections }) => {
       title={`${course.subject} ${course.code}`}
       icon={<BookOpen size={16} />}
       actions={[
-        { icon: <Trash2 size={16} />, onClick: handleDeleteCourse },
         {
-          icon: pref.included ? <Eye size={16} /> : <EyeOffIcon size={16} />,
+          icon: <Trash2 size={16} color="#717680" />,
+          onClick: handleDeleteCourse,
+        },
+        {
+          icon: pref.included ? (
+            <Eye size={16} color="#717680" />
+          ) : (
+            <EyeOffIcon size={16} />
+          ),
           onClick: handleToggleIncluded,
         },
       ]}
@@ -310,6 +317,7 @@ const CourseCard = ({ course }: { course: CourseWithSections }) => {
               >
                 <ChevronUp
                   size={16}
+                  color="#717680"
                   className={twMerge(
                     "h-4 w-4 cursor-pointer transition-transform",
                     openInstructors.has(instructor) ? "rotate-180" : "",

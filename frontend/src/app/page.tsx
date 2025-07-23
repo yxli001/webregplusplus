@@ -1,12 +1,10 @@
 "use client";
-import { Calendar, Upload } from "lucide-react";
 import { Toast } from "primereact/toast";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import CourseList from "@/components/CourseList";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
-import Dropdown from "@/components/dropdown/Dropdown";
-import Pin from "@/components/icons/Pin";
+import ScheduleList from "@/components/ScheduleList";
 import ButtonGroup from "@/components/inputs/ButtonGroup";
 import CourseDropdown from "@/components/inputs/CourseDropdown";
 import ThreePane from "@/components/layouts/ThreePane";
@@ -286,18 +284,7 @@ export default function Home() {
         }
         right={
           <aside className="flex flex-col gap-6 p-6">
-            <Dropdown
-              value="sched1"
-              title="Schedule 1"
-              icon={<Calendar size={16} />}
-              actions={[
-                { icon: <Pin size={16} /> },
-                { icon: <Upload size={16} /> },
-              ]}
-              defaultOpen
-            >
-              <div>test</div>
-            </Dropdown>
+            <ScheduleList />
           </aside>
         }
       />
