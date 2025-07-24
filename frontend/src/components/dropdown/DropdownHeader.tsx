@@ -24,6 +24,7 @@ export default function DropdownHeader({
   open,
   toggleProps,
   className,
+  onClick,
   ...buttonProps
 }: DropdownHeaderProps) {
   return (
@@ -34,7 +35,10 @@ export default function DropdownHeader({
         className,
       )}
     >
-      <span className="flex items-center gap-2 text-sm text-text-darker">
+      <span
+        className="flex cursor-pointer items-center gap-2 text-sm text-text-darker"
+        onClick={onClick}
+      >
         {icon}
         {title}
       </span>

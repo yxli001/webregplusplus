@@ -6,6 +6,7 @@ export type CalSchedule = {
   borderColor: string;
   textColor: string;
 };
+
 export type CalEvent = {
   id: string;
   title: string;

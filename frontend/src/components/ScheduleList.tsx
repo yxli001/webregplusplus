@@ -7,6 +7,17 @@ import { useScheduleStore } from "@/hooks/useScheduleStore";
 
 const ScheduleList = () => {
   const schedules = useScheduleStore((state) => state.schedules);
+  const currSchedule = useScheduleStore((state) => state.currSchedule);
+  const setCurrSchedule = useScheduleStore((state) => state.setCurrSchedule);
+
+  /* Event Handlers */
+  const handleScheduleClick = (scheduleId: number) => {
+    const selectedSchedule = schedules.find((sched) => sched.id === scheduleId);
+
+    if (selectedSchedule) {
+      setCurrSchedule(selectedSchedule);
+    }
+  };
 
   return (
     <>
@@ -28,6 +39,17 @@ const ScheduleList = () => {
               { icon: <Upload size={16} color="#717680" /> },
             ]}
             defaultOpen={false}
+            style={
+              currSchedule && schedule.id === currSchedule.id
+                ? {
+                    boxShadow: `0 0 0 2px ${currSchedule?.textColor}`,
+                    borderColor: "transparent",
+                  }
+                : {}
+            }
+            onClick={() => {
+              handleScheduleClick(schedule.id);
+            }}
           >
             <div>Nothing here yet</div>
           </Dropdown>

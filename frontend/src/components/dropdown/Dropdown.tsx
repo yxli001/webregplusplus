@@ -15,6 +15,8 @@ export type DropdownProps = {
   defaultOpen?: boolean;
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
+  onClick?: () => void; // optional click handler for the header
 };
 
 export default function Dropdown({
@@ -25,6 +27,8 @@ export default function Dropdown({
   defaultOpen = false,
   children,
   className,
+  style,
+  onClick,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const collapse = useCollapse({ isExpanded: isOpen });
@@ -35,6 +39,7 @@ export default function Dropdown({
         "rounded-lg border border-border bg-white font-inter font-semibold text-[#181D27]",
         className,
       )}
+      style={style}
     >
       <DropdownHeader
         title={title}
@@ -47,6 +52,7 @@ export default function Dropdown({
             setIsOpen(!isOpen);
           },
         })}
+        onClick={onClick}
       />
 
       <div {...collapse.getCollapseProps()} className="border-t px-3 py-2">
