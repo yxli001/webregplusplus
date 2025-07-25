@@ -61,7 +61,7 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
             <div
               className={twMerge(
                 "rounded-md border px-[8px] py-[6px] text-xs",
-                // backgroundColor ? `!bg-[${backgroundColor}]` : "bg-[#e3f8ff]",
+                
                 borderColor ? `border-[${borderColor}]` : "border-[#B2DDFF]",
               )}
               style={{
