@@ -23,3 +23,5 @@ export const scheduleColors: {
     titleColor: "#3A6A2D",
   },
 ];
+
+export const maxPinnedSchedules = 2;

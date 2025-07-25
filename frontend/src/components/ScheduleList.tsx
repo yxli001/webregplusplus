@@ -6,7 +6,7 @@ import Dropdown from "./dropdown/Dropdown";
 import Pin from "./icons/Pin";
 
 import { useScheduleStore } from "@/hooks/useScheduleStore";
-import { scheduleColors } from "@/lib/constants";
+import { maxPinnedSchedules, scheduleColors } from "@/lib/constants";
 import { CalSchedule } from "@/types/calendar";
 
 type ScheduleListProps = {
@@ -53,12 +53,11 @@ const ScheduleList = ({ updateScheduleColors }: ScheduleListProps) => {
 
     const pinned = newSchedules.filter((sched) => sched.pinned);
 
-    if (pinned.length === scheduleColors.length) {
+    if (pinned.length === maxPinnedSchedules) {
       toast.current?.show({
         severity: "info",
         summary: "Info",
-        detail:
-          "You can only pin up to 2 schedules. Please unpin one before pinning another.",
+        detail: `You can only pin up to ${maxPinnedSchedules} schedules. Please unpin one before pinning another.`,
         life: 2000,
       });
 
