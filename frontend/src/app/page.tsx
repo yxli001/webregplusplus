@@ -49,26 +49,27 @@ export default function Home() {
     "calendar",
   );
 
-  // Helper functions
+  /* Helper functions */
+  // Recompute schedule colors based on pinned status
   const updateScheduleColors = useCallback(
     (schedulesToUpdate: CalSchedule[]) => {
       if (schedulesToUpdate.length > 0) {
-        const pinned = schedulesToUpdate
-          .filter((schedule) => schedule.pinned)
-          .map((schedule, index) => {
+        let pinnedColorIndex = 0;
+
+        return schedulesToUpdate.map((schedule) => {
+          if (schedule.pinned) {
+            // Assign color to pinned schedules in order
+            const colorIndex = pinnedColorIndex;
+            pinnedColorIndex++;
+
             return {
               ...schedule,
-              backgroundColor: scheduleColors[index].backgroundColor,
-              textColor: scheduleColors[index].textColor,
-              borderColor: scheduleColors[index].borderColor,
+              backgroundColor: scheduleColors[colorIndex].backgroundColor,
+              textColor: scheduleColors[colorIndex].textColor,
+              borderColor: scheduleColors[colorIndex].borderColor,
             };
-          })
-          .sort((a, b) => a.id - b.id);
-
-        const unpinned = schedulesToUpdate
-          .filter((schedule) => !schedule.pinned)
-          .sort((a, b) => a.id - b.id)
-          .map((schedule) => {
+          } else {
+            // For unpinned schedules, keep current schedule colors if it matches
             if (currSchedule && currSchedule.id === schedule.id) {
               return {
                 ...schedule,
@@ -79,9 +80,8 @@ export default function Home() {
             }
 
             return schedule;
-          });
-
-        return [...pinned, ...unpinned];
+          }
+        });
       }
 
       return schedulesToUpdate;
@@ -284,7 +284,7 @@ export default function Home() {
         }
         right={
           <aside className="flex flex-col gap-6 p-6">
-            <ScheduleList />
+            <ScheduleList updateScheduleColors={updateScheduleColors} />
           </aside>
         }
       />
