@@ -24,6 +24,7 @@ export default function DropdownHeader({
   open,
   toggleProps,
   className,
+  onClick,
   ...buttonProps
 }: DropdownHeaderProps) {
   return (
@@ -34,12 +35,15 @@ export default function DropdownHeader({
         className,
       )}
     >
-      <span className="flex items-center gap-2">
+      <span
+        className="flex cursor-pointer items-center gap-2 text-sm text-text-darker"
+        onClick={onClick}
+      >
         {icon}
         {title}
       </span>
 
-      <span className="flex items-center gap-3">
+      <span className="flex items-center gap-1">
         {actions.map((action, idx) => (
           <IconButton key={idx} icon={action.icon} onClick={action.onClick} />
         ))}
@@ -54,6 +58,7 @@ export default function DropdownHeader({
         >
           <ChevronUp
             size={16}
+            color="#717680"
             className={twMerge("h-4 w-4", open ? "rotate-180" : "")}
           />
         </button>

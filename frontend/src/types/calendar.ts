@@ -3,8 +3,10 @@ export type CalSchedule = {
   pinned: boolean;
   events: CalEvent[];
   backgroundColor: string;
+  borderColor: string;
   textColor: string;
 };
+
 export type CalEvent = {
   id: string;
   title: string;
@@ -19,5 +21,6 @@ export type CalEvent = {
     location?: string;
   };
   backgroundColor?: string;
+  borderColor?: string;
   textColor?: string;
 };

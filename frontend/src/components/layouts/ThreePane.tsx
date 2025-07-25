@@ -26,7 +26,12 @@ export default function ThreePane({
     >
       <PanelGroup direction="horizontal" className="h-full">
         {/* ───── Left column ───── */}
-        <Panel defaultSize={20} minSize={20} maxSize={35}>
+        <Panel
+          defaultSize={20}
+          minSize={20}
+          maxSize={35}
+          className="!overflow-y-auto"
+        >
           {left} {/* your search / added tab UI */}
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-l" />
@@ -36,7 +41,12 @@ export default function ThreePane({
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-r" />
         {/* ───── Right column ───── */}
-        <Panel defaultSize={25} minSize={25} maxSize={35}>
+        <Panel
+          defaultSize={25}
+          minSize={25}
+          maxSize={35}
+          className="!overflow-y-auto"
+        >
           {right}
         </Panel>
       </PanelGroup>

@@ -7,6 +7,7 @@ type CheckboxProps = {
   checked?: boolean | undefined;
   onChange?: (next: boolean) => void;
   className?: string;
+  disabled?: boolean;
 };
 
 /**
@@ -15,11 +16,20 @@ type CheckboxProps = {
  *
  * @param checked - Whether the checkbox is checked
  * @param onChange - Callback function when the checkbox is clicked
+ * @param disabled - Whether the checkbox is disabled
  * @param className - Additional class names to apply to the checkbox
+ *
  * @returns
  */
-const Checkbox = ({ checked, onChange, className = "" }: CheckboxProps) => {
+const Checkbox = ({
+  checked,
+  onChange,
+  className = "",
+  disabled = false,
+}: CheckboxProps) => {
   const handleClick = () => {
+    if (disabled) return;
+
     // if indeterminate, toggle to unchecked
     const next = checked === undefined ? false : !checked;
 
@@ -39,17 +49,18 @@ const Checkbox = ({ checked, onChange, className = "" }: CheckboxProps) => {
         }
       }}
       className={twMerge(
-        "flex h-5 w-5 cursor-pointer appearance-none items-center justify-center rounded border border-border p-0.5 focus:outline-4 focus:outline-offset-4 focus:outline-primary-light",
+        "flex h-5 w-5 flex-shrink-0 cursor-pointer appearance-none items-center justify-center rounded border border-border p-0.5 focus:outline-4 focus:outline-offset-4 focus:outline-primary-light",
         checked === undefined || checked
-          ? "bg-primary-light hover:bg-primary-dark"
+          ? "border-none bg-primary-light hover:bg-primary-dark"
           : "",
+        disabled ? "cursor-not-allowed bg-gray-100 hover:bg-gray-100" : "",
         className,
       )}
     >
       {checked === undefined ? (
-        <Minus color="white" />
+        <Minus color={disabled ? "#E9EAEB" : "white"} />
       ) : checked ? (
-        <Check color="white" />
+        <Check color={disabled ? "#E9EAEB" : "white"} />
       ) : null}
     </div>
   );

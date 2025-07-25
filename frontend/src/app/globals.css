@@ -35,7 +35,7 @@
     overflow-x: hidden;
   }
 
-  ::-webkit-scrollbar {
+  /* ::-webkit-scrollbar {
     width: 1rem;
   }
 
@@ -49,7 +49,7 @@
     background-color: var(--text-light);
     border-radius: 100vh;
     border: 0.2rem solid var(--background);
-  }
+  } */
 }
 
 .fc {

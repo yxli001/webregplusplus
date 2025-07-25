@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useEffect, useRef } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { CalEvent } from "@/types/calendar";
 
@@ -49,27 +50,35 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
         nowIndicator={false}
         allDaySlot={false}
         eventContent={(eventInfo) => {
-          const { title, extendedProps, backgroundColor, textColor } =
-            eventInfo.event;
+          const {
+            title,
+            extendedProps,
+            backgroundColor,
+            borderColor,
+            textColor,
+          } = eventInfo.event;
           return (
             <div
-              className={`flex items-center px-[4px] py-[6px] text-[0.5rem]`}
+              className={twMerge(
+                "rounded-md border px-[8px] py-[6px] text-xs",
+
+                borderColor ? `border-[${borderColor}]` : "border-[#B2DDFF]",
+              )}
               style={{
-                backgroundColor: backgroundColor ? backgroundColor : "#e3f8ff",
-                color: textColor ? textColor : "#1992d4",
+                backgroundColor: backgroundColor || "#e3f8ff",
               }}
             >
               {/* Colored left bar */}
               <div
-                className={`mr-[6px] h-full w-[2.5px] flex-shrink-0 rounded-md`}
-                style={{
-                  backgroundColor: textColor ? textColor : "#1992D4",
-                }}
+                className={twMerge(
+                  "mr-[6px] h-full w-[2.5px] flex-shrink-0 rounded-md",
+                  textColor ? `text-[${textColor}]` : "text-[#1570ef]",
+                )}
               ></div>
               {/* Text content */}
-              <div className="leading-[1.2]">
-                <div className="text-[0.6rem] font-semibold">{title}</div>
-                <span className="font-semibold">
+              <div className="flex flex-col items-start gap-1 overflow-hidden whitespace-nowrap leading-[1.2]">
+                <div className="truncate font-semibold">{title}</div>
+                <span className="truncate font-normal">
                   {extendedProps.lecture}
                   {extendedProps.section} / {extendedProps.meetingType}
                 </span>
