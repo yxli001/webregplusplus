@@ -234,7 +234,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log(coursePreferences);
     handleAutoScheduler(courseDetails, coursePreferences, schedulePreferences);
   }, [courseDetails, coursePreferences, schedulePreferences]);
 
