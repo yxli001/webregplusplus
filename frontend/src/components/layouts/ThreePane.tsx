@@ -36,7 +36,7 @@ export default function ThreePane({
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-l" />
         {/* ───── Middle canvas ───── */}
-        <Panel defaultSize={50} minSize={30}>
+        <Panel defaultSize={50} minSize={30} className="!overflow-visible">
           {center}
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-r" />

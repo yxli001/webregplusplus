@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CourseList from "@/components/CourseList";
 import ScheduleDisplay from "@/components/ScheduleDisplay";
 import ScheduleList from "@/components/ScheduleList";
-import ButtonGroup from "@/components/inputs/ButtonGroup";
+import Toolbar from "@/components/Toolbar";
 import CourseDropdown from "@/components/inputs/CourseDropdown";
 import ThreePane from "@/components/layouts/ThreePane";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
@@ -247,33 +247,8 @@ export default function Home() {
           </aside>
         }
         center={
-          <main className="flex h-full w-full flex-col items-end p-6">
-            <ButtonGroup
-              className="flex"
-              buttons={[
-                {
-                  label: "Calendar",
-                  active: activeTab === "calendar",
-                  onClick: () => {
-                    setActiveTab("calendar");
-                  },
-                },
-                {
-                  label: "Finals",
-                  active: activeTab === "finals",
-                  onClick: () => {
-                    setActiveTab("finals");
-                  },
-                },
-                {
-                  label: "List",
-                  active: activeTab === "list",
-                  onClick: () => {
-                    setActiveTab("list");
-                  },
-                },
-              ]}
-            />
+          <main className="flex h-full w-full flex-col p-6">
+            <Toolbar activeTab={activeTab} onTabChange={setActiveTab} />
             {activeTab === "calendar" && (
               <ScheduleDisplay events={getEvents()} />
             )}
