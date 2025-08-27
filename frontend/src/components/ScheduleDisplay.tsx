@@ -25,7 +25,7 @@ export default function ScheduleDisplay({ events }: ScheduleDisplayProps) {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="mx-auto h-full w-full p-4">
+    <div ref={wrapperRef} className="mx-auto mt-5 h-full w-full">
       <FullCalendar
         ref={calRef}
         viewClassNames="w-full"
