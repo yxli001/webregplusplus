@@ -36,14 +36,14 @@ export default function ThreePane({
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-l" />
         {/* ───── Middle canvas ───── */}
-        <Panel defaultSize={50} minSize={30}>
+        <Panel defaultSize={55} minSize={30}>
           {center}
         </Panel>
         <PanelResizeHandle className="group relative w-3 cursor-col-resize border-r" />
         {/* ───── Right column ───── */}
         <Panel
-          defaultSize={25}
-          minSize={25}
+          defaultSize={16}
+          minSize={16}
           maxSize={35}
           className="!overflow-y-auto"
         >

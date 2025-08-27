@@ -34,16 +34,25 @@ export default function DropdownHeader({
         "flex w-full items-center justify-between gap-2 p-3",
         className,
       )}
+      onClick={onClick}
     >
-      <span
-        className="flex cursor-pointer items-center gap-2 text-sm text-text-darker"
-        onClick={onClick}
-      >
+      <span className="flex cursor-pointer items-center gap-2 text-sm text-text-darker">
         {icon}
         {title}
       </span>
 
-      <span className="flex items-center gap-1">
+      <span
+        className="flex items-center gap-1"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+        }}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+        }}
+      >
         {actions.map((action, idx) => (
           <IconButton key={idx} icon={action.icon} onClick={action.onClick} />
         ))}
@@ -59,7 +68,10 @@ export default function DropdownHeader({
           <ChevronUp
             size={16}
             color="#717680"
-            className={twMerge("h-4 w-4", open ? "rotate-180" : "")}
+            className={twMerge(
+              "h-4 w-4 transition-transform",
+              open ? "rotate-180" : "",
+            )}
           />
         </button>
       </span>

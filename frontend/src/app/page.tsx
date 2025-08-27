@@ -202,6 +202,7 @@ export default function Home() {
               title,
               startTime: entry.startTime,
               endTime: entry.endTime,
+              isRequired: isMain ? true : entry.isRequired,
               daysOfWeek: convertDaysToNumbers(entry.days),
               extendedProps: {
                 lecture: isMain ? entry.letter : mainSection?.letter,

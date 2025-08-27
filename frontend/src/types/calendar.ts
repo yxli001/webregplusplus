@@ -12,6 +12,7 @@ export type CalEvent = {
   title: string;
   startTime: string;
   endTime: string;
+  isRequired?: boolean;
   daysOfWeek?: number[];
   extendedProps?: {
     lecture?: string;
