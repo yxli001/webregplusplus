@@ -14,42 +14,38 @@ Try it live: [https://webregplusplus.tech](https://webregplusplus.tech)
 
 ## Tech Stack
 
-- Frontend: Next.js, TypeScript, TailwindCSS
-- Backend: Express.js, TypeScript, PostgreSQL
-- Deployment: Vercel (frontend)
-
-## Project Structure
-
-webregplusplus/
-
-├── frontend/ # Next.js frontend
-
-├── backend/ # Express + TypeScript backend
-
-├── .husky/ # Git hooks
-
-├── .secret-scan/ # Secret scan rules
-
-└── README.md
+- Frontend: [Next.js](https://nextjs.org/docs), [TailwindCSS](https://tailwindcss.com/docs/styling-with-utility-classes), [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction)
+- Backend: [Node.js](https://nodejs.org/en), [Express.js](https://expressjs.com/), [PostgreSQL](https://www.postgresql.org/)
+- Deployment: [Vercel](https://vercel.com/)
+- Package Manager: [pnpm](https://pnpm.io/)
 
 ## Getting Started
 
+### Tool installation
+
+Make sure you have the following installed and configured:
+
+- [Node.js](https://nodejs.org/en/download/) (>= 22.x)
+- [PostgreSQL](https://www.postgresql.org/download/) (17)
+- [pnpm](https://pnpm.io/) (10.12.1)
+
 ### Clone the repository
 
-git clone https://github.com/yxli001/webregplusplus.git
+- `git clone https://github.com/yxli001/webregplusplus.git`
 
-`cd webregplusplus`
+- `cd webregplusplus`
 
 ### Install dependencies
 
 _Run in root directory_
-`pnpm install`
+
+- `pnpm install`
 
 ### Environment variables
 
 **Backend**
 
-Configure a local PostgreSQL instance and put the following fields in the backend `.env` file:
+Configure a local PostgreSQL instance and put the following fields in a `.env.development` file in the backend root directory:
 
 - `PORT`
 - `FRONTEND_ORIGIN`
@@ -71,48 +67,20 @@ Configure a local PostgreSQL instance and put the following fields in the backen
 
 **Frontend**
 
+- Create a `.env` files in the frontend directory (NOT inside `src`).
+  - Set `NEXT_PUBLIC_BACKEND_HOST` to the origin of your backend server. (e.g. `http://localhost:5000`)
 - `pnpm run dev`
 
 The app should now be running on `http://localhost:3000`.
 
-Note: The frontend application runs slowly in dev mode. For a more optimized program, use pnpm run build followed by pnpm start
+Note: The frontend application runs slowly in dev mode. For a more production optimized build, use `pnpm run build` followed by `pnpm start`.
 
-### API Endpoints:
+### Running lint checkers
 
-- GET `/api/course`
-  - No params
-  - Returns list of all courses, only containing the course subject and code
-  - Intended to be used to generate the course dropdown list
-- GET `/api/course/details?courses=[courses]`
-  - Returns course full detail for the list of courses specified in the `courses` param
-  - `courses` param should be a string of comma separated course full names joined by a `+`, e.g. `"CSE+100,CSE+101,MATH+183"`
+To ensure code quality and consistency, pre-commit hooks are configured to automatically run lint checks. These can also be manually run via the following commands:
 
-Steps to test:
-
-- First configure a local PostgreSQL instance and put the following fields in the backend `.env.development` file
-  - `PORT`
-  - `FRONTEND_ORIGIN`
-  - `POSTGRES_HOST`
-  - `POSTGRES_PORT`
-  - `POSTGRES_USER`
-  - `POSTGRES_PASSWORD`
-  - `POSTGRES_DB`
-
-## Algorithm Overview
-
-The scheduling logic in `scheduler.ts` works by:
-
-- Generating 5 random schedules initially
-- Selecting a random lecture or subsection to mutate
-- Attempting replacement through `mutateMainSection` or `mutateSubSection`
-- Accepting replacements only if they improve schedule fitness or pass a probabilistic check using Monte Carlo acceptance
-- Caching evaluated schedules to avoid recomputation
-
-This results in an optimized schedule that balances user preferences and constraints.
-
-## Screenshots
-
-_Screenshots will be added soon._
+- `pnpm run lint-check`: Runs ESLint and Prettier checks and reports issues without editing files.
+- `pnpm run lint-fix`: Automatically fixes simple linting and formatting issues.
 
 ## License
 
