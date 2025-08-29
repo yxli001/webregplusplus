@@ -3,6 +3,10 @@ import tseslint from "typescript-eslint";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import prettier from "eslint-config-prettier";
 import tsImport from "eslint-plugin-import";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default [
   js.configs.recommended,
@@ -12,6 +16,7 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
+        tsconfigRootDir: __dirname,
         project: "./tsconfig.json",
         sourceType: "module",
       },
