@@ -250,7 +250,7 @@ export default function Home() {
           <main className="flex h-full w-full flex-col p-6">
             <Toolbar activeTab={activeTab} onTabChange={setActiveTab} />
             {activeTab === "calendar" && (
-              <ScheduleDisplay events={getEvents()} />
+              <ScheduleDisplay events={getEvents()} selectable />
             )}
             {activeTab === "finals" && <ScheduleDisplay events={getEvents()} />}
             {activeTab === "list" && <ScheduleDisplay events={[]} />}

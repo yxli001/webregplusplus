@@ -39,43 +39,42 @@ function isValidEntry(
     return true; // Allow conflict
   }
   const excludedTimeSlots = preferences.excludedTimeSlots;
+  const newEntryDays = convertDaysToNumbers(newEntry.days);
   for (const slot of excludedTimeSlots) {
-    for (let j = 0; j < slot.days.length; j++) {
-      if (newEntry.days.includes(slot.days[j])) {
-        const excludedStartIdx = timeToIndex(
-          slot.startTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const excludedEndIdx = timeToIndex(
-          slot.endTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const newStartIdx = timeToIndex(
-          newEntry.startTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        const newEndIdx = timeToIndex(
-          newEntry.endTime,
-          START_TIME,
-          TIME_INTERVAL,
-        );
-        // if (
-        //   (newStartIdx >= excludedStartIdx && newStartIdx < excludedEndIdx) || // Starts inside another class
-        //   (excludedStartIdx >= newStartIdx && excludedStartIdx < newEndIdx) || // Another class starts inside new class
-        //   (newStartIdx === excludedStartIdx && newEndIdx === excludedEndIdx) // Complete overlap
-        // ) {
-        //   return false; // Conflict found
-        // }
-        // overlap check
-        if (
-          Math.max(excludedStartIdx, newStartIdx) <
-          Math.min(excludedEndIdx, newEndIdx)
-        ) {
-          return false; // Conflict found
-        }
+    if (newEntryDays.includes(slot.day)) {
+      const excludedStartIdx = timeToIndex(
+        slot.startTime,
+        START_TIME,
+        TIME_INTERVAL,
+      );
+      const excludedEndIdx = timeToIndex(
+        slot.endTime,
+        START_TIME,
+        TIME_INTERVAL,
+      );
+      const newStartIdx = timeToIndex(
+        newEntry.startTime,
+        START_TIME,
+        TIME_INTERVAL,
+      );
+      const newEndIdx = timeToIndex(
+        newEntry.endTime,
+        START_TIME,
+        TIME_INTERVAL,
+      );
+      // if (
+      //   (newStartIdx >= excludedStartIdx && newStartIdx < excludedEndIdx) || // Starts inside another class
+      //   (excludedStartIdx >= newStartIdx && excludedStartIdx < newEndIdx) || // Another class starts inside new class
+      //   (newStartIdx === excludedStartIdx && newEndIdx === excludedEndIdx) // Complete overlap
+      // ) {
+      //   return false; // Conflict found
+      // }
+      // overlap check
+      if (
+        Math.max(excludedStartIdx, newStartIdx) <
+        Math.min(excludedEndIdx, newEndIdx)
+      ) {
+        return false; // Conflict found
       }
     }
   }
@@ -351,13 +350,10 @@ export function generateRandomSchedule(
   ); // Track occupied time slots
   const excludedTimeSlots = preferences.excludedTimeSlots;
   for (const slot of excludedTimeSlots) {
-    const days = convertDaysToNumbers(slot.days);
-    for (const day of days) {
-      const startIdx = timeToIndex(slot.startTime, START_TIME, TIME_INTERVAL);
-      const endIdx = timeToIndex(slot.endTime, START_TIME, TIME_INTERVAL);
-      for (let i = startIdx; i < endIdx; i++) {
-        timeGrid[day][i] = true;
-      }
+    const startIdx = timeToIndex(slot.startTime, START_TIME, TIME_INTERVAL);
+    const endIdx = timeToIndex(slot.endTime, START_TIME, TIME_INTERVAL);
+    for (let i = startIdx; i < endIdx; i++) {
+      timeGrid[slot.day][i] = true;
     }
   }
 
