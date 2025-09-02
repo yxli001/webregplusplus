@@ -124,7 +124,9 @@ export default function ScheduleDisplay({
                 "relative flex h-full rounded-md border px-[5px] py-[5px] text-xs",
                 borderColor ? `border-[${borderColor}]` : "border-[#B2DDFF]",
                 textColor ? `text-[${textColor}]` : "text-[#B2DDFF]",
-                extendedProps.deletable ? "hover:cursor-pointer" : "",
+                extendedProps.deletable
+                  ? "transition-all hover:cursor-pointer hover:ring-2 hover:ring-red-400"
+                  : "",
               )}
               style={{
                 backgroundColor: backgroundColor || "#e3f8ff",
