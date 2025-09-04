@@ -19,7 +19,10 @@ export type CalEvent = {
     meetingType?: string;
     instructor?: string;
     location?: string;
-  };
+  } & (
+    | { deletable: true; onDelete: (id: string) => void }
+    | { deletable?: false; onDelete?: never }
+  );
   backgroundColor?: string;
   borderColor?: string;
   textColor?: string;

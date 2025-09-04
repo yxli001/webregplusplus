@@ -5,7 +5,7 @@ import { SpreadPreference } from "@/types/preferences";
 
 type TimeSlot = {
   id: string;
-  days: string;
+  day: number;
   startTime: string;
   endTime: string;
 };
@@ -45,6 +45,8 @@ export type PreferenceActions = {
     update: Partial<CoursePreferences>,
   ) => void;
   updateSchedulePreferences: (update: Partial<SchedulePreferences>) => void;
+  addExcludedTimeSlot: (slot: TimeSlot) => void;
+  removeExcludedTimeSlot: (id: string) => void;
 };
 
 export type PreferenceStore = PreferenceState & PreferenceActions;
@@ -153,6 +155,29 @@ export const createPreferenceStore = (
                 id: `slot-${Date.now()}-${index}`,
               }))
             : state.schedulePreferences.excludedTimeSlots,
+        },
+      }));
+    },
+
+    addExcludedTimeSlot: (slot) => {
+      set((state) => ({
+        schedulePreferences: {
+          ...state.schedulePreferences,
+          excludedTimeSlots: [
+            ...state.schedulePreferences.excludedTimeSlots,
+            slot,
+          ],
+        },
+      }));
+    },
+
+    removeExcludedTimeSlot: (id) => {
+      set((state) => ({
+        schedulePreferences: {
+          ...state.schedulePreferences,
+          excludedTimeSlots: state.schedulePreferences.excludedTimeSlots.filter(
+            (slot) => slot.id !== id,
+          ),
         },
       }));
     },
