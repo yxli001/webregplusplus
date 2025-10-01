@@ -8,6 +8,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { useEffect, useMemo, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
+import PreferredDayStar from "@/components/inputs/Star";
 import { usePreferenceStore } from "@/hooks/usePreferenceStore";
 import { CalEvent } from "@/types/calendar";
 
@@ -78,6 +79,14 @@ export default function ScheduleDisplay({
     );
   }, [excludedTimeslots]);
 
+  const TOKENS = ["M", "Tu", "W", "Th", "F"];
+  const preferredDays = usePreferenceStore(
+    (s) => s.schedulePreferences.preferredDays ?? [],
+  );
+  const updateSchedulePreferences = usePreferenceStore(
+    (s) => s.updateSchedulePreferences,
+  );
+
   return (
     <div ref={wrapperRef} className="mx-auto mt-5 h-full w-full">
       <FullCalendar
@@ -87,13 +96,36 @@ export default function ScheduleDisplay({
         slotLabelClassNames="uppercase !px-[0.5rem]"
         plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
-        firstDay={1} // 0 = Sunday, 1 = Monday
+        firstDay={1} // 0 = Sun
         slotLabelFormat={{
           hour: "numeric",
           hour12: true,
         }}
         dayHeaderFormat={{ weekday: "short" }}
-        hiddenDays={[0, 6]} // Hide Sunday and Saturday
+        dayHeaderContent={(arg) => {
+          const js = arg.date.getDay();
+          if (js < 1 || js > 5) return arg.text;
+          const idx = js - 1;
+          const token = TOKENS[idx];
+          const isOn = preferredDays.includes(token);
+
+          return (
+            <span className="group inline-flex items-center gap-1">
+              <PreferredDayStar
+                active={isOn}
+                onClick={() => {
+                  const next = isOn
+                    ? preferredDays.filter((d) => d !== token)
+                    : [...preferredDays, token];
+                  updateSchedulePreferences({ preferredDays: next });
+                }}
+                className="opacity-0 transition-opacity group-hover:opacity-100"
+              />
+              <span className="inline-flex items-center">{arg.text}</span>
+            </span>
+          );
+        }}
+        hiddenDays={[0, 6]} // Hide Sunday/ Saturday
         headerToolbar={false}
         events={[...events, ...excludedEvents]}
         selectable={selectable}
@@ -134,12 +166,10 @@ export default function ScheduleDisplay({
               title={extendedProps.deletable ? "Click to delete" : undefined}
               onClick={() => {
                 if (extendedProps.deletable) {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                   extendedProps.onDelete(eventInfo.event.id);
                 }
               }}
             >
-              {/* Text content */}
               <div className="flex flex-col items-start gap-1 overflow-hidden whitespace-nowrap leading-[1.2]">
                 <div className="truncate font-semibold">{title}</div>
                 {extendedProps.lecture && (
