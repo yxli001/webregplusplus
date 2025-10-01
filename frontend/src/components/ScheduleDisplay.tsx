@@ -166,6 +166,7 @@ export default function ScheduleDisplay({
               title={extendedProps.deletable ? "Click to delete" : undefined}
               onClick={() => {
                 if (extendedProps.deletable) {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                   extendedProps.onDelete(eventInfo.event.id);
                 }
               }}
