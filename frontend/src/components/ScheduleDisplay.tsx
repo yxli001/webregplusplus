@@ -96,7 +96,7 @@ export default function ScheduleDisplay({
         slotLabelClassNames="uppercase !px-[0.5rem]"
         plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
-        firstDay={1} // 0 = Sun
+        firstDay={1} // 0 = Sunday, 1 = Monday
         slotLabelFormat={{
           hour: "numeric",
           hour12: true,
@@ -125,7 +125,7 @@ export default function ScheduleDisplay({
             </span>
           );
         }}
-        hiddenDays={[0, 6]} // Hide Sunday/ Saturday
+        hiddenDays={[0, 6]} // Hide Sunday and Saturday
         headerToolbar={false}
         events={[...events, ...excludedEvents]}
         selectable={selectable}
