@@ -20,7 +20,13 @@ export default function PreferredDayStar({
       }}
       aria-label="Toggle preferred day"
       className={`${className ?? ""} star-button ${active ? "opacity-100" : ""}`}
-      style={{ background: "transparent", border: "none", padding: 0, marginRight: 2, cursor: "pointer" }}
+      style={{
+        background: "transparent",
+        border: "none",
+        padding: 0,
+        marginRight: 2,
+        cursor: "pointer",
+      }}
     >
       <Star size={14} stroke={YELLOW} fill={active ? YELLOW : "none"} />
     </button>
